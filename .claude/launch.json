@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vite",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\npx.cmd",
+      "runtimeArgs": ["vite", "--host", "127.0.0.1", "--port", "5173"],
+      "port": 5173,
+      "env": {
+        "PATH": "C:\\Program Files\\nodejs;%PATH%"
+      }
+    }
+  ]
+}
