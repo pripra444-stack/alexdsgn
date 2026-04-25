@@ -14,7 +14,7 @@ let _db = null;
 export function getDb() {
   if (!_db) {
     _db = new DatabaseSync(join(dataDir, "submissions.db"));
-    _db.pragma("journal_mode = WAL");
+    _db.exec("PRAGMA journal_mode = WAL;");
     _db.exec(`
       CREATE TABLE IF NOT EXISTS submissions (
         id          INTEGER PRIMARY KEY AUTOINCREMENT,
