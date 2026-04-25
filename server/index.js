@@ -6,10 +6,11 @@ import { getDb } from "./db.js";
 import { createBot, notifyAdmin } from "./bot.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const isProd = process.env.NODE_ENV === "production";
 
-// ── Load .env ────────────────────────────────────────────────────────────
+// ── Load .env (только локально, на Railway env vars приходят через платформу)
 const envPath = join(__dirname, "..", ".env");
-if (existsSync(envPath)) {
+if (!isProd && existsSync(envPath)) {
   readFileSync(envPath, "utf-8")
     .split("\n")
     .forEach((line) => {
@@ -32,13 +33,18 @@ const bot = createBot(process.env.TELEGRAM_TOKEN);
 const app = express();
 app.use(express.json());
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-  next();
-});
+// CORS нужен только в dev (в prod Express сам отдаёт фронтенд)
+if (!isProd) {
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+  });
+}
+
+// ── API routes ────────────────────────────────────────────────────────────
 
 // POST /api/submissions — сохранить заявку + уведомить бота
 app.post("/api/submissions", (req, res) => {
@@ -60,8 +66,6 @@ app.post("/api/submissions", (req, res) => {
       .get(result.lastInsertRowid);
 
     console.log(`[DB] Заявка #${saved.id} — ${saved.name ?? "?"} ${saved.contact ?? ""}`);
-
-    // Async: отправить в Telegram (не блокируем ответ)
     notifyAdmin(bot, saved).catch(() => {});
 
     res.json({ ok: true, id: saved.id });
@@ -83,7 +87,22 @@ app.delete("/api/submissions/:id", (req, res) => {
   res.json({ ok: true });
 });
 
-const PORT = process.env.API_PORT ?? 3001;
+// ── Serve built frontend in production ────────────────────────────────────
+if (isProd) {
+  const distPath = join(__dirname, "..", "dist");
+  app.use(express.static(distPath));
+  // SPA fallback — все не-API маршруты отдают index.html
+  app.get("*", (req, res) => {
+    if (req.path.startsWith("/api")) {
+      return res.status(404).json({ error: "Not found" });
+    }
+    res.sendFile(join(distPath, "index.html"));
+  });
+}
+
+// ── Listen ────────────────────────────────────────────────────────────────
+// Railway инжектит PORT автоматически; локально — 3001
+const PORT = process.env.PORT ?? process.env.API_PORT ?? 3001;
 app.listen(PORT, () =>
-  console.log(`\n  API:   http://localhost:${PORT}\n  DB:    data/submissions.db\n`)
+  console.log(`\n  Сервер: http://localhost:${PORT}  [${isProd ? "production" : "dev"}]\n  DB:     ${process.env.DATA_DIR ?? "data"}/submissions.db\n`)
 );

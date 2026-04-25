@@ -3,12 +3,15 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
-    "dev": "concurrently -k -n WEB,API -c cyan,magenta \"vite\" \"node --experimental-sqlite server/index.js\"",
+    "dev": "concurrently -k -n WEB,API -c cyan,magenta \"vite\" \"node server/index.js\"",
     "dev:web": "vite",
-    "dev:api": "node --experimental-sqlite server/index.js",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "dev:api": "node server/index.js",
+    "build": "vite build",
+    "start": "node --experimental-sqlite server/index.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.2",

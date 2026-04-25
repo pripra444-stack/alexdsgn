@@ -4,7 +4,10 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dataDir = join(__dirname, "..", "data");
+// DATA_DIR задаётся на Railway через Volume; локально — ./data
+const dataDir = process.env.DATA_DIR
+  ? process.env.DATA_DIR
+  : join(__dirname, "..", "data");
 mkdirSync(dataDir, { recursive: true });
 
 const ADMIN_FILE = join(dataDir, "admin.json");
