@@ -56,8 +56,20 @@ const QUESTIONS: Q[] = [
   {
     id: "contact",
     label: "Оставь контакт — куда написать?",
-    hint: "@username в Telegram",
-    validate: (v) => (v.trim().length < 2 ? "Укажи контакт" : null),
+    hint: "Только Telegram: @username",
+    validate: (v) => {
+      const val = v.trim();
+      // Reject phone numbers
+      if (/^\+?[\d\s\-()]{6,}$/.test(val))
+        return "Телефон не принимаем — введи Telegram @username";
+      // Must start with @
+      if (!val.startsWith("@"))
+        return "Начни с @ — например @username";
+      // Valid Telegram username: @[a-zA-Z0-9_]{5,32}
+      if (!/^@[a-zA-Z0-9_]{5,32}$/.test(val))
+        return "@username: 5–32 символа, только буквы, цифры и _";
+      return null;
+    },
   },
 ];
 
