@@ -7,6 +7,8 @@ import "./index.css";
 // Code-split routes — each page loads as a separate chunk
 const Landing = lazy(() => import("./pages/Landing"));
 const Questionnaire = lazy(() => import("./pages/Questionnaire"));
+const Oferta = lazy(() => import("./pages/Oferta"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -26,6 +28,22 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             element={
               <Suspense fallback={null}>
                 <Questionnaire />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/oferta"
+            element={
+              <Suspense fallback={null}>
+                <Oferta />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <Suspense fallback={null}>
+                <Privacy />
               </Suspense>
             }
           />

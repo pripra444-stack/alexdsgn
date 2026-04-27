@@ -853,8 +853,8 @@ function Footer() {
           <a href="https://t.me/maxvibecode" target="_blank" rel="noopener" className="hover:text-zinc-200 transition">
             Telegram
           </a>
-          <a href="#" className="hover:text-zinc-200 transition">Политика</a>
-          <a href="#" className="hover:text-zinc-200 transition">Оферта</a>
+          <Link to="/privacy" className="hover:text-zinc-200 transition">Политика</Link>
+          <Link to="/oferta" className="hover:text-zinc-200 transition">Оферта</Link>
         </div>
       </div>
     </footer>
