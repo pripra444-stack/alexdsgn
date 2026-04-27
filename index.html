@@ -3,8 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- ── Favicon ─────────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/claude-code-logo.svg" />
 
     <!-- ── SEO ─────────────────────────────────────────────────────── -->
@@ -15,75 +13,93 @@
     <link rel="canonical" href="https://maxvibelandingpage-production.up.railway.app/" />
     <meta name="robots" content="index, follow" />
 
-    <!-- ── Open Graph ───────────────────────────────────────────────── -->
+    <!-- ── Open Graph ─────────────────────────────────────────────── -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://maxvibelandingpage-production.up.railway.app/" />
     <meta property="og:title" content="Вайбкодинг с нейросетями — выйди на 100 000 ₽/мес на фрилансе" />
-    <meta property="og:description" content="6-недельная программа: без опыта в коде — к реальным заказам через Claude Code и Cursor. 47 учеников, средний доход 82 000 ₽/мес." />
-    <meta property="og:image" content="https://maxvibelandingpage-production.up.railway.app/og-image.png" />
+    <meta property="og:description" content="6-недельная программа: без опыта в коде — к реальным заказам. 47 учеников, средний доход 82 000 ₽/мес." />
     <meta property="og:locale" content="ru_RU" />
 
-    <!-- ── Twitter Card ─────────────────────────────────────────────── -->
+    <!-- ── Twitter Card ───────────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Вайбкодинг с нейросетями — выйди на 100 000 ₽/мес на фрилансе" />
+    <meta name="twitter:title" content="Вайбкодинг с нейросетями — выйди на 100 000 ₽/мес" />
     <meta name="twitter:description" content="6-недельная программа без опыта в коде. 47 учеников. Средний доход 82к/мес." />
-    <meta name="twitter:image" content="https://maxvibelandingpage-production.up.railway.app/og-image.png" />
 
-    <!-- ── Structured data (Course) ─────────────────────────────────── -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Course",
-      "name": "Вайбкодинг с нейросетями: от нуля до 100 000 ₽/мес",
-      "description": "Пошаговая 6-недельная программа: научись зарабатывать на фрилансе с помощью Claude Code и Cursor без опыта в программировании.",
-      "provider": {
-        "@type": "Person",
-        "name": "Максим",
-        "sameAs": "https://t.me/maxvibecode"
-      },
-      "courseMode": "online",
-      "inLanguage": "ru",
-      "numberOfCredits": "6",
-      "offers": {
-        "@type": "Offer",
-        "price": "29900",
-        "priceCurrency": "RUB",
-        "availability": "https://schema.org/LimitedAvailability",
-        "validFrom": "2026-04-01"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "47",
-        "bestRating": "5"
-      }
-    }
-    </script>
+    <!-- ── JSON-LD ─────────────────────────────────────────────────── -->
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Course","name":"Вайбкодинг с нейросетями: от нуля до 100 000 ₽/мес","description":"Пошаговая 6-недельная программа: научись зарабатывать на фрилансе с помощью Claude Code и Cursor.","provider":{"@type":"Person","name":"Максим","sameAs":"https://t.me/maxvibecode"},"courseMode":"online","inLanguage":"ru","offers":{"@type":"Offer","price":"29900","priceCurrency":"RUB","availability":"https://schema.org/LimitedAvailability"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"47","bestRating":"5"}}</script>
 
-    <!-- ── Fonts: preconnect + non-blocking load ─────────────────────
-         media="print" → loads without blocking render → onload switches to "all"
-         Saves ~2 seconds of render-blocking time.
-    ──────────────────────────────────────────────────────────────── -->
+    <!-- ── Critical CSS (renders before JS, ensures no FOUC) ─────── -->
+    <style>
+      *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+      html{background:#0b0b0c;color-scheme:dark;scroll-behavior:smooth}
+      body{background:#0b0b0c;color:#e4e4e7;font-family:Geist,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+      #sh{min-height:100dvh;background:#0b0b0c}
+      #sh-nav{height:64px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;backdrop-filter:blur(20px);background:rgba(11,11,12,.7);z-index:30}
+      #sh-logo{display:flex;align-items:center;gap:10px;font-weight:500;letter-spacing:-.01em;font-size:15px}
+      #sh-logo svg{color:#D97757}
+      #sh-cta-nav{background:#D97757;color:#fff;border:none;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block}
+      #sh-hero{max-width:1200px;margin:0 auto;padding:80px 20px 80px}
+      #sh-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(217,119,87,.3);background:rgba(217,119,87,.05);border-radius:999px;padding:6px 12px;font-size:12px;color:#D97757;margin-bottom:28px}
+      #sh-dot{width:8px;height:8px;border-radius:50%;background:#D97757;animation:ping 1.5s ease-in-out infinite}
+      @keyframes ping{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+      #sh-h1{font-size:clamp(40px,6.5vw,84px);line-height:.97;letter-spacing:-.04em;font-weight:500;max-width:14ch}
+      .sh-accent{color:#D97757}
+      .sh-muted{color:#71717a}
+      #sh-sub{font-size:clamp(16px,1.4vw,20px);color:#71717a;max-width:58ch;line-height:1.65;margin-top:28px}
+      #sh-sub strong{color:#e4e4e7}
+      #sh-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+      #sh-btn-primary{background:#D97757;color:#fff;border-radius:999px;padding:14px 24px;font-size:15px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 10px 40px -10px rgba(217,119,87,.6)}
+      #sh-btn-secondary{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.02);color:#e4e4e7;border-radius:999px;padding:14px 24px;font-size:15px;text-decoration:none}
+      #sh-note{margin-top:14px;font-size:13px;color:#52525b}
+    </style>
+
+    <!-- ── Fonts: non-blocking (saves ~2s render-blocking time) ──── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://images.unsplash.com" />
-
-    <!-- Only the weights we actually use: 400, 500, 700 -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400&display=swap"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400&display=swap"
-      />
-    </noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400&display=swap" /></noscript>
   </head>
   <body>
-    <div id="root"></div>
+    <!--
+      Static hero — shown INSTANTLY before React loads.
+      React replaces #root content when JS executes → seamless handoff.
+      This makes FCP/LCP fast even on slow mobile connections.
+    -->
+    <div id="root">
+      <div id="sh">
+        <nav id="sh-nav">
+          <div id="sh-logo">
+            <svg width="22" height="22" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">
+              <path d="M32 4 L37.2 25.8 L59 32 L37.2 38.2 L32 60 L26.8 38.2 L5 32 L26.8 25.8 Z"/>
+            </svg>
+            Макс · Вайбкодинг
+          </div>
+          <a id="sh-cta-nav" href="/anketa">Записаться</a>
+        </nav>
+        <div id="sh-hero">
+          <div id="sh-badge">
+            <span id="sh-dot"></span>
+            Набор на поток — апрель 2026
+          </div>
+          <h1 id="sh-h1">
+            Научись <span class="sh-accent">вайбкодить</span><br>
+            с нейросетями<br>
+            <span class="sh-muted">и взять первые заказы.</span>
+          </h1>
+          <p id="sh-sub">
+            Пошаговая программа: без бэкграунда в программировании — на
+            <strong>100 000 ₽/мес</strong> на фрилансе за счёт Claude Code, Cursor и правильной системы поиска клиентов.
+          </p>
+          <div id="sh-btns">
+            <a id="sh-btn-primary" href="/anketa">Заполнить анкету — бесплатно →</a>
+            <a id="sh-btn-secondary" href="#program">Смотреть программу</a>
+          </div>
+          <p id="sh-note">~2 минуты · без оплаты · я лично отвечу каждому</p>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
