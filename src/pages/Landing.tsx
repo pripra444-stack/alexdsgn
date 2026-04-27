@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   ArrowUpRight,
   Sparkles,
@@ -96,7 +96,7 @@ function Nav() {
 function Hero() {
   return (
     <section className="relative max-w-[1200px] mx-auto px-5 md:px-8 pt-20 md:pt-28 pb-16 md:pb-24">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -107,11 +107,11 @@ function Hero() {
           <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
         </span>
         Набор на поток — апрель 2026 · осталось 7 мест
-      </motion.div>
+      </m.div>
 
       <div className="mt-7 grid md:grid-cols-12 gap-10 items-end">
         <div className="md:col-span-8">
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.05 }}
@@ -121,7 +121,7 @@ function Hero() {
             <span className="relative inline-block">
               <span className="text-accent">вайбкодить</span>
               <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 300 12" fill="none">
-                <motion.path
+                <m.path
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
@@ -136,9 +136,9 @@ function Hero() {
             <br />
             с нейросетями <br className="hidden md:block" />
             <span className="text-zinc-400">и взять первые заказы.</span>
-          </motion.h1>
+          </m.h1>
 
-          <motion.p
+          <m.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -147,9 +147,9 @@ function Hero() {
             Пошаговая программа: без бэкграунда в программировании — на{" "}
             <span className="text-white font-medium">100 000 ₽/мес</span> на фрилансе
             за счёт Claude Code, Cursor и правильной системы поиска клиентов.
-          </motion.p>
+          </m.p>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
@@ -168,19 +168,19 @@ function Hero() {
             >
               Смотреть программу
             </a>
-          </motion.div>
+          </m.div>
 
-          <motion.p
+          <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
             className="mt-4 text-sm text-zinc-600"
           >
             ~2 минуты · без оплаты · я лично отвечу каждому
-          </motion.p>
+          </m.p>
         </div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.35 }}
@@ -200,17 +200,17 @@ function Hero() {
               <p className="text-accent/90">✦ Reading requirements...</p>
               <p className="text-zinc-300">→ создаю компоненты, настраиваю Tailwind</p>
               <p className="text-zinc-300">→ деплою на Vercel</p>
-              <motion.p
+              <m.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 1, 1, 0] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 0.5 }}
                 className="text-emerald-400"
               >
                 ✓ готово за 38 минут · +15 000 ₽
-              </motion.p>
+              </m.p>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );
@@ -228,7 +228,7 @@ function SocialProofStrip() {
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-5">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-xl overflow-hidden">
           {stats.map((s) => (
-            <motion.div
+            <m.div
               key={s.label}
               {...fadeUp}
               className="bg-ink-950/80 px-6 py-5 flex items-center gap-4"
@@ -238,7 +238,7 @@ function SocialProofStrip() {
                 <p className="text-xl font-medium tracking-tight">{s.value}</p>
                 <p className="text-xs text-zinc-500 mt-0.5 leading-snug">{s.label}</p>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -276,7 +276,7 @@ function About() {
   return (
     <section id="about" className="max-w-[1200px] mx-auto px-5 md:px-8 py-24 md:py-32">
       <div className="grid md:grid-cols-12 gap-10 md:gap-16">
-        <motion.div {...fadeUp} className="md:col-span-5">
+        <m.div {...fadeUp} className="md:col-span-5">
           <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/10">
             <img
               src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=900&q=80"
@@ -289,9 +289,9 @@ function About() {
               <p className="mt-1 text-2xl font-medium">Максим</p>
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
-        <motion.div {...fadeUp} className="md:col-span-7">
+        <m.div {...fadeUp} className="md:col-span-7">
           <p className="text-sm uppercase tracking-[0.2em] text-accent">обо мне</p>
           <h2 className="mt-4 text-3xl md:text-5xl tracking-[-0.03em] leading-[1.05] font-medium">
             Я не кодил{" "}
@@ -323,7 +323,7 @@ function About() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );
@@ -355,18 +355,18 @@ function WhyBlock() {
   return (
     <section className="relative">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-20 md:py-28 border-t border-white/5">
-        <motion.div {...fadeUp} className="max-w-[60ch]">
+        <m.div {...fadeUp} className="max-w-[60ch]">
           <p className="text-sm uppercase tracking-[0.2em] text-accent">зачем это</p>
           <h2 className="mt-4 text-3xl md:text-5xl tracking-[-0.03em] leading-[1.05] font-medium">
             Не ещё один курс по Python.
             <br />
             <span className="text-zinc-500">Система под реальные деньги на фрилансе.</span>
           </h2>
-        </motion.div>
+        </m.div>
 
         <div className="mt-14 grid md:grid-cols-2 gap-4">
           {cards.map((c, i) => (
-            <motion.div
+            <m.div
               key={c.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -379,7 +379,7 @@ function WhyBlock() {
               </div>
               <h3 className="mt-5 text-xl font-medium tracking-tight">{c.title}</h3>
               <p className="mt-3 text-[15px] text-zinc-400 leading-relaxed">{c.body}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -404,15 +404,15 @@ function ForWhom() {
   return (
     <section className="relative">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-20 md:py-28 border-t border-white/5">
-        <motion.div {...fadeUp}>
+        <m.div {...fadeUp}>
           <p className="text-sm uppercase tracking-[0.2em] text-accent">для кого</p>
           <h2 className="mt-4 text-3xl md:text-5xl tracking-[-0.03em] leading-[1.05] font-medium max-w-[26ch]">
             Кому подойдёт этот курс?
           </h2>
-        </motion.div>
+        </m.div>
 
         <div className="mt-14 grid md:grid-cols-2 gap-4">
-          <motion.div
+          <m.div
             {...fadeUp}
             className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-7"
           >
@@ -425,9 +425,9 @@ function ForWhom() {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             {...fadeUp}
             className="rounded-2xl border border-white/10 bg-white/[0.015] p-7"
           >
@@ -440,7 +440,7 @@ function ForWhom() {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>
@@ -490,7 +490,7 @@ function Program() {
   return (
     <section id="program" className="relative">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-20 md:py-28 border-t border-white/5">
-        <motion.div {...fadeUp} className="flex items-end justify-between flex-wrap gap-6">
+        <m.div {...fadeUp} className="flex items-end justify-between flex-wrap gap-6">
           <div className="max-w-[60ch]">
             <p className="text-sm uppercase tracking-[0.2em] text-accent">программа</p>
             <h2 className="mt-4 text-3xl md:text-5xl tracking-[-0.03em] leading-[1.05] font-medium">
@@ -498,11 +498,11 @@ function Program() {
             </h2>
           </div>
           <p className="text-sm text-zinc-500">~6 часов в неделю · практика с первой недели</p>
-        </motion.div>
+        </m.div>
 
         <div className="mt-14 grid md:grid-cols-2 gap-4">
           {weeks.map((w, i) => (
-            <motion.div
+            <m.div
               key={w.n}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -523,7 +523,7 @@ function Program() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -543,16 +543,16 @@ function Included() {
   return (
     <section className="relative">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-20 md:py-28 border-t border-white/5">
-        <motion.div {...fadeUp}>
+        <m.div {...fadeUp}>
           <p className="text-sm uppercase tracking-[0.2em] text-accent">что включено</p>
           <h2 className="mt-4 text-3xl md:text-5xl tracking-[-0.03em] leading-[1.05] font-medium">
             Всё что нужно — <br />
             <span className="text-zinc-500">уже внутри.</span>
           </h2>
-        </motion.div>
+        </m.div>
         <div className="mt-14 grid md:grid-cols-3 gap-4">
           {items.map((item, i) => (
-            <motion.div
+            <m.div
               key={item.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -565,7 +565,7 @@ function Included() {
               </div>
               <h3 className="mt-4 text-lg font-medium">{item.title}</h3>
               <p className="mt-2 text-[14px] text-zinc-500 leading-relaxed">{item.body}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -577,15 +577,15 @@ function Pricing() {
   return (
     <section id="pricing" className="relative">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-20 md:py-28 border-t border-white/5">
-        <motion.div {...fadeUp}>
+        <m.div {...fadeUp}>
           <p className="text-sm uppercase tracking-[0.2em] text-accent">стоимость</p>
           <h2 className="mt-4 text-3xl md:text-5xl tracking-[-0.03em] leading-[1.05] font-medium">
             Один поток — одна цена.
           </h2>
-        </motion.div>
+        </m.div>
 
         <div className="mt-14 grid md:grid-cols-12 gap-6">
-          <motion.div
+          <m.div
             {...fadeUp}
             className="md:col-span-7 relative overflow-hidden rounded-3xl border border-accent/30 bg-gradient-to-br from-accent/10 via-ink-900 to-ink-950 p-8 md:p-10"
           >
@@ -626,9 +626,9 @@ function Pricing() {
               </Link>
               <p className="mt-3 text-sm text-zinc-600">Сначала анкета — потом оплата. Без обязательств.</p>
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div {...fadeUp} className="md:col-span-5 flex flex-col gap-4">
+          <m.div {...fadeUp} className="md:col-span-5 flex flex-col gap-4">
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 flex-1">
               <p className="text-sm text-zinc-500 uppercase tracking-[0.15em]">Рассрочка</p>
               <p className="mt-3 text-3xl font-medium tracking-tight">4 983 ₽ / мес</p>
@@ -648,7 +648,7 @@ function Pricing() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>
@@ -682,16 +682,16 @@ function Results() {
   return (
     <section id="results" className="relative">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-20 md:py-28 border-t border-white/5">
-        <motion.div {...fadeUp}>
+        <m.div {...fadeUp}>
           <p className="text-sm uppercase tracking-[0.2em] text-accent">результаты</p>
           <h2 className="mt-4 text-3xl md:text-5xl tracking-[-0.03em] leading-[1.05] font-medium max-w-[20ch]">
             Те, кто уже прошёл прошлый поток.
           </h2>
-        </motion.div>
+        </m.div>
 
         <div className="mt-14 grid md:grid-cols-3 gap-4">
           {cases.map((c, i) => (
-            <motion.div
+            <m.div
               key={c.name}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -718,7 +718,7 @@ function Results() {
                 </div>
                 <p className="mt-4 text-[15px] text-zinc-400 leading-relaxed">"{c.text}"</p>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -759,16 +759,16 @@ function Faq() {
   return (
     <section className="relative">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-20 md:py-28 border-t border-white/5">
-        <motion.div {...fadeUp}>
+        <m.div {...fadeUp}>
           <p className="text-sm uppercase tracking-[0.2em] text-accent">вопросы</p>
           <h2 className="mt-4 text-3xl md:text-5xl tracking-[-0.03em] leading-[1.05] font-medium">
             Частые вопросы.
           </h2>
-        </motion.div>
+        </m.div>
 
         <div className="mt-14 max-w-[780px] space-y-2">
           {items.map((item, i) => (
-            <motion.div
+            <m.div
               key={i}
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -790,7 +790,7 @@ function Faq() {
                   {item.a}
                 </div>
               )}
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>
@@ -802,7 +802,7 @@ function FinalCTA() {
   return (
     <section className="relative">
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-24 md:py-36 border-t border-white/5">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -835,7 +835,7 @@ function FinalCTA() {
             </Link>
             <span className="text-sm text-zinc-500">~2 минуты · без обязательств · мест осталось 7</span>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

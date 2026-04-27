@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { ArrowLeft, CheckCircle2, Sparkles } from "lucide-react";
 import { PromptInputBox } from "@/components/ui/ai-prompt-box";
 
@@ -176,7 +176,7 @@ export default function Questionnaire() {
         {/* Progress bar */}
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex w-28 h-1 rounded-full bg-white/10 overflow-hidden">
-            <motion.div
+            <m.div
               className="h-full bg-accent rounded-full"
               initial={{ width: 0 }}
               animate={{ width: done ? "100%" : `${progress}%` }}
@@ -197,7 +197,7 @@ export default function Questionnaire() {
           <div className="w-full min-h-[120px] flex items-center justify-center">
             <AnimatePresence mode="wait">
               {done ? (
-                <motion.div
+                <m.div
                   key="done"
                   variants={questionVariants}
                   initial="enter"
@@ -206,9 +206,9 @@ export default function Questionnaire() {
                   className="w-full"
                 >
                   <DoneCard answers={answers} />
-                </motion.div>
+                </m.div>
               ) : (
-                <motion.div
+                <m.div
                   key={`q-${step}`}
                   variants={questionVariants}
                   initial="enter"
@@ -229,17 +229,17 @@ export default function Questionnaire() {
                   {/* Error hint */}
                   <AnimatePresence>
                     {error && (
-                      <motion.p
+                      <m.p
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         className="text-sm text-red-400"
                       >
                         {error}
-                      </motion.p>
+                      </m.p>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
@@ -247,7 +247,7 @@ export default function Questionnaire() {
           {/* Prompt input — hidden when done */}
           <AnimatePresence>
             {!done && (
-              <motion.div
+              <m.div
                 key="input"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -263,7 +263,7 @@ export default function Questionnaire() {
                 <p className="mt-3 text-center text-[11px] text-zinc-600">
                   Enter — отправить &nbsp;·&nbsp; Shift + Enter — новая строка
                 </p>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>
