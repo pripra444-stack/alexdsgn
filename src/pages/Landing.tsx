@@ -415,7 +415,7 @@ function StatsBar() {
                   <Counter to={m.to} suffix={m.s} prefix={m.p} decimals={m.d??0}/>
                 </p>
                 <p className="text-[14px] font-semibold text-white leading-snug">{m.label}</p>
-                <p className="text-[12px] text-zinc-500 mt-0.5">{m.sub}</p>
+                <p className="text-[12px] text-zinc-400 mt-0.5">{m.sub}</p>
                 <div className="mt-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide"
                   style={{ background:`${m.glow}12`, color:`${m.glow}CC`, border:`1px solid ${m.glow}20` }}>
                   {m.ctx}
@@ -462,7 +462,7 @@ function ICPSection() {
           <p className="text-sm uppercase tracking-[0.2em] mb-3" style={{ color: V2 }}>Кому это</p>
           <h2 className="text-3xl md:text-[48px] font-bold tracking-[-0.03em] leading-[1.08] text-white max-w-[24ch]">
             Сделано для тех,{" "}
-            <span className="text-zinc-500">кто отвечает за людей.</span>
+            <span className="text-zinc-300">кто отвечает за людей.</span>
           </h2>
         </motion.div>
 
@@ -610,7 +610,7 @@ function HowItWorks() {
           <p className="text-sm uppercase tracking-[0.2em] mb-4" style={{ color: V2 }}>Как работает</p>
           <h2 className="text-3xl md:text-[52px] font-bold tracking-[-0.03em] leading-[1.08] text-white">
             От встречи до роста эффективности —
-            <br/><span className="text-zinc-500">четыре шага.</span>
+            <br/><span className="text-zinc-300">четыре шага.</span>
           </h2>
         </motion.div>
 
@@ -630,7 +630,7 @@ function HowItWorks() {
                 </div>
                 <p className="font-mono text-xs mb-3" style={{ color:`${s.color}90` }}>Шаг {s.n}</p>
                 <h3 className="text-[16px] font-bold text-white mb-3 leading-snug">{s.title}</h3>
-                <p className="text-[13px] text-zinc-500 leading-relaxed">{s.body}</p>
+                <p className="text-[13px] text-zinc-400 leading-relaxed">{s.body}</p>
               </div>
             </motion.div>
           ))}
@@ -723,7 +723,7 @@ function Results() {
         <motion.div {...fadeUp} className="text-center mb-16">
           <p className="text-sm uppercase tracking-[0.2em] mb-4" style={{ color: V2 }}>Результаты</p>
           <h2 className="text-3xl md:text-[52px] font-bold tracking-[-0.03em] leading-[1.08] text-white">
-            Измеримый результат —<br/><span className="text-zinc-500">не обещания.</span>
+            Измеримый результат —<br/><span className="text-zinc-300">не обещания.</span>
           </h2>
         </motion.div>
 
@@ -746,7 +746,7 @@ function Results() {
                 <Counter to={s.to} suffix={s.s} prefix={s.p}/>
               </p>
               <p className="text-[18px] font-bold text-white mb-2">{s.l}</p>
-              <p className="text-[14px] text-zinc-500">{s.sub}</p>
+              <p className="text-[14px] text-zinc-400">{s.sub}</p>
             </motion.div>
           ))}
         </div>
@@ -769,7 +769,7 @@ function Cases() {
         <motion.div {...fadeUp} className="mb-14">
           <p className="text-sm uppercase tracking-[0.2em] mb-4" style={{ color: V2 }}>Кейсы клиентов</p>
           <h2 className="text-3xl md:text-[48px] font-bold tracking-[-0.03em] leading-[1.08] text-white">
-            Реальные компании.<br/><span className="text-zinc-500">Конкретные цифры.</span>
+            Реальные компании.<br/><span className="text-zinc-300">Конкретные цифры.</span>
           </h2>
         </motion.div>
 
@@ -783,7 +783,7 @@ function Cases() {
               {/* Header */}
               <div className="px-5 py-4 border-b" style={{ borderColor:`${c.glow}15` }}>
                 <p className="font-bold text-white text-[15px]">{c.company}</p>
-                <p className="text-[12px] text-zinc-500 mt-0.5">{c.detail}</p>
+                <p className="text-[12px] text-zinc-400 mt-0.5">{c.detail}</p>
               </div>
               {/* KEY metric — hero of the card */}
               <div className="px-5 py-5 relative overflow-hidden" style={{ background:`${c.glow}0E` }}>
@@ -803,7 +803,7 @@ function Cases() {
                 {c.secondary.map(m => (
                   <div key={m.l} className="px-4 py-3 border-r last:border-r-0 text-center" style={{ borderColor:`${c.glow}15` }}>
                     <p className="text-[15px] font-bold text-white">{m.v}</p>
-                    <p className="text-[11px] text-zinc-500 mt-0.5">{m.l}</p>
+                    <p className="text-[11px] text-zinc-400 mt-0.5">{m.l}</p>
                   </div>
                 ))}
               </div>
@@ -869,7 +869,7 @@ function FinalCTA() {
                   { id:"phone",   label:"Телефон",   placeholder:"+7 (___) ___-__-__",  type:"tel" },
                 ].map(f => (
                   <div key={f.id}>
-                    <label htmlFor={f.id} className="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1.5">{f.label}</label>
+                    <label htmlFor={f.id} className="block text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5">{f.label}</label>
                     <input id={f.id} type={f.type} placeholder={f.placeholder}
                       className="w-full rounded-xl px-3.5 py-2.5 text-[14px] text-white placeholder-zinc-700 focus:outline-none transition-all"
                       style={{ border:`1px solid ${BORDER}`, background:"rgba(255,255,255,0.04)" }}
@@ -880,7 +880,7 @@ function FinalCTA() {
                 ))}
               </div>
               <div>
-                <label htmlFor="role" className="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1.5">Должность</label>
+                <label htmlFor="role" className="block text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5">Должность</label>
                 <input id="role" type="text" placeholder="HR-директор, CHRO, Team Lead..."
                   className="w-full rounded-xl px-3.5 py-2.5 text-[14px] text-white placeholder-zinc-700 focus:outline-none transition-all"
                   style={{ border:`1px solid ${BORDER}`, background:"rgba(255,255,255,0.04)" }}
@@ -913,11 +913,11 @@ function SiteFooter() {
               <RConfLogo size={34}/>
               <span className="font-bold text-white text-lg">RConf</span>
             </div>
-            <p className="text-[14px] text-zinc-500 leading-relaxed max-w-[38ch] mb-6">
+            <p className="text-[14px] text-zinc-400 leading-relaxed max-w-[38ch] mb-6">
               Система для развития команд на основе искусственного интеллекта.
               Анализирует встречи, выявляет паттерны, даёт рекомендации.
             </p>
-            <div className="space-y-3 text-[14px] text-zinc-500">
+            <div className="space-y-3 text-[14px] text-zinc-400">
               {[
                 { href:"tel:+74951084698",         icon:PhoneCall, text:"+7 (495) 108-46-98" },
                 { href:"mailto:sales@cyberskill.net", icon:Mail,  text:"sales@cyberskill.net" },
@@ -938,7 +938,7 @@ function SiteFooter() {
           ].map(col => (
             <div key={col.title}>
               <p className="text-[11px] uppercase tracking-[0.15em] text-zinc-700 mb-4">{col.title}</p>
-              <ul className="space-y-2.5 text-[14px] text-zinc-500">
+              <ul className="space-y-2.5 text-[14px] text-zinc-400">
                 {col.links.map(l => (
                   <li key={l}><a href="#" className="hover:text-white transition-colors">{l}</a></li>
                 ))}
