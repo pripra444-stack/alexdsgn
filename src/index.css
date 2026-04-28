@@ -8,7 +8,7 @@
 
 html,
 body {
-  background: #0b0b0c;
+  background: #07040F;
   color: #e6e6e6;
   font-family: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -21,7 +21,7 @@ html {
 }
 
 ::selection {
-  background: rgba(217, 119, 87, 0.35);
+  background: rgba(139, 92, 246, 0.4);
   color: #fff;
 }
 
