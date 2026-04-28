@@ -415,7 +415,7 @@ function StatsBar() {
                   <Counter to={m.to} suffix={m.s} prefix={m.p} decimals={m.d??0}/>
                 </p>
                 <p className="text-[14px] font-semibold text-white leading-snug">{m.label}</p>
-                <p className="text-[12px] text-zinc-400 mt-0.5">{m.sub}</p>
+                <p className="text-[12px] mt-0.5" style={{ color:`${m.glow}99` }}>{m.sub}</p>
                 <div className="mt-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide"
                   style={{ background:`${m.glow}12`, color:`${m.glow}CC`, border:`1px solid ${m.glow}20` }}>
                   {m.ctx}
