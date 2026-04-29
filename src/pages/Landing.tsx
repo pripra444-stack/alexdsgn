@@ -223,7 +223,7 @@ function Hero() {
             <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.55 }}
               className="flex flex-wrap items-center gap-5">
               <div className="flex -space-x-2">
-                {["photo-1507003211169-0a1dd7228f2d","photo-1494790108377-be9c29b29330","photo-1500648767791-00dcc994a43e"].map(id => (
+                {["photo-1507003211169-0a1dd7228f2d","photo-1472099645785-5658abf4ff4e","photo-1500648767791-00dcc994a43e"].map(id => (
                   <img key={id} src={`https://images.unsplash.com/${id}?w=64&q=80&fit=crop&crop=face`}
                     className="w-8 h-8 rounded-full border-2 object-cover" style={{ borderColor: BG }} alt=""/>
                 ))}
@@ -504,9 +504,9 @@ function ICPSection() {
 // ─── Team section (photos) ────────────────────────────────────────────────────
 function TeamSection() {
   const photos = [
-    { src:"photo-1573497491208-6b1acb260507", caption:"Команда разрабатывает стратегию" },
-    { src:"photo-1542744173-8e7e53415bb0",    caption:"Обсуждение результатов спринта" },
-    { src:"photo-1556761175-b413da4baf72",    caption:"Планирование и расстановка приоритетов" },
+    { src:"photo-1522071820081-009f0129c71c", caption:"Команда разрабатывает стратегию" },
+    { src:"photo-1524178232363-1fb2b075b655", caption:"Обсуждение результатов спринта" },
+    { src:"photo-1531482615713-2afd69097998", caption:"Планирование и расстановка приоритетов" },
   ];
 
   return (
