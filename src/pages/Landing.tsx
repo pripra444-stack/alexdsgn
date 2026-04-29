@@ -501,18 +501,13 @@ function ICPSection() {
   );
 }
 
-// ─── Team section (photos) ────────────────────────────────────────────────────
+// ─── Team section (product UI panels) ───────────────────────────────────────
 function TeamSection() {
-  const photos = [
-    { src:"photo-1522071820081-009f0129c71c", caption:"Команда разрабатывает стратегию" },
-    { src:"photo-1524178232363-1fb2b075b655", caption:"Обсуждение результатов спринта" },
-    { src:"photo-1531482615713-2afd69097998", caption:"Планирование и расстановка приоритетов" },
-  ];
-
   return (
     <section className="border-t" style={{ borderColor: BORDER }}>
       <div className="max-w-[1200px] mx-auto px-5 md:px-8 py-24 md:py-32">
         <div className="grid md:grid-cols-12 gap-12 items-center">
+
           {/* Left text */}
           <motion.div {...fadeUp} className="md:col-span-5">
             <p className="text-sm uppercase tracking-[0.2em] mb-4" style={{ color: V2 }}>О сервисе</p>
@@ -550,42 +545,80 @@ function TeamSection() {
             </a>
           </motion.div>
 
-          {/* Right: photo collage */}
-          <div className="md:col-span-7">
-            <div className="grid grid-cols-2 gap-3">
-              {/* Large photo */}
-              <motion.div
-                initial={{ opacity:0, x:20 }} whileInView={{ opacity:1, x:0 }}
-                viewport={{ once:true }} transition={{ duration:0.7 }}
-                className="col-span-2 rounded-2xl overflow-hidden relative border" style={{ borderColor: BORDER }}>
-                <div className="aspect-[21/9] relative">
-                  <img src={`https://images.unsplash.com/${photos[0].src}?w=1000&q=80`}
-                    alt="" className="w-full h-full object-cover"/>
-                  <div className="absolute inset-0"
-                    style={{ background:`linear-gradient(135deg, ${V1}25, ${BG}40)` }}/>
-                  <div className="absolute bottom-4 left-4 bg-white/5 backdrop-blur-md rounded-xl px-3 py-2 border" style={{ borderColor: BORDER }}>
-                    <p className="text-xs text-zinc-300">{photos[0].caption}</p>
-                  </div>
-                </div>
-              </motion.div>
+          {/* Right: product UI panels */}
+          <div className="md:col-span-7 flex flex-col gap-3">
 
-              {photos.slice(1).map((p, i) => (
-                <motion.div key={p.src}
-                  initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
-                  viewport={{ once:true }} transition={{ delay:0.15+i*0.1, duration:0.6 }}
-                  className="rounded-2xl overflow-hidden relative border" style={{ borderColor: BORDER }}>
-                  <div className="aspect-square relative">
-                    <img src={`https://images.unsplash.com/${p.src}?w=600&q=80`}
-                      alt="" className="w-full h-full object-cover"/>
-                    <div className="absolute inset-0"
-                      style={{ background:`linear-gradient(135deg, ${V1}20, ${BG}55)` }}/>
-                    <div className="absolute bottom-3 left-3 bg-white/5 backdrop-blur-md rounded-lg px-2.5 py-1.5 border" style={{ borderColor: BORDER }}>
-                      <p className="text-[11px] text-zinc-300">{p.caption}</p>
-                    </div>
+            {/* Panel 1 — Team radar */}
+            <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }}
+              viewport={{ once:true }} transition={{ duration:0.6 }}
+              className="rounded-2xl border p-4" style={{ background: CARD, borderColor: BORDER }}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Users className="w-3.5 h-3.5" style={{ color: V2 }}/>
+                  <span className="text-[12px] font-semibold text-white">Радар команды</span>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background:`${V1}20`, color: V2 }}>Спринт 42</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { name:"Александр", score:87, trend:"+4", c: V2 },
+                  { name:"Мария",     score:74, trend:"+1", c: V2 },
+                  { name:"Дмитрий",   score:38, trend:"−8", c: PINK },
+                  { name:"Елена",     score:81, trend:"+2", c: V2 },
+                ].map(p => (
+                  <div key={p.name} className="rounded-xl p-3 border text-center"
+                    style={{ background:`${p.c}08`, borderColor:`${p.c}20` }}>
+                    <p className="text-[18px] font-black" style={{ color: p.c }}>{p.score}</p>
+                    <p className="text-[10px] text-zinc-400 mt-0.5">{p.name}</p>
+                    <p className="text-[10px] font-semibold mt-1" style={{ color: p.c }}>{p.trend}</p>
                   </div>
-                </motion.div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Panel 2 — Risk alert */}
+            <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }}
+              viewport={{ once:true }} transition={{ duration:0.6, delay:0.1 }}
+              className="rounded-2xl border p-4" style={{ background: CARD, borderColor:`${PINK}25` }}>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background:`${PINK}18` }}>
+                  <Lightbulb className="w-4 h-4" style={{ color: PINK }}/>
+                </div>
+                <div className="flex-1">
+                  <p className="text-[13px] font-bold text-white mb-1">Риск выгорания · 1 сотрудник</p>
+                  <p className="text-[12px] text-zinc-400 leading-relaxed">
+                    Дмитрий В. снизил вовлечённость на 8 пт за 2 недели. Рекомендован 1-on-1 с тимлидом до следующего ретро.
+                  </p>
+                </div>
+                <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0"
+                  style={{ background:`${PINK}18`, color: PINK }}>⚠ Риск</span>
+              </div>
+            </motion.div>
+
+            {/* Panel 3 — Growth trends */}
+            <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }}
+              viewport={{ once:true }} transition={{ duration:0.6, delay:0.2 }}
+              className="rounded-2xl border p-4" style={{ background: CARD, borderColor: BORDER }}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-3.5 h-3.5" style={{ color: V2 }}/>
+                  <span className="text-[12px] font-semibold text-white">Динамика за 4 недели</span>
+                </div>
+              </div>
+              <div className="flex items-end gap-1.5 h-10">
+                {[42,48,44,55,60,57,63,68,64,72,70,75,73,80,78,82].map((v,i) => (
+                  <motion.div key={i} className="flex-1 rounded-t-sm"
+                    style={{ background: i > 11 ? V2 : `${V1}50` }}
+                    initial={{ height:0 }} whileInView={{ height:`${v}%` }}
+                    viewport={{ once:true }} transition={{ delay:0.3+i*0.04, duration:0.4 }}/>
+                ))}
+              </div>
+              <div className="flex justify-between mt-2 text-[10px] text-zinc-600">
+                <span>Нед. 1</span><span>Нед. 2</span><span>Нед. 3</span><span>Нед. 4</span>
+              </div>
+            </motion.div>
+
           </div>
         </div>
       </div>
