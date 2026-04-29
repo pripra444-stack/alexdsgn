@@ -546,79 +546,82 @@ function TeamSection() {
           </motion.div>
 
           {/* Right: product UI panels */}
-          <div className="md:col-span-7 flex flex-col gap-3">
+          <div className="md:col-span-7">
+            <div className="grid grid-cols-2 gap-3">
 
-            {/* Panel 1 — Team radar */}
-            <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }}
-              viewport={{ once:true }} transition={{ duration:0.6 }}
-              className="rounded-2xl border p-4" style={{ background: CARD, borderColor: BORDER }}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Users className="w-3.5 h-3.5" style={{ color: V2 }}/>
-                  <span className="text-[12px] font-semibold text-white">Радар команды</span>
-                </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background:`${V1}20`, color: V2 }}>Спринт 42</span>
-              </div>
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  { name:"Александр", score:87, trend:"+4", c: V2 },
-                  { name:"Мария",     score:74, trend:"+1", c: V2 },
-                  { name:"Дмитрий",   score:38, trend:"−8", c: PINK },
-                  { name:"Елена",     score:81, trend:"+2", c: V2 },
-                ].map(p => (
-                  <div key={p.name} className="rounded-xl p-3 border text-center"
-                    style={{ background:`${p.c}08`, borderColor:`${p.c}20` }}>
-                    <p className="text-[18px] font-black" style={{ color: p.c }}>{p.score}</p>
-                    <p className="text-[10px] text-zinc-400 mt-0.5">{p.name}</p>
-                    <p className="text-[10px] font-semibold mt-1" style={{ color: p.c }}>{p.trend}</p>
+              {/* Большое фото — командная встреча + данные поверх */}
+              <motion.div initial={{ opacity:0, x:20 }} whileInView={{ opacity:1, x:0 }}
+                viewport={{ once:true }} transition={{ duration:0.7 }}
+                className="col-span-2 rounded-2xl overflow-hidden relative border"
+                style={{ borderColor: BORDER }}>
+                <div className="aspect-[16/7] relative">
+                  <img
+                    src="https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=900"
+                    alt="" className="w-full h-full object-cover"/>
+                  {/* Overlay */}
+                  <div className="absolute inset-0" style={{ background:`linear-gradient(135deg, ${BG}CC 0%, ${V1}55 100%)` }}/>
+                  {/* Data overlay */}
+                  <div className="absolute inset-0 p-5 flex flex-col justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background:"#4ade80" }}/>
+                      <span className="text-[11px] font-medium text-emerald-400">Анализ в реальном времени</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { v:"+40%", l:"конверсия менеджеров", c: V2 },
+                        { v:"8.4/10", l:"средняя эффективность", c:"#4ade80" },
+                        { v:"−60%", l:"срок адаптации", c: PINK },
+                      ].map(m => (
+                        <div key={m.l} className="rounded-xl p-3 backdrop-blur-md border"
+                          style={{ background:"rgba(7,4,15,0.75)", borderColor:`${m.c}30` }}>
+                          <p className="text-[22px] font-black leading-none" style={{ color: m.c }}>{m.v}</p>
+                          <p className="text-[10px] text-zinc-400 mt-1">{m.l}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Panel 2 — Risk alert */}
-            <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }}
-              viewport={{ once:true }} transition={{ duration:0.6, delay:0.1 }}
-              className="rounded-2xl border p-4" style={{ background: CARD, borderColor:`${PINK}25` }}>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background:`${PINK}18` }}>
-                  <Lightbulb className="w-4 h-4" style={{ color: PINK }}/>
                 </div>
-                <div className="flex-1">
-                  <p className="text-[13px] font-bold text-white mb-1">Риск выгорания · 1 сотрудник</p>
-                  <p className="text-[12px] text-zinc-400 leading-relaxed">
-                    Дмитрий В. снизил вовлечённость на 8 пт за 2 недели. Рекомендован 1-on-1 с тимлидом до следующего ретро.
-                  </p>
-                </div>
-                <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0"
-                  style={{ background:`${PINK}18`, color: PINK }}>⚠ Риск</span>
-              </div>
-            </motion.div>
+              </motion.div>
 
-            {/* Panel 3 — Growth trends */}
-            <motion.div initial={{ opacity:0, x:24 }} whileInView={{ opacity:1, x:0 }}
-              viewport={{ once:true }} transition={{ duration:0.6, delay:0.2 }}
-              className="rounded-2xl border p-4" style={{ background: CARD, borderColor: BORDER }}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-3.5 h-3.5" style={{ color: V2 }}/>
-                  <span className="text-[12px] font-semibold text-white">Динамика за 4 недели</span>
+              {/* Фото 2 — 1-on-1 + риск */}
+              <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
+                viewport={{ once:true }} transition={{ delay:0.15, duration:0.6 }}
+                className="rounded-2xl overflow-hidden relative border" style={{ borderColor: BORDER }}>
+                <div className="aspect-square relative">
+                  <img
+                    src="https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg?auto=compress&cs=tinysrgb&w=600"
+                    alt="" className="w-full h-full object-cover"/>
+                  <div className="absolute inset-0" style={{ background:`linear-gradient(160deg, ${BG}BB, ${PINK}44)` }}/>
+                  <div className="absolute inset-0 p-4 flex flex-col justify-end">
+                    <div className="rounded-xl p-3 backdrop-blur-md border" style={{ background:"rgba(7,4,15,0.8)", borderColor:`${PINK}30` }}>
+                      <p className="text-[10px] font-semibold mb-1" style={{ color: PINK }}>⚠ AI-инсайт</p>
+                      <p className="text-[12px] text-white font-semibold">Риск выгорания выявлен</p>
+                      <p className="text-[10px] text-zinc-400 mt-0.5">до того, как сотрудник решил уйти</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-end gap-1.5 h-10">
-                {[42,48,44,55,60,57,63,68,64,72,70,75,73,80,78,82].map((v,i) => (
-                  <motion.div key={i} className="flex-1 rounded-t-sm"
-                    style={{ background: i > 11 ? V2 : `${V1}50` }}
-                    initial={{ height:0 }} whileInView={{ height:`${v}%` }}
-                    viewport={{ once:true }} transition={{ delay:0.3+i*0.04, duration:0.4 }}/>
-                ))}
-              </div>
-              <div className="flex justify-between mt-2 text-[10px] text-zinc-600">
-                <span>Нед. 1</span><span>Нед. 2</span><span>Нед. 3</span><span>Нед. 4</span>
-              </div>
-            </motion.div>
+              </motion.div>
 
+              {/* Фото 3 — встреча + рост */}
+              <motion.div initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
+                viewport={{ once:true }} transition={{ delay:0.25, duration:0.6 }}
+                className="rounded-2xl overflow-hidden relative border" style={{ borderColor: BORDER }}>
+                <div className="aspect-square relative">
+                  <img
+                    src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=600"
+                    alt="" className="w-full h-full object-cover"/>
+                  <div className="absolute inset-0" style={{ background:`linear-gradient(160deg, ${BG}BB, ${V2}44)` }}/>
+                  <div className="absolute inset-0 p-4 flex flex-col justify-end">
+                    <div className="rounded-xl p-3 backdrop-blur-md border" style={{ background:"rgba(7,4,15,0.8)", borderColor:`${V2}30` }}>
+                      <p className="text-[22px] font-black leading-none" style={{ color: V2 }}>−48%</p>
+                      <p className="text-[11px] text-white font-semibold mt-0.5">текучесть руководителей</p>
+                      <p className="text-[10px] text-zinc-400">за первые 6 месяцев</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
           </div>
         </div>
       </div>
