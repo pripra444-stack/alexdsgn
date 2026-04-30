@@ -262,12 +262,15 @@ function Hero() {
           <motion.h1
             initial={{ opacity:0, y:32 }} animate={{ opacity:1, y:0 }}
             transition={{ duration:0.8, delay:0.1, ease:[0.22,1,0.36,1] }}
-            style={{ fontWeight:800, color:"#fff", lineHeight:1.05,
-              letterSpacing:"-0.04em", marginBottom:20, maxWidth:800,
-              fontSize:"clamp(44px,5.5vw,74px)", textAlign:"center" }}>
+            style={{ fontWeight:700, color:"#fff", lineHeight:1.08,
+              letterSpacing:"-0.03em", marginBottom:20, maxWidth:820,
+              fontSize:"clamp(38px,4.6vw,62px)", textAlign:"center",
+              textTransform:"none", fontFeatureSettings:"normal",
+              fontVariant:"normal" }}>
             Выявляйте{" "}
             <span style={{ background:`linear-gradient(135deg, ${V2} 0%, ${PINK} 100%)`,
-              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
+              fontFeatureSettings:"normal" }}>
               слабые места
             </span>
             {" "}команды<br/>после каждой сессии.
