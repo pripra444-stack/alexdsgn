@@ -161,39 +161,48 @@ function Nav() {
   );
 }
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
-// Фиксированные углы лучей — без Math.random() чтобы не перерендеривать
-const RAY_ANGLES = [0,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240,255,270,285,300,315,330,345];
-const RAY_LENS   = [420,360,440,380,460,350,430,370,450,340,410,390,440,360,420,380,460,350,430,370,450,340,410,390];
+// ─── Hero (wope.com layout — pixel perfect) ───────────────────────────────────
+const RAYS = [
+  {a:  0, l:520}, {a: 12, l:460}, {a: 24, l:540}, {a: 36, l:480}, {a: 48, l:500},
+  {a: 60, l:470}, {a: 72, l:510}, {a: 84, l:450}, {a: 96, l:530}, {a:108, l:490},
+  {a:120, l:560}, {a:132, l:440}, {a:144, l:550}, {a:156, l:470}, {a:168, l:530},
+  {a:180, l:500}, {a:192, l:460}, {a:204, l:540}, {a:216, l:480}, {a:228, l:510},
+  {a:240, l:470}, {a:252, l:520}, {a:264, l:450}, {a:276, l:530}, {a:288, l:490},
+  {a:300, l:560}, {a:312, l:440}, {a:324, l:520}, {a:336, l:470}, {a:348, l:510},
+];
 
-function HeroRays() {
+function WopeRays() {
   return (
-    <svg
-      aria-hidden
-      className="pointer-events-none absolute left-1/2 -translate-x-1/2"
-      style={{ top: 0, width: 1400, height: 600, overflow: "visible", zIndex: 0 }}
-      viewBox="-700 0 1400 600"
-    >
+    <svg aria-hidden className="pointer-events-none"
+      style={{ position:"absolute", left:"50%", top:0, transform:"translateX(-50%)",
+        width:1200, height:700, overflow:"visible", zIndex:1 }}
+      viewBox="-600 0 1200 700">
       <defs>
-        <radialGradient id="rg" cx="50%" cy="0%" r="75%">
+        <linearGradient id="rayFade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stopColor={V1} stopOpacity="0"/>
+          <stop offset="30%"  stopColor={V1} stopOpacity="0.6"/>
+          <stop offset="100%" stopColor={V1} stopOpacity="0"/>
+        </linearGradient>
+        <radialGradient id="rayR" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(0 340) scale(600 400)">
           <stop offset="0%"   stopColor={V1} stopOpacity="0.7"/>
+          <stop offset="60%"  stopColor={V2} stopOpacity="0.2"/>
           <stop offset="100%" stopColor={V1} stopOpacity="0"/>
         </radialGradient>
       </defs>
-      {RAY_ANGLES.map((deg, i) => {
-        const rad = (deg * Math.PI) / 180;
-        const len = RAY_LENS[i];
+      {RAYS.map(({a, l}, i) => {
+        const r = (a * Math.PI) / 180;
         return (
           <motion.line key={i}
-            x1={0} y1={0}
-            x2={Math.cos(rad) * len}
-            y2={Math.sin(rad) * len}
-            stroke="url(#rg)"
-            strokeWidth={i % 6 === 0 ? 1.5 : 0.6}
-            strokeOpacity={i % 3 === 0 ? 0.55 : 0.22}
+            x1={0} y1={340}
+            x2={Math.cos(r) * l}
+            y2={340 + Math.sin(r) * l}
+            stroke={V1}
+            strokeWidth={i % 5 === 0 ? 1.0 : 0.4}
+            strokeOpacity={i % 5 === 0 ? 0.45 : 0.18}
             initial={{ pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 1.6, delay: 0.2 + i * 0.035, ease: "easeOut" }}
+            transition={{ duration: 1.8, delay: 0.1 + i * 0.03, ease: "easeOut" }}
           />
         );
       })}
@@ -205,322 +214,374 @@ function Hero() {
   const [email, setEmail] = useState("");
 
   return (
-    <section className="relative overflow-hidden" style={{ background: BG }}>
-      <GridBg opacity={0.03}/>
+    <section className="relative overflow-hidden" style={{ background:"#08051A" }}>
 
-      {/* ── Большое радиальное свечение по центру (как у wope) ── */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0" style={{
-        top: "30%",
-        height: 700,
-        background: `radial-gradient(ellipse 70% 60% at 50% 0%, ${V1}38 0%, ${V2}18 40%, transparent 75%)`,
-      }}/>
-      {/* Точечный розовый блик */}
-      <div aria-hidden className="pointer-events-none absolute left-1/2 -translate-x-1/2"
-        style={{ top: "38%", width: 300, height: 300, marginLeft: -150,
-          background: `radial-gradient(circle, ${PINK}28, transparent 65%)`,
-          filter: "blur(50px)" }}/>
+      {/* ── Тёмная сетка ── */}
+      <GridBg opacity={0.025}/>
 
-      <div className="relative z-10">
+      {/* ── ГЛАВНЫЙ SPOTLIGHT (как у wope — яркое фиолетовое пятно по центру) ── */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0"
+        style={{ top: 220, height: 700, zIndex: 0,
+          background:`radial-gradient(ellipse 800px 500px at 50% 0%,
+            #7C3AED88 0%,
+            #6D28D960 20%,
+            #5B21B625 50%,
+            transparent 75%)` }}/>
 
-        {/* ═══ Текстовый блок — строго по центру ═══ */}
-        <div className="flex flex-col items-center text-center pt-20 md:pt-28 px-5">
+      {/* Дополнительный точечный блик в центре */}
+      <div aria-hidden className="pointer-events-none absolute"
+        style={{ left:"50%", top: 300, transform:"translate(-50%,-50%)",
+          width:320, height:320, borderRadius:"50%", zIndex:0,
+          background:`radial-gradient(circle, #A78BFA55 0%, #7C3AED22 40%, transparent 75%)`,
+          filter:"blur(8px)" }}/>
+
+      {/* ── Лучи (WopeRays позиционированы на y=340 от верха секции) ── */}
+      <div className="absolute inset-0 overflow-hidden" style={{ zIndex:1 }}>
+        <WopeRays/>
+      </div>
+
+      {/* ── КОНТЕНТ ── */}
+      <div className="relative" style={{ zIndex:2 }}>
+
+        {/* Текстовый блок — строго по центру */}
+        <div style={{ paddingTop: 80, paddingBottom: 0, textAlign:"center",
+          display:"flex", flexDirection:"column", alignItems:"center", padding:"80px 20px 0" }}>
 
           {/* Бейдж */}
           <motion.div
-            initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.45 }}
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] mb-7"
-            style={{ borderColor:`${V1}40`, background:`${V1}12`, color: V2 }}>
-            <Sparkles className="w-3.5 h-3.5"/> AI-платформа для развития команд
+            initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
+            transition={{ duration:0.4 }}
+            style={{ display:"inline-flex", alignItems:"center", gap:8,
+              borderRadius:999, border:`1px solid ${V1}40`,
+              background:`${V1}14`, color: V2,
+              padding:"6px 16px", fontSize:13, marginBottom:28 }}>
+            <Sparkles style={{ width:14, height:14 }}/> AI-платформа для развития команд
           </motion.div>
 
-          {/* H1 — оригинальный текст */}
+          {/* H1 */}
           <motion.h1
-            initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.85, delay:0.1, ease:[0.22,1,0.36,1] }}
-            className="font-bold text-white leading-[1.04] tracking-[-0.04em] mb-5 max-w-[820px]"
-            style={{ fontSize:"clamp(42px,5.8vw,76px)" }}>
+            initial={{ opacity:0, y:32 }} animate={{ opacity:1, y:0 }}
+            transition={{ duration:0.8, delay:0.1, ease:[0.22,1,0.36,1] }}
+            style={{ fontWeight:800, color:"#fff", lineHeight:1.05,
+              letterSpacing:"-0.04em", marginBottom:20, maxWidth:800,
+              fontSize:"clamp(44px,5.5vw,74px)", textAlign:"center" }}>
             Выявляйте{" "}
-            <span style={{
-              background:`linear-gradient(135deg, ${V2} 0%, ${PINK} 100%)`,
-              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"
-            }}>слабые места</span>
+            <span style={{ background:`linear-gradient(135deg, ${V2} 0%, ${PINK} 100%)`,
+              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+              слабые места
+            </span>
             {" "}команды<br/>после каждой сессии.
           </motion.h1>
 
-          {/* Подзаголовок — оригинальный */}
+          {/* Subtitle */}
           <motion.p
             initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.7, delay:0.2 }}
-            className="text-[17px] leading-[1.7] text-zinc-400 max-w-[52ch] mb-9">
+            transition={{ duration:0.65, delay:0.18 }}
+            style={{ fontSize:16, lineHeight:1.7, color:"#94A3B8",
+              maxWidth:"52ch", marginBottom:32, textAlign:"center" }}>
             RConf AI анализирует встречи и показывает HR-директору,
             кто выгорает, кто готов к росту и где команда теряет эффективность —
-            {" "}<span className="text-white font-medium">автоматически после каждой сессии.</span>
+            {" "}<span style={{ color:"#fff", fontWeight:500 }}>автоматически после каждой сессии.</span>
           </motion.p>
 
-          {/* Email + кнопка (pill) */}
+          {/* Email pill + кнопка — точно как у wope */}
           <motion.div
             initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.6, delay:0.3 }}
-            className="flex items-center rounded-full border p-1.5 mb-4 w-full"
-            style={{ maxWidth: 460, borderColor: BORDER,
-              background:"rgba(255,255,255,0.04)",
-              boxShadow:`0 0 0 1px ${V1}18, 0 8px 40px -8px ${V1}35` }}>
-            <Mail className="w-4 h-4 shrink-0 ml-4 text-zinc-500"/>
+            transition={{ duration:0.55, delay:0.26 }}
+            style={{ display:"flex", alignItems:"center", width:"100%", maxWidth:460,
+              borderRadius:999, border:`1px solid ${BORDER}`,
+              background:"rgba(255,255,255,0.05)", padding:"5px 5px 5px 16px",
+              marginBottom:14,
+              boxShadow:`0 0 0 1px ${V1}20, 0 8px 48px -8px ${V1}50` }}>
+            <Mail style={{ width:16, height:16, color:"#64748B", flexShrink:0 }}/>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="ваш@email.ru"
-              className="flex-1 bg-transparent outline-none text-[14px] text-white placeholder:text-zinc-600 px-3 py-1.5"/>
-            <a href="#cta"
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-6 py-2.5 text-[14px] font-semibold text-white hover:opacity-85 transition-opacity"
-              style={{ background:`linear-gradient(135deg, ${V1}, ${V2})`,
-                boxShadow:`0 4px 24px -4px ${V1}70` }}>
-              Попробовать <ArrowRight className="w-3.5 h-3.5"/>
+              style={{ flex:1, background:"transparent", border:"none", outline:"none",
+                fontSize:14, color:"#fff", padding:"4px 10px" }}/>
+            <a href="#cta" style={{ flexShrink:0, display:"inline-flex", alignItems:"center",
+              gap:6, borderRadius:999, padding:"10px 22px",
+              fontSize:14, fontWeight:600, color:"#fff", textDecoration:"none",
+              background:`linear-gradient(135deg, ${V1}, ${V2})`,
+              boxShadow:`0 4px 24px -4px ${V1}80` }}>
+              Попробовать <ArrowRight style={{ width:14, height:14 }}/>
             </a>
           </motion.div>
 
-          {/* Мелкий hint */}
-          <motion.p
-            initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.42 }}
-            className="text-[13px] text-zinc-600 mb-10">
-            Бесплатно · Без карты · Данные на серверах РФ
+          {/* Hint */}
+          <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.38 }}
+            style={{ fontSize:13, color:"#475569", marginBottom:32 }}>
+            Бесплатно · Без карты · Серверы РФ (ФЗ-152)
           </motion.p>
 
-          {/* Социальное доверие */}
-          <motion.div
-            initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.5 }}
-            className="flex flex-wrap items-center justify-center gap-5 mb-16">
-            <div className="flex -space-x-2">
+          {/* Social proof */}
+          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.48 }}
+            style={{ display:"flex", flexWrap:"wrap", alignItems:"center",
+              justifyContent:"center", gap:16, marginBottom:56 }}>
+            <div style={{ display:"flex" }}>
               {[
                 "https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=64",
                 "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=64",
                 "https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&w=64",
               ].map((src, i) => (
-                <img key={i} src={src} alt=""
-                  className="w-8 h-8 rounded-full border-2 object-cover object-top"
-                  style={{ borderColor: BG }}/>
+                <img key={i} src={src} alt="" style={{ width:32, height:32, borderRadius:"50%",
+                  border:`2px solid #08051A`, objectFit:"cover", objectPosition:"top",
+                  marginLeft: i===0?0:-8 }}/>
               ))}
             </div>
-            <span className="text-sm text-zinc-400">
-              <span className="text-white font-semibold">500+</span> команд уже используют
+            <span style={{ fontSize:14, color:"#94A3B8" }}>
+              <span style={{ color:"#fff", fontWeight:600 }}>500+</span> команд уже используют
             </span>
-            <div className="h-4 w-px" style={{ background:"rgba(255,255,255,0.1)" }}/>
-            <div className="flex items-center gap-1">
+            <span style={{ width:1, height:16, background:"rgba(255,255,255,0.1)" }}/>
+            <div style={{ display:"flex", alignItems:"center", gap:3 }}>
               {Array.from({length:5}).map((_,i) => (
-                <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400"/>
+                <Star key={i} style={{ width:14, height:14, fill:"#FBBF24", color:"#FBBF24" }}/>
               ))}
-              <span className="text-sm text-zinc-400 ml-1.5">4.9 / 5.0</span>
+              <span style={{ fontSize:14, color:"#94A3B8", marginLeft:6 }}>4.9 / 5.0</span>
             </div>
           </motion.div>
         </div>
 
-        {/* ═══ Зона лучей + mockup ═══ */}
-        <div className="relative" style={{ minHeight: 480 }}>
-          {/* Лучи — исходят из верхней середины зоны */}
-          <HeroRays/>
+        {/* ── Browser mockup (точно как у wope — на всю ширину, снизу) ── */}
+        <motion.div
+          initial={{ opacity:0, y:60, scale:0.97 }} animate={{ opacity:1, y:0, scale:1 }}
+          transition={{ duration:1.1, delay:0.35, ease:[0.22,1,0.36,1] }}
+          style={{ position:"relative", maxWidth:1160, margin:"0 auto", padding:"0 20px" }}>
 
-          {/* Большой browser mockup */}
+          {/* Floating chip — ФЗ */}
           <motion.div
-            initial={{ opacity:0, y:56, scale:0.96 }} animate={{ opacity:1, y:0, scale:1 }}
-            transition={{ duration:1.1, delay:0.38, ease:[0.22,1,0.36,1] }}
-            className="relative z-10 mx-auto px-5 md:px-10"
-            style={{ maxWidth: 1200 }}>
+            animate={{ y:[0,-6,0] }} transition={{ duration:3.8, repeat:Infinity, ease:"easeInOut", delay:1.3 }}
+            style={{ position:"absolute", top:-18, right:32, zIndex:20,
+              display:"inline-flex", alignItems:"center", gap:8,
+              borderRadius:14, padding:"8px 14px", backdropFilter:"blur(20px)",
+              background:"rgba(14,10,28,0.97)", border:`1px solid ${BORDER}`,
+              boxShadow:"0 8px 32px rgba(0,0,0,0.4)" }}>
+            <ShieldCheck style={{ width:15, height:15, color: V2 }}/>
+            <span style={{ fontSize:13, fontWeight:500, color:"#fff" }}>ФЗ-152 · Серверы РФ</span>
+          </motion.div>
 
-            {/* Floating badges */}
-            <motion.div
-              animate={{ y:[0,-7,0] }} transition={{ duration:3.8, repeat:Infinity, ease:"easeInOut", delay:1.4 }}
-              className="absolute -top-5 right-8 md:right-16 z-20 rounded-2xl px-3.5 py-2.5 border backdrop-blur-xl shadow-2xl"
-              style={{ background:"rgba(14,10,28,0.97)", borderColor: BORDER }}>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4" style={{ color: V2 }}/>
-                <span className="text-[13px] font-medium text-white">ФЗ-152 · Серверы РФ</span>
+          {/* Floating chip — эффективность */}
+          <motion.div
+            animate={{ y:[0,6,0] }} transition={{ duration:4.2, repeat:Infinity, ease:"easeInOut", delay:0.6 }}
+            style={{ position:"absolute", top:-18, left:32, zIndex:20,
+              display:"inline-flex", alignItems:"center", gap:8,
+              borderRadius:14, padding:"8px 14px", backdropFilter:"blur(20px)",
+              background:"rgba(14,10,28,0.97)", border:`1px solid ${PINK}35`,
+              boxShadow:"0 8px 32px rgba(0,0,0,0.4)" }}>
+            <TrendingUp style={{ width:15, height:15, color: PINK }}/>
+            <span style={{ fontSize:13, fontWeight:500, color:"#fff" }}>+62% эффективность</span>
+          </motion.div>
+
+          {/* Browser frame */}
+          <div style={{ borderRadius:"16px 16px 0 0", overflow:"hidden",
+            border:`1px solid ${BORDER}`, borderBottom:"none",
+            background: CARD,
+            boxShadow:`0 -32px 100px -10px ${V1}40, 0 0 0 1px ${V1}12, inset 0 1px 0 rgba(255,255,255,0.06)` }}>
+
+            {/* Chrome bar */}
+            <div style={{ display:"flex", alignItems:"center", padding:"12px 20px",
+              borderBottom:`1px solid ${BORDER}`, background:"rgba(7,4,15,0.85)" }}>
+              {/* Dots */}
+              <div style={{ display:"flex", gap:7, flexShrink:0 }}>
+                <span style={{ width:12, height:12, borderRadius:"50%", background:"#FF5F57" }}/>
+                <span style={{ width:12, height:12, borderRadius:"50%", background:"#FEBC2E" }}/>
+                <span style={{ width:12, height:12, borderRadius:"50%", background:"#28C840" }}/>
               </div>
-            </motion.div>
-            <motion.div
-              animate={{ y:[0,7,0] }} transition={{ duration:4.2, repeat:Infinity, ease:"easeInOut", delay:0.7 }}
-              className="absolute -top-5 left-8 md:left-16 z-20 rounded-2xl px-3.5 py-2.5 border backdrop-blur-xl shadow-2xl"
-              style={{ background:"rgba(14,10,28,0.97)", borderColor:`${PINK}35` }}>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" style={{ color: PINK }}/>
-                <span className="text-[13px] font-medium text-white">+62% эффективность</span>
-              </div>
-            </motion.div>
-
-            {/* Browser chrome */}
-            <div className="rounded-t-2xl overflow-hidden border border-b-0"
-              style={{ background: CARD, borderColor: BORDER,
-                boxShadow:`0 -24px 80px -8px ${V1}30, 0 0 0 1px ${V1}15` }}>
-
-              {/* Title bar */}
-              <div className="flex items-center gap-3 px-5 py-3.5 border-b"
-                style={{ borderColor: BORDER, background:`${BG}DD` }}>
-                {/* Светофор */}
-                <div className="flex gap-1.5 shrink-0">
-                  <span className="w-3 h-3 rounded-full" style={{ background:"#FF5F57" }}/>
-                  <span className="w-3 h-3 rounded-full" style={{ background:"#FEBC2E" }}/>
-                  <span className="w-3 h-3 rounded-full" style={{ background:"#28C840" }}/>
+              {/* URL bar centered */}
+              <div style={{ flex:1, display:"flex", justifyContent:"center" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10,
+                  borderRadius:999, padding:"6px 16px", maxWidth:420, width:"100%",
+                  background:"rgba(255,255,255,0.05)", border:`1px solid ${BORDER}`,
+                  fontSize:12, fontFamily:"monospace", color:"#64748B" }}>
+                  <span style={{ width:8, height:8, borderRadius:"50%", background:"#4ade80", flexShrink:0 }}/>
+                  rconf.ru/dashboard · Ретроспектива Sprint 42
                 </div>
-                {/* URL bar */}
-                <div className="flex-1 flex justify-center">
-                  <div className="flex items-center gap-2.5 rounded-full px-4 py-1.5 text-[12px] font-mono text-zinc-500 max-w-[380px] w-full"
-                    style={{ background:"rgba(255,255,255,0.05)", border:`1px solid ${BORDER}` }}>
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ background:"#4ade80" }}/>
-                    rconf.ru/dashboard · Ретроспектива Sprint 42
+              </div>
+              {/* Live */}
+              <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
+                <span style={{ position:"relative", display:"inline-flex", width:8, height:8 }}>
+                  <span className="animate-ping" style={{ position:"absolute", inset:0,
+                    borderRadius:"50%", background:"#4ade80", opacity:0.6 }}/>
+                  <span style={{ position:"relative", width:8, height:8, borderRadius:"50%", background:"#4ade80" }}/>
+                </span>
+                <span style={{ fontSize:12, color:"#4ade80", fontWeight:500 }}>Live</span>
+              </div>
+            </div>
+
+            {/* Dashboard body */}
+            <div style={{ display:"grid", gridTemplateColumns:"240px 1fr" }}>
+
+              {/* Sidebar */}
+              <div style={{ borderRight:`1px solid ${BORDER}`,
+                background:"rgba(7,4,15,0.6)", padding:16 }}>
+                <p style={{ fontSize:10, fontWeight:600, textTransform:"uppercase",
+                  letterSpacing:"0.15em", color:`${V1}70`, marginBottom:12, padding:"0 8px" }}>
+                  Сессии
+                </p>
+                {[
+                  { name:"Ретроспектива Sprint 42", date:"14 апр", active:true  },
+                  { name:"Планирование Q2",          date:"11 апр", active:false },
+                  { name:"Оценка рисков",            date:"9 апр",  active:false },
+                  { name:"1-on-1 с командой",        date:"7 апр",  active:false },
+                ].map((s,i) => (
+                  <div key={i} style={{ borderRadius:12, padding:"10px 12px", marginBottom:4,
+                    background: s.active ? `${V1}22` : "transparent",
+                    border:`1px solid ${s.active ? `${V1}40` : "transparent"}` }}>
+                    <p style={{ fontSize:12, fontWeight:500, lineHeight:1.3,
+                      color: s.active ? V2 : "rgba(255,255,255,0.4)", marginBottom:2 }}>
+                      {s.name}
+                    </p>
+                    <p style={{ fontSize:10, color:"rgba(255,255,255,0.2)" }}>{s.date}</p>
                   </div>
-                </div>
-                {/* Live indicator */}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full rounded-full animate-ping" style={{ background:"#4ade80", opacity:0.6 }}/>
-                    <span className="relative h-2 w-2 rounded-full" style={{ background:"#4ade80" }}/>
-                  </span>
-                  <span className="text-[12px] text-emerald-400 font-medium">Live</span>
-                </div>
+                ))}
               </div>
 
-              {/* Dashboard */}
-              <div className="grid grid-cols-12 gap-0 min-h-[400px]">
+              {/* Main panel */}
+              <div style={{ padding:20 }}>
 
-                {/* Sidebar */}
-                <div className="col-span-3 border-r p-4 space-y-2" style={{ borderColor: BORDER, background:`${BG}88` }}>
-                  <p className="text-[10px] font-medium uppercase tracking-widest px-2 mb-3"
-                    style={{ color:`${V1}80` }}>Сессии</p>
+                {/* Header */}
+                <div style={{ display:"flex", justifyContent:"space-between",
+                  alignItems:"flex-start", marginBottom:16 }}>
+                  <div>
+                    <p style={{ fontSize:16, fontWeight:600, color:"#fff", marginBottom:3 }}>
+                      Ретроспектива Sprint 42
+                    </p>
+                    <p style={{ fontSize:12, color:"#64748B" }}>
+                      9 участников · 47 мин · 14 апр 2025
+                    </p>
+                  </div>
+                  <span style={{ fontSize:12, padding:"5px 14px", borderRadius:999,
+                    background:`${V1}20`, color: V2, border:`1px solid ${V1}30`,
+                    fontWeight:500 }}>
+                    Анализ готов
+                  </span>
+                </div>
+
+                {/* KPI row */}
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:14 }}>
                   {[
-                    { name:"Ретроспектива Sprint 42", date:"14 апр", active:true  },
-                    { name:"Планирование Q2",          date:"11 апр", active:false },
-                    { name:"Оценка рисков",            date:"9 апр",  active:false },
-                    { name:"1-on-1 с командой",        date:"7 апр",  active:false },
-                  ].map((s,i) => (
-                    <div key={i} className="rounded-xl px-3 py-2.5 cursor-pointer"
-                      style={{ background: s.active ? `${V1}22` : "transparent",
-                        border:`1px solid ${s.active ? `${V1}40` : "transparent"}` }}>
-                      <p className="text-[12px] font-medium leading-snug"
-                        style={{ color: s.active ? V2 : "rgba(255,255,255,0.45)" }}>{s.name}</p>
-                      <p className="text-[10px] mt-0.5" style={{ color:"rgba(255,255,255,0.2)" }}>{s.date}</p>
+                    { l:"Эффективность", v:"8.4/10", c: V2      },
+                    { l:"Вовлечённость", v:"71%",    c:"#4ade80" },
+                    { l:"Решения",       v:"7 из 8", c: V2       },
+                    { l:"Риски",         v:"1 чел.", c: PINK     },
+                  ].map(m => (
+                    <div key={m.l} style={{ borderRadius:12, padding:"12px 10px", textAlign:"center",
+                      background:"rgba(255,255,255,0.025)", border:`1px solid ${BORDER}` }}>
+                      <p style={{ fontSize:19, fontWeight:700, color: m.c, marginBottom:2 }}>{m.v}</p>
+                      <p style={{ fontSize:11, color:"#64748B" }}>{m.l}</p>
                     </div>
                   ))}
                 </div>
 
-                {/* Main area */}
-                <div className="col-span-9 p-5 space-y-4">
-
-                  {/* Session header */}
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-[15px] font-semibold text-white">Ретроспектива Sprint 42</p>
-                      <p className="text-[12px] text-zinc-500 mt-0.5">9 участников · 47 мин · 14 апр 2025</p>
-                    </div>
-                    <span className="text-[12px] px-3 py-1.5 rounded-full font-medium"
-                      style={{ background:`${V1}20`, color: V2, border:`1px solid ${V1}30` }}>
-                      Анализ готов
-                    </span>
-                  </div>
-
-                  {/* KPI cards */}
-                  <div className="grid grid-cols-4 gap-3">
-                    {[
-                      { l:"Эффективность", v:"8.4/10", c: V2       },
-                      { l:"Вовлечённость", v:"71%",    c:"#4ade80"  },
-                      { l:"Решения",       v:"7 из 8", c: V2        },
-                      { l:"Риски",         v:"1 чел.", c: PINK      },
-                    ].map(m => (
-                      <div key={m.l} className="rounded-xl p-3 text-center border"
-                        style={{ background:"rgba(255,255,255,0.025)", borderColor: BORDER }}>
-                        <p className="text-[18px] font-bold" style={{ color: m.c }}>{m.v}</p>
-                        <p className="text-[11px] text-zinc-500 mt-0.5">{m.l}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Timeline chart */}
-                    <div className="rounded-xl p-4 border" style={{ background:"rgba(255,255,255,0.02)", borderColor: BORDER }}>
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-[12px] text-zinc-400 font-medium">Вовлечённость по времени</p>
-                        <p className="text-[11px]" style={{ color: V2 }}>Ср. 71%</p>
-                      </div>
-                      <div className="flex items-end gap-[3px] h-14">
-                        {[55,62,58,70,85,72,65,78,90,82,75,68,80,88,76,70,65,58,72,80,85,78,72,68].map((v,i) => (
-                          <motion.div key={i} className="flex-1 rounded-t-sm"
-                            style={{ background: v>80 ? V2 : v>65 ? `${V1}90` : `${V1}40` }}
-                            initial={{ height:0 }} animate={{ height:`${v}%` }}
-                            transition={{ delay:0.6+i*0.025, duration:0.3 }}/>
-                        ))}
-                      </div>
-                      <div className="flex justify-between text-[10px] text-zinc-600 mt-1.5">
-                        <span>0:00</span><span>15:00</span><span>30:00</span><span>47:00</span>
-                      </div>
-                    </div>
-
-                    {/* AI insight card */}
-                    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.5 }}
-                      className="rounded-xl p-4 border flex flex-col gap-2"
-                      style={{ background:`${PINK}08`, borderColor:`${PINK}22` }}>
-                      <div className="flex items-center gap-2">
-                        <Lightbulb className="w-4 h-4 shrink-0" style={{ color: PINK }}/>
-                        <p className="text-[12px] font-semibold" style={{ color: PINK }}>AI-инсайт</p>
-                      </div>
-                      <p className="text-[12px] text-zinc-300 leading-relaxed">
-                        Дмитрий В. вовлечён на 38% — риск выгорания. Рекомендуется 1-on-1 с тимлидом.
+                {/* Charts row */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:14 }}>
+                  {/* Timeline */}
+                  <div style={{ borderRadius:12, padding:14, border:`1px solid ${BORDER}`,
+                    background:"rgba(255,255,255,0.02)" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between",
+                      alignItems:"center", marginBottom:10 }}>
+                      <p style={{ fontSize:12, color:"#94A3B8", fontWeight:500 }}>
+                        Вовлечённость по времени
                       </p>
-                      <div className="flex items-center gap-1.5 mt-auto">
-                        <Brain className="w-3 h-3" style={{ color:`${V2}88` }}/>
-                        <span className="text-[10px]" style={{ color:`${V2}66` }}>Сгенерировано RConf AI · только что</span>
-                      </div>
-                    </motion.div>
+                      <p style={{ fontSize:11, color: V2 }}>Ср. 71%</p>
+                    </div>
+                    <div style={{ display:"flex", alignItems:"flex-end", gap:3, height:52 }}>
+                      {[55,62,58,70,85,72,65,78,90,82,75,68,80,88,76,70,65,58,72,80,85,78,72,68].map((v,i) => (
+                        <motion.div key={i} style={{ flex:1, borderRadius:"2px 2px 0 0",
+                          background: v>80 ? V2 : v>65 ? `${V1}90` : `${V1}40` }}
+                          initial={{ height:0 }} animate={{ height:`${v}%` }}
+                          transition={{ delay:0.5+i*0.02, duration:0.3 }}/>
+                      ))}
+                    </div>
+                    <div style={{ display:"flex", justifyContent:"space-between",
+                      fontSize:10, color:"#334155", marginTop:6 }}>
+                      <span>0:00</span><span>15:00</span><span>30:00</span><span>47:00</span>
+                    </div>
                   </div>
 
-                  {/* Participants list */}
-                  <div className="space-y-2">
-                    {[
-                      { n:"Александр К.", r:"Тимлид",      pct:87, low:false },
-                      { n:"Мария С.",     r:"Разработчик", pct:74, low:false },
-                      { n:"Дмитрий В.",   r:"QA Engineer", pct:38, low:true  },
-                      { n:"Елена П.",     r:"PM",          pct:81, low:false },
-                    ].map((m,i) => (
-                      <motion.div key={m.n}
-                        initial={{ opacity:0, x:10 }} animate={{ opacity:1, x:0 }}
-                        transition={{ delay:0.85+i*0.07 }}
-                        className="flex items-center gap-3 rounded-xl px-3.5 py-2.5"
-                        style={{ background: m.low ? `${PINK}08` : "rgba(255,255,255,0.02)",
-                          border:`1px solid ${m.low ? `${PINK}20` : BORDER}` }}>
-                        <span className="w-2 h-2 rounded-full shrink-0"
-                          style={{ background: m.low ? PINK : "#4ade80" }}/>
-                        <span className="text-[13px] text-zinc-200 w-28 truncate">{m.n}</span>
-                        <span className="text-[11px] text-zinc-500 flex-1">{m.r}</span>
-                        <div className="w-28 h-1.5 rounded-full" style={{ background:"rgba(255,255,255,0.06)" }}>
-                          <motion.div className="h-full rounded-full"
-                            style={{ background: m.low ? PINK : V2 }}
-                            initial={{ width:0 }} animate={{ width:`${m.pct}%` }}
-                            transition={{ delay:1.05+i*0.07, duration:0.7 }}/>
-                        </div>
-                        <span className="text-[12px] font-mono w-8 text-right"
-                          style={{ color: m.low ? PINK : "rgba(255,255,255,0.45)" }}>{m.pct}%</span>
-                      </motion.div>
-                    ))}
-                  </div>
+                  {/* AI insight */}
+                  <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.4 }}
+                    style={{ borderRadius:12, padding:14, border:`1px solid ${PINK}25`,
+                      background:`${PINK}08`, display:"flex", flexDirection:"column", gap:8 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                      <Lightbulb style={{ width:15, height:15, color: PINK, flexShrink:0 }}/>
+                      <p style={{ fontSize:12, fontWeight:600, color: PINK }}>AI-инсайт</p>
+                    </div>
+                    <p style={{ fontSize:12, color:"#CBD5E1", lineHeight:1.5 }}>
+                      Дмитрий В. вовлечён на 38% — риск выгорания.
+                      Рекомендуется 1-on-1 с тимлидом до конца недели.
+                    </p>
+                    <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:"auto" }}>
+                      <Brain style={{ width:11, height:11, color:`${V2}70` }}/>
+                      <span style={{ fontSize:10, color:`${V2}55` }}>
+                        Сгенерировано RConf AI · только что
+                      </span>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Participants */}
+                <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                  {[
+                    { n:"Александр К.", r:"Тимлид",      pct:87, low:false },
+                    { n:"Мария С.",     r:"Разработчик", pct:74, low:false },
+                    { n:"Дмитрий В.",   r:"QA Engineer", pct:38, low:true  },
+                    { n:"Елена П.",     r:"PM",          pct:81, low:false },
+                  ].map((m,i) => (
+                    <motion.div key={m.n}
+                      initial={{ opacity:0, x:12 }} animate={{ opacity:1, x:0 }}
+                      transition={{ delay:0.8+i*0.07 }}
+                      style={{ display:"flex", alignItems:"center", gap:12,
+                        borderRadius:12, padding:"10px 14px",
+                        background: m.low ? `${PINK}08` : "rgba(255,255,255,0.02)",
+                        border:`1px solid ${m.low ? `${PINK}22` : BORDER}` }}>
+                      <span style={{ width:7, height:7, borderRadius:"50%", flexShrink:0,
+                        background: m.low ? PINK : "#4ade80" }}/>
+                      <span style={{ fontSize:13, color:"#E2E8F0", width:110,
+                        whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                        {m.n}
+                      </span>
+                      <span style={{ fontSize:11, color:"#64748B", flex:1 }}>{m.r}</span>
+                      <div style={{ width:100, height:5, borderRadius:99,
+                        background:"rgba(255,255,255,0.07)" }}>
+                        <motion.div style={{ height:"100%", borderRadius:99,
+                          background: m.low ? PINK : V2 }}
+                          initial={{ width:0 }} animate={{ width:`${m.pct}%` }}
+                          transition={{ delay:1+i*0.07, duration:0.7 }}/>
+                      </div>
+                      <span style={{ fontSize:12, fontFamily:"monospace", width:32,
+                        textAlign:"right",
+                        color: m.low ? PINK : "rgba(255,255,255,0.4)" }}>
+                        {m.pct}%
+                      </span>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
-
-              {/* Нижний fade-out */}
-              <div className="h-20 pointer-events-none"
-                style={{ background:`linear-gradient(to bottom, transparent, ${BG})` }}/>
             </div>
-          </motion.div>
-        </div>
 
-        {/* ═══ Полоса доверия ═══ */}
+            {/* Bottom gradient fade */}
+            <div style={{ height:72, pointerEvents:"none",
+              background:`linear-gradient(to bottom, transparent, #08051A)` }}/>
+          </div>
+        </motion.div>
+
+        {/* ── Trust logos ── */}
         <motion.div
-          initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.9 }}
-          className="border-t py-8 px-5"
-          style={{ borderColor: BORDER }}>
-          <p className="text-center text-[11px] uppercase tracking-[0.18em] text-zinc-600 mb-7">
+          initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.85 }}
+          style={{ borderTop:`1px solid ${BORDER}`, padding:"28px 20px" }}>
+          <p style={{ textAlign:"center", fontSize:11, textTransform:"uppercase",
+            letterSpacing:"0.18em", color:"#334155", marginBottom:24 }}>
             Используют HR-команды в компаниях
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-10 md:gap-14">
+          <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center",
+            justifyContent:"center", gap:"0 52px", rowGap:16 }}>
             {["Сбер","Яндекс","ВКонтакте","МТС","Мегафон","Ozon"].map(name => (
-              <span key={name}
-                className="font-bold text-[15px] tracking-tight text-white opacity-25 hover:opacity-55 transition-opacity select-none">
+              <span key={name} style={{ fontSize:16, fontWeight:700, letterSpacing:"-0.02em",
+                color:"rgba(255,255,255,0.22)", cursor:"default",
+                transition:"color .2s" }}
+                onMouseEnter={e => (e.currentTarget.style.color="rgba(255,255,255,0.6)")}
+                onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.22)")}>
                 {name}
               </span>
             ))}
