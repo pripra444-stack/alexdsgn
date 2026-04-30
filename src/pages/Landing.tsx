@@ -243,106 +243,70 @@ function Hero() {
       {/* ── КОНТЕНТ ── */}
       <div className="relative" style={{ zIndex:2 }}>
 
-        {/* Текстовый блок — строго по центру */}
-        <div style={{ paddingTop: 80, paddingBottom: 0, textAlign:"center",
-          display:"flex", flexDirection:"column", alignItems:"center", padding:"80px 20px 0" }}>
+        {/* ═══ Текстовый блок — точно как у wope ═══ */}
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center",
+          textAlign:"center", padding:"72px 20px 0" }}>
 
-          {/* Бейдж */}
-          <motion.div
-            initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.4 }}
-            style={{ display:"inline-flex", alignItems:"center", gap:8,
-              borderRadius:999, border:`1px solid ${V1}40`,
-              background:`${V1}14`, color: V2,
-              padding:"6px 16px", fontSize:13, marginBottom:28 }}>
-            <Sparkles style={{ width:14, height:14 }}/> AI-платформа для развития команд
-          </motion.div>
-
-          {/* H1 */}
+          {/* H1 — крупный, uppercase, точно как на скриншоте */}
           <motion.h1
             initial={{ opacity:0, y:32 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.8, delay:0.1, ease:[0.22,1,0.36,1] }}
-            style={{ fontWeight:700, color:"#fff", lineHeight:1.08,
-              letterSpacing:"-0.03em", marginBottom:20, maxWidth:820,
-              fontSize:"clamp(38px,4.6vw,62px)", textAlign:"center",
-              textTransform:"none", fontFeatureSettings:"normal",
-              fontVariant:"normal" }}>
-            Выявляйте{" "}
-            <span style={{ background:`linear-gradient(135deg, ${V2} 0%, ${PINK} 100%)`,
-              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
-              fontFeatureSettings:"normal" }}>
-              слабые места
-            </span>
-            {" "}команды<br/>после каждой сессии.
+            transition={{ duration:0.75, delay:0.05, ease:[0.22,1,0.36,1] }}
+            style={{ fontWeight:800, color:"#FFFFFF", lineHeight:1.06,
+              letterSpacing:"-0.01em", marginBottom:24, maxWidth:860,
+              fontSize:"clamp(36px,4.8vw,64px)", textAlign:"center",
+              textTransform:"uppercase", fontFeatureSettings:"normal",
+              fontVariant:"normal", fontStyle:"normal" }}>
+            Выявляйте слабые места команды<br/>после каждой сессии
           </motion.h1>
 
           {/* Subtitle */}
           <motion.p
             initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.65, delay:0.18 }}
-            style={{ fontSize:16, lineHeight:1.7, color:"#94A3B8",
-              maxWidth:"52ch", marginBottom:32, textAlign:"center" }}>
+            transition={{ duration:0.6, delay:0.15 }}
+            style={{ fontSize:15, lineHeight:1.65, color:"#94A3B8",
+              maxWidth:"56ch", marginBottom:28, textAlign:"center" }}>
             RConf AI анализирует встречи и показывает HR-директору,
             кто выгорает, кто готов к росту и где команда теряет эффективность —
             {" "}<span style={{ color:"#fff", fontWeight:500 }}>автоматически после каждой сессии.</span>
           </motion.p>
 
-          {/* Email pill + кнопка — точно как у wope */}
+          {/* Email pill + кнопка */}
           <motion.div
-            initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.55, delay:0.26 }}
-            style={{ display:"flex", alignItems:"center", width:"100%", maxWidth:460,
-              borderRadius:999, border:`1px solid ${BORDER}`,
-              background:"rgba(255,255,255,0.05)", padding:"5px 5px 5px 16px",
-              marginBottom:14,
-              boxShadow:`0 0 0 1px ${V1}20, 0 8px 48px -8px ${V1}50` }}>
-            <Mail style={{ width:16, height:16, color:"#64748B", flexShrink:0 }}/>
+            initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
+            transition={{ duration:0.5, delay:0.22 }}
+            style={{ display:"flex", alignItems:"center", width:"100%", maxWidth:440,
+              borderRadius:999, border:`1px solid rgba(139,92,246,0.22)`,
+              background:"rgba(255,255,255,0.05)", padding:"5px 5px 5px 14px",
+              marginBottom:12,
+              boxShadow:`0 0 0 1px rgba(139,92,246,0.15), 0 8px 48px -8px rgba(124,58,237,0.55)` }}>
+            <Mail style={{ width:15, height:15, color:"#475569", flexShrink:0 }}/>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="ваш@email.ru"
               style={{ flex:1, background:"transparent", border:"none", outline:"none",
-                fontSize:14, color:"#fff", padding:"4px 10px" }}/>
+                fontSize:14, color:"#fff", padding:"5px 10px",
+                caretColor: V2 }}/>
             <a href="#cta" style={{ flexShrink:0, display:"inline-flex", alignItems:"center",
-              gap:6, borderRadius:999, padding:"10px 22px",
+              gap:6, borderRadius:999, padding:"9px 20px",
               fontSize:14, fontWeight:600, color:"#fff", textDecoration:"none",
               background:`linear-gradient(135deg, ${V1}, ${V2})`,
-              boxShadow:`0 4px 24px -4px ${V1}80` }}>
-              Попробовать <ArrowRight style={{ width:14, height:14 }}/>
+              boxShadow:`0 4px 20px -4px rgba(124,58,237,0.7)` }}>
+              Попробовать <ArrowRight style={{ width:13, height:13 }}/>
             </a>
           </motion.div>
 
-          {/* Hint */}
-          <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.38 }}
-            style={{ fontSize:13, color:"#475569", marginBottom:32 }}>
-            Бесплатно · Без карты · Серверы РФ (ФЗ-152)
+          {/* Hint строка */}
+          <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.32 }}
+            style={{ fontSize:13, color:"#334155", marginBottom:48, display:"flex",
+              alignItems:"center", gap:8 }}>
+            <span>Бесплатно</span>
+            <span style={{ color:"#1E293B" }}>·</span>
+            <span>Без карты</span>
+            <span style={{ color:"#1E293B" }}>·</span>
+            <span>Серверы РФ</span>
+            <span style={{ color:"#1E293B" }}>·</span>
+            <span>ФЗ-152</span>
           </motion.p>
-
-          {/* Social proof */}
-          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.48 }}
-            style={{ display:"flex", flexWrap:"wrap", alignItems:"center",
-              justifyContent:"center", gap:16, marginBottom:56 }}>
-            <div style={{ display:"flex" }}>
-              {[
-                "https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=64",
-                "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=64",
-                "https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&w=64",
-              ].map((src, i) => (
-                <img key={i} src={src} alt="" style={{ width:32, height:32, borderRadius:"50%",
-                  border:`2px solid #08051A`, objectFit:"cover", objectPosition:"top",
-                  marginLeft: i===0?0:-8 }}/>
-              ))}
-            </div>
-            <span style={{ fontSize:14, color:"#94A3B8" }}>
-              <span style={{ color:"#fff", fontWeight:600 }}>500+</span> команд уже используют
-            </span>
-            <span style={{ width:1, height:16, background:"rgba(255,255,255,0.1)" }}/>
-            <div style={{ display:"flex", alignItems:"center", gap:3 }}>
-              {Array.from({length:5}).map((_,i) => (
-                <Star key={i} style={{ width:14, height:14, fill:"#FBBF24", color:"#FBBF24" }}/>
-              ))}
-              <span style={{ fontSize:14, color:"#94A3B8", marginLeft:6 }}>4.9 / 5.0</span>
-            </div>
-          </motion.div>
         </div>
 
         {/* ── Browser mockup (точно как у wope — на всю ширину, снизу) ── */}
@@ -569,22 +533,30 @@ function Hero() {
           </div>
         </motion.div>
 
-        {/* ── Trust logos ── */}
+        {/* ── Trust logos — российские компании ── */}
         <motion.div
           initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.85 }}
-          style={{ borderTop:`1px solid ${BORDER}`, padding:"28px 20px" }}>
+          style={{ borderTop:`1px solid rgba(139,92,246,0.15)`, padding:"24px 20px 32px" }}>
           <p style={{ textAlign:"center", fontSize:11, textTransform:"uppercase",
-            letterSpacing:"0.18em", color:"#334155", marginBottom:24 }}>
-            Используют HR-команды в компаниях
+            letterSpacing:"0.2em", color:"#1E293B", marginBottom:22 }}>
+            Используют команды в компаниях
           </p>
           <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center",
-            justifyContent:"center", gap:"0 52px", rowGap:16 }}>
-            {["Сбер","Яндекс","ВКонтакте","МТС","Мегафон","Ozon"].map(name => (
-              <span key={name} style={{ fontSize:16, fontWeight:700, letterSpacing:"-0.02em",
-                color:"rgba(255,255,255,0.22)", cursor:"default",
-                transition:"color .2s" }}
-                onMouseEnter={e => (e.currentTarget.style.color="rgba(255,255,255,0.6)")}
-                onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.22)")}>
+            justifyContent:"center", gap:"0 48px", rowGap:14 }}>
+            {[
+              { name:"Сбер",      w:700 },
+              { name:"Яндекс",    w:700 },
+              { name:"ВКонтакте", w:700 },
+              { name:"МТС",       w:800 },
+              { name:"Мегафон",   w:700 },
+              { name:"Ozon",      w:700 },
+            ].map(({ name, w }) => (
+              <span key={name}
+                style={{ fontSize:15, fontWeight:w, letterSpacing:"-0.02em",
+                  color:"rgba(255,255,255,0.2)", cursor:"default",
+                  transition:"color 0.2s" }}
+                onMouseEnter={e => (e.currentTarget.style.color="rgba(255,255,255,0.55)")}
+                onMouseLeave={e => (e.currentTarget.style.color="rgba(255,255,255,0.2)")}>
                 {name}
               </span>
             ))}
