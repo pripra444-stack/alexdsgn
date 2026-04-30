@@ -162,41 +162,41 @@ function Nav() {
 }
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
-function RadiatingLines() {
-  // Lines emanating from a central point outward
-  const lines = Array.from({ length: 24 }, (_, i) => {
-    const angle = (i / 24) * 360;
-    const rad = (angle * Math.PI) / 180;
-    const len = 340 + Math.random() * 120;
-    const x2 = Math.cos(rad) * len;
-    const y2 = Math.sin(rad) * len;
-    return { angle, x2, y2, delay: i * 0.04 };
-  });
+// Фиксированные углы лучей — без Math.random() чтобы не перерендеривать
+const RAY_ANGLES = [0,15,30,45,60,75,90,105,120,135,150,165,180,195,210,225,240,255,270,285,300,315,330,345];
+const RAY_LENS   = [420,360,440,380,460,350,430,370,450,340,410,390,440,360,420,380,460,350,430,370,450,340,410,390];
 
+function HeroRays() {
   return (
     <svg
-      className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-      style={{ top: "calc(100% - 60px)", width: 900, height: 520, overflow: "visible" }}
-      viewBox="-450 -60 900 520"
+      aria-hidden
+      className="pointer-events-none absolute left-1/2 -translate-x-1/2"
+      style={{ top: 0, width: 1400, height: 600, overflow: "visible", zIndex: 0 }}
+      viewBox="-700 0 1400 600"
     >
       <defs>
-        <radialGradient id="lineGrad" cx="50%" cy="0%" r="100%">
-          <stop offset="0%" stopColor={V1} stopOpacity="0.55"/>
+        <radialGradient id="rg" cx="50%" cy="0%" r="75%">
+          <stop offset="0%"   stopColor={V1} stopOpacity="0.7"/>
           <stop offset="100%" stopColor={V1} stopOpacity="0"/>
         </radialGradient>
       </defs>
-      {lines.map((l, i) => (
-        <motion.line
-          key={i}
-          x1={0} y1={0} x2={l.x2} y2={l.y2}
-          stroke={`url(#lineGrad)`}
-          strokeWidth={i % 6 === 0 ? 1.2 : 0.5}
-          strokeOpacity={i % 4 === 0 ? 0.6 : 0.28}
-          initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ duration: 1.4, delay: 0.3 + l.delay, ease: "easeOut" }}
-        />
-      ))}
+      {RAY_ANGLES.map((deg, i) => {
+        const rad = (deg * Math.PI) / 180;
+        const len = RAY_LENS[i];
+        return (
+          <motion.line key={i}
+            x1={0} y1={0}
+            x2={Math.cos(rad) * len}
+            y2={Math.sin(rad) * len}
+            stroke="url(#rg)"
+            strokeWidth={i % 6 === 0 ? 1.5 : 0.6}
+            strokeOpacity={i % 3 === 0 ? 0.55 : 0.22}
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 1.6, delay: 0.2 + i * 0.035, ease: "easeOut" }}
+          />
+        );
+      })}
     </svg>
   );
 }
@@ -205,76 +205,90 @@ function Hero() {
   const [email, setEmail] = useState("");
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden" style={{ background: BG }}>
       <GridBg opacity={0.03}/>
 
-      {/* Central radial glow */}
-      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ top: "52%", width: 800, height: 800, marginLeft: -400,
-          background: `radial-gradient(circle at 50% 50%, ${V1}2E 0%, ${V2}18 30%, transparent 70%)`,
-          filter: "blur(1px)" }}/>
-      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-        style={{ top: "54%", width: 400, height: 400, marginLeft: -200,
-          background: `radial-gradient(circle, ${PINK}22, transparent 65%)`,
-          filter: "blur(40px)" }}/>
+      {/* ── Большое радиальное свечение по центру (как у wope) ── */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0" style={{
+        top: "30%",
+        height: 700,
+        background: `radial-gradient(ellipse 70% 60% at 50% 0%, ${V1}38 0%, ${V2}18 40%, transparent 75%)`,
+      }}/>
+      {/* Точечный розовый блик */}
+      <div aria-hidden className="pointer-events-none absolute left-1/2 -translate-x-1/2"
+        style={{ top: "38%", width: 300, height: 300, marginLeft: -150,
+          background: `radial-gradient(circle, ${PINK}28, transparent 65%)`,
+          filter: "blur(50px)" }}/>
 
-      <div className="relative z-10 pt-20 pb-0 md:pt-28">
+      <div className="relative z-10">
 
-        {/* ── Centered text block ── */}
-        <div className="flex flex-col items-center text-center px-5 max-w-[800px] mx-auto">
+        {/* ═══ Текстовый блок — строго по центру ═══ */}
+        <div className="flex flex-col items-center text-center pt-20 md:pt-28 px-5">
 
-          {/* Badge */}
-          <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}
-            className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] mb-8"
-            style={{ borderColor:`${V1}40`, background:`${V1}14`, color: V2 }}>
-            <Sparkles className="w-3.5 h-3.5"/> AI-аналитика командных встреч
+          {/* Бейдж */}
+          <motion.div
+            initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }}
+            transition={{ duration:0.45 }}
+            className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[13px] mb-7"
+            style={{ borderColor:`${V1}40`, background:`${V1}12`, color: V2 }}>
+            <Sparkles className="w-3.5 h-3.5"/> AI-платформа для развития команд
           </motion.div>
 
-          {/* H1 */}
+          {/* H1 — оригинальный текст */}
           <motion.h1
-            initial={{ opacity:0, y:28 }} animate={{ opacity:1, y:0 }}
+            initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }}
             transition={{ duration:0.85, delay:0.1, ease:[0.22,1,0.36,1] }}
-            className="font-bold text-white leading-[1.04] tracking-[-0.04em] mb-6"
-            style={{ fontSize:"clamp(40px,5.5vw,72px)" }}>
-            Видите команду —<br/>
-            <span style={{ background:`linear-gradient(135deg, ${V2} 0%, ${PINK} 100%)`,
-              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
-              через данные каждой встречи.
-            </span>
+            className="font-bold text-white leading-[1.04] tracking-[-0.04em] mb-5 max-w-[820px]"
+            style={{ fontSize:"clamp(42px,5.8vw,76px)" }}>
+            Выявляйте{" "}
+            <span style={{
+              background:`linear-gradient(135deg, ${V2} 0%, ${PINK} 100%)`,
+              WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"
+            }}>слабые места</span>
+            {" "}команды<br/>после каждой сессии.
           </motion.h1>
 
-          {/* Subtitle */}
+          {/* Подзаголовок — оригинальный */}
           <motion.p
             initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.7, delay:0.22 }}
-            className="text-[17px] leading-[1.65] text-zinc-400 max-w-[56ch] mb-10">
-            RConf AI анализирует запись совещания и показывает,
-            кто выгорает, кто молчит и где команда теряет эффективность —
-            {" "}<span className="text-white font-medium">автоматически, после каждой сессии.</span>
+            transition={{ duration:0.7, delay:0.2 }}
+            className="text-[17px] leading-[1.7] text-zinc-400 max-w-[52ch] mb-9">
+            RConf AI анализирует встречи и показывает HR-директору,
+            кто выгорает, кто готов к росту и где команда теряет эффективность —
+            {" "}<span className="text-white font-medium">автоматически после каждой сессии.</span>
           </motion.p>
 
-          {/* Email CTA */}
+          {/* Email + кнопка (pill) */}
           <motion.div
             initial={{ opacity:0, y:14 }} animate={{ opacity:1, y:0 }}
-            transition={{ duration:0.6, delay:0.34 }}
-            className="flex items-center w-full max-w-[480px] rounded-full border p-1.5 mb-5"
-            style={{ background:"rgba(255,255,255,0.04)", borderColor: BORDER,
-              boxShadow:`0 0 0 1px ${V1}20, 0 8px 40px -8px ${V1}30` }}>
-            <Mail className="w-4 h-4 text-zinc-500 ml-4 shrink-0"/>
+            transition={{ duration:0.6, delay:0.3 }}
+            className="flex items-center rounded-full border p-1.5 mb-4 w-full"
+            style={{ maxWidth: 460, borderColor: BORDER,
+              background:"rgba(255,255,255,0.04)",
+              boxShadow:`0 0 0 1px ${V1}18, 0 8px 40px -8px ${V1}35` }}>
+            <Mail className="w-4 h-4 shrink-0 ml-4 text-zinc-500"/>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="ваш@email.ru"
-              className="flex-1 bg-transparent outline-none text-[14px] text-white placeholder:text-zinc-600 px-3 py-1"/>
+              className="flex-1 bg-transparent outline-none text-[14px] text-white placeholder:text-zinc-600 px-3 py-1.5"/>
             <a href="#cta"
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-6 py-2.5 text-[14px] font-semibold text-white transition-opacity hover:opacity-85"
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-6 py-2.5 text-[14px] font-semibold text-white hover:opacity-85 transition-opacity"
               style={{ background:`linear-gradient(135deg, ${V1}, ${V2})`,
-                boxShadow:`0 6px 28px -4px ${V1}70` }}>
+                boxShadow:`0 4px 24px -4px ${V1}70` }}>
               Попробовать <ArrowRight className="w-3.5 h-3.5"/>
             </a>
           </motion.div>
 
-          {/* Social proof row */}
-          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.52 }}
+          {/* Мелкий hint */}
+          <motion.p
+            initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.42 }}
+            className="text-[13px] text-zinc-600 mb-10">
+            Бесплатно · Без карты · Данные на серверах РФ
+          </motion.p>
+
+          {/* Социальное доверие */}
+          <motion.div
+            initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.5 }}
             className="flex flex-wrap items-center justify-center gap-5 mb-16">
             <div className="flex -space-x-2">
               {[
@@ -282,14 +296,15 @@ function Hero() {
                 "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=64",
                 "https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&w=64",
               ].map((src, i) => (
-                <img key={i} src={src} className="w-8 h-8 rounded-full border-2 object-cover object-top"
-                  style={{ borderColor: BG }} alt=""/>
+                <img key={i} src={src} alt=""
+                  className="w-8 h-8 rounded-full border-2 object-cover object-top"
+                  style={{ borderColor: BG }}/>
               ))}
             </div>
             <span className="text-sm text-zinc-400">
               <span className="text-white font-semibold">500+</span> команд уже используют
             </span>
-            <div className="h-4 w-px bg-white/10"/>
+            <div className="h-4 w-px" style={{ background:"rgba(255,255,255,0.1)" }}/>
             <div className="flex items-center gap-1">
               {Array.from({length:5}).map((_,i) => (
                 <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400"/>
@@ -299,112 +314,137 @@ function Hero() {
           </motion.div>
         </div>
 
-        {/* ── Radiating lines (behind mockup) ── */}
-        <div className="relative">
-          <RadiatingLines/>
+        {/* ═══ Зона лучей + mockup ═══ */}
+        <div className="relative" style={{ minHeight: 480 }}>
+          {/* Лучи — исходят из верхней середины зоны */}
+          <HeroRays/>
 
-          {/* ── Browser mockup ── */}
+          {/* Большой browser mockup */}
           <motion.div
-            initial={{ opacity:0, y:48, scale:0.97 }} animate={{ opacity:1, y:0, scale:1 }}
-            transition={{ duration:1.1, delay:0.45, ease:[0.22,1,0.36,1] }}
-            className="relative z-10 mx-auto"
-            style={{ maxWidth: 1100, padding: "0 24px" }}>
+            initial={{ opacity:0, y:56, scale:0.96 }} animate={{ opacity:1, y:0, scale:1 }}
+            transition={{ duration:1.1, delay:0.38, ease:[0.22,1,0.36,1] }}
+            className="relative z-10 mx-auto px-5 md:px-10"
+            style={{ maxWidth: 1200 }}>
 
-            <div className="rounded-t-2xl border border-b-0 overflow-hidden"
+            {/* Floating badges */}
+            <motion.div
+              animate={{ y:[0,-7,0] }} transition={{ duration:3.8, repeat:Infinity, ease:"easeInOut", delay:1.4 }}
+              className="absolute -top-5 right-8 md:right-16 z-20 rounded-2xl px-3.5 py-2.5 border backdrop-blur-xl shadow-2xl"
+              style={{ background:"rgba(14,10,28,0.97)", borderColor: BORDER }}>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4" style={{ color: V2 }}/>
+                <span className="text-[13px] font-medium text-white">ФЗ-152 · Серверы РФ</span>
+              </div>
+            </motion.div>
+            <motion.div
+              animate={{ y:[0,7,0] }} transition={{ duration:4.2, repeat:Infinity, ease:"easeInOut", delay:0.7 }}
+              className="absolute -top-5 left-8 md:left-16 z-20 rounded-2xl px-3.5 py-2.5 border backdrop-blur-xl shadow-2xl"
+              style={{ background:"rgba(14,10,28,0.97)", borderColor:`${PINK}35` }}>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" style={{ color: PINK }}/>
+                <span className="text-[13px] font-medium text-white">+62% эффективность</span>
+              </div>
+            </motion.div>
+
+            {/* Browser chrome */}
+            <div className="rounded-t-2xl overflow-hidden border border-b-0"
               style={{ background: CARD, borderColor: BORDER,
-                boxShadow:`0 -20px 80px -10px ${V1}25, 0 40px 120px -20px ${V1}20` }}>
+                boxShadow:`0 -24px 80px -8px ${V1}30, 0 0 0 1px ${V1}15` }}>
 
-              {/* Window chrome bar */}
-              <div className="flex items-center justify-between px-5 py-3.5 border-b"
-                style={{ borderColor: BORDER, background:`${BG}CC` }}>
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ background:"#FF5F57" }}/>
-                  <div className="w-3 h-3 rounded-full" style={{ background:"#FEBC2E" }}/>
-                  <div className="w-3 h-3 rounded-full" style={{ background:"#28C840" }}/>
+              {/* Title bar */}
+              <div className="flex items-center gap-3 px-5 py-3.5 border-b"
+                style={{ borderColor: BORDER, background:`${BG}DD` }}>
+                {/* Светофор */}
+                <div className="flex gap-1.5 shrink-0">
+                  <span className="w-3 h-3 rounded-full" style={{ background:"#FF5F57" }}/>
+                  <span className="w-3 h-3 rounded-full" style={{ background:"#FEBC2E" }}/>
+                  <span className="w-3 h-3 rounded-full" style={{ background:"#28C840" }}/>
                 </div>
-                <div className="flex-1 mx-6">
-                  <div className="mx-auto max-w-[360px] flex items-center gap-2 rounded-full px-4 py-1.5 text-[12px] font-mono text-zinc-500"
-                    style={{ background:"rgba(255,255,255,0.04)", border:`1px solid ${BORDER}` }}>
+                {/* URL bar */}
+                <div className="flex-1 flex justify-center">
+                  <div className="flex items-center gap-2.5 rounded-full px-4 py-1.5 text-[12px] font-mono text-zinc-500 max-w-[380px] w-full"
+                    style={{ background:"rgba(255,255,255,0.05)", border:`1px solid ${BORDER}` }}>
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ background:"#4ade80" }}/>
-                    rconf.ru/dashboard · сессия #42
+                    rconf.ru/dashboard · Ретроспектива Sprint 42
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="absolute inline-flex h-full w-full rounded-full animate-ping"
-                      style={{ background:"#4ade80", opacity:0.6 }}/>
-                    <span className="relative h-2.5 w-2.5 rounded-full" style={{ background:"#4ade80" }}/>
+                {/* Live indicator */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full rounded-full animate-ping" style={{ background:"#4ade80", opacity:0.6 }}/>
+                    <span className="relative h-2 w-2 rounded-full" style={{ background:"#4ade80" }}/>
                   </span>
                   <span className="text-[12px] text-emerald-400 font-medium">Live</span>
                 </div>
               </div>
 
-              {/* Dashboard content */}
-              <div className="p-6 grid grid-cols-12 gap-4">
+              {/* Dashboard */}
+              <div className="grid grid-cols-12 gap-0 min-h-[400px]">
 
-                {/* Left sidebar */}
-                <div className="col-span-3 space-y-3">
-                  <p className="text-[11px] text-zinc-600 font-medium uppercase tracking-wide px-1">Сессии</p>
+                {/* Sidebar */}
+                <div className="col-span-3 border-r p-4 space-y-2" style={{ borderColor: BORDER, background:`${BG}88` }}>
+                  <p className="text-[10px] font-medium uppercase tracking-widest px-2 mb-3"
+                    style={{ color:`${V1}80` }}>Сессии</p>
                   {[
-                    { name:"Ретроспектива Sprint 42", date:"14 апр", active:true },
-                    { name:"Планирование Q2",         date:"11 апр", active:false },
-                    { name:"Оценка рисков",           date:"9 апр",  active:false },
-                    { name:"1-on-1 с командой",       date:"7 апр",  active:false },
+                    { name:"Ретроспектива Sprint 42", date:"14 апр", active:true  },
+                    { name:"Планирование Q2",          date:"11 апр", active:false },
+                    { name:"Оценка рисков",            date:"9 апр",  active:false },
+                    { name:"1-on-1 с командой",        date:"7 апр",  active:false },
                   ].map((s,i) => (
-                    <div key={i} className="rounded-xl px-3 py-2.5 cursor-pointer transition-all"
-                      style={{ background: s.active ? `${V1}20` : "rgba(255,255,255,0.025)",
-                        border:`1px solid ${s.active ? `${V1}40` : BORDER}` }}>
+                    <div key={i} className="rounded-xl px-3 py-2.5 cursor-pointer"
+                      style={{ background: s.active ? `${V1}22` : "transparent",
+                        border:`1px solid ${s.active ? `${V1}40` : "transparent"}` }}>
                       <p className="text-[12px] font-medium leading-snug"
-                        style={{ color: s.active ? V2 : "#aaa" }}>{s.name}</p>
-                      <p className="text-[10px] text-zinc-600 mt-0.5">{s.date}</p>
+                        style={{ color: s.active ? V2 : "rgba(255,255,255,0.45)" }}>{s.name}</p>
+                      <p className="text-[10px] mt-0.5" style={{ color:"rgba(255,255,255,0.2)" }}>{s.date}</p>
                     </div>
                   ))}
                 </div>
 
-                {/* Main panel */}
-                <div className="col-span-9 space-y-4">
+                {/* Main area */}
+                <div className="col-span-9 p-5 space-y-4">
 
-                  {/* Header */}
-                  <div className="flex items-center justify-between">
+                  {/* Session header */}
+                  <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-[16px] font-semibold text-white">Ретроспектива Sprint 42</p>
+                      <p className="text-[15px] font-semibold text-white">Ретроспектива Sprint 42</p>
                       <p className="text-[12px] text-zinc-500 mt-0.5">9 участников · 47 мин · 14 апр 2025</p>
                     </div>
                     <span className="text-[12px] px-3 py-1.5 rounded-full font-medium"
-                      style={{ background:`${V1}20`, color: V2, border:`1px solid ${V1}35` }}>
+                      style={{ background:`${V1}20`, color: V2, border:`1px solid ${V1}30` }}>
                       Анализ готов
                     </span>
                   </div>
 
-                  {/* Top metrics */}
+                  {/* KPI cards */}
                   <div className="grid grid-cols-4 gap-3">
                     {[
-                      { label:"Эффективность", v:"8.4/10",  c: V2    },
-                      { label:"Вовлечённость", v:"71%",     c:"#4ade80" },
-                      { label:"Решения",       v:"7 из 8",  c: V2    },
-                      { label:"Риски",         v:"1 чел.",  c: PINK  },
+                      { l:"Эффективность", v:"8.4/10", c: V2       },
+                      { l:"Вовлечённость", v:"71%",    c:"#4ade80"  },
+                      { l:"Решения",       v:"7 из 8", c: V2        },
+                      { l:"Риски",         v:"1 чел.", c: PINK      },
                     ].map(m => (
-                      <div key={m.label} className="rounded-xl p-3 text-center border"
+                      <div key={m.l} className="rounded-xl p-3 text-center border"
                         style={{ background:"rgba(255,255,255,0.025)", borderColor: BORDER }}>
-                        <p className="text-[17px] font-bold" style={{ color: m.c }}>{m.v}</p>
-                        <p className="text-[11px] text-zinc-500 mt-0.5">{m.label}</p>
+                        <p className="text-[18px] font-bold" style={{ color: m.c }}>{m.v}</p>
+                        <p className="text-[11px] text-zinc-500 mt-0.5">{m.l}</p>
                       </div>
                     ))}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    {/* Timeline */}
-                    <div className="rounded-xl p-4 border" style={{ background:"rgba(255,255,255,0.025)", borderColor: BORDER }}>
+                    {/* Timeline chart */}
+                    <div className="rounded-xl p-4 border" style={{ background:"rgba(255,255,255,0.02)", borderColor: BORDER }}>
                       <div className="flex items-center justify-between mb-3">
                         <p className="text-[12px] text-zinc-400 font-medium">Вовлечённость по времени</p>
                         <p className="text-[11px]" style={{ color: V2 }}>Ср. 71%</p>
                       </div>
-                      <div className="flex items-end gap-[3px] h-12">
+                      <div className="flex items-end gap-[3px] h-14">
                         {[55,62,58,70,85,72,65,78,90,82,75,68,80,88,76,70,65,58,72,80,85,78,72,68].map((v,i) => (
                           <motion.div key={i} className="flex-1 rounded-t-sm"
-                            style={{ background: v > 80 ? V2 : v > 65 ? `${V1}90` : `${V1}40` }}
+                            style={{ background: v>80 ? V2 : v>65 ? `${V1}90` : `${V1}40` }}
                             initial={{ height:0 }} animate={{ height:`${v}%` }}
-                            transition={{ delay:0.7+i*0.025, duration:0.3 }}/>
+                            transition={{ delay:0.6+i*0.025, duration:0.3 }}/>
                         ))}
                       </div>
                       <div className="flex justify-between text-[10px] text-zinc-600 mt-1.5">
@@ -412,104 +452,76 @@ function Hero() {
                       </div>
                     </div>
 
-                    {/* AI insight */}
-                    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.6 }}
+                    {/* AI insight card */}
+                    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:1.5 }}
                       className="rounded-xl p-4 border flex flex-col gap-2"
-                      style={{ background:`${PINK}08`, borderColor:`${PINK}25` }}>
+                      style={{ background:`${PINK}08`, borderColor:`${PINK}22` }}>
                       <div className="flex items-center gap-2">
                         <Lightbulb className="w-4 h-4 shrink-0" style={{ color: PINK }}/>
                         <p className="text-[12px] font-semibold" style={{ color: PINK }}>AI-инсайт</p>
                       </div>
                       <p className="text-[12px] text-zinc-300 leading-relaxed">
-                        Дмитрий В. вовлечён на 38% — риск выгорания. Рекомендуется 1-on-1 с тимлидом до конца недели.
+                        Дмитрий В. вовлечён на 38% — риск выгорания. Рекомендуется 1-on-1 с тимлидом.
                       </p>
-                      <div className="flex items-center gap-2 mt-auto">
-                        <Brain className="w-3.5 h-3.5" style={{ color: V2 }}/>
-                        <span className="text-[11px]" style={{ color:`${V2}99` }}>Сгенерировано RConf AI · только что</span>
+                      <div className="flex items-center gap-1.5 mt-auto">
+                        <Brain className="w-3 h-3" style={{ color:`${V2}88` }}/>
+                        <span className="text-[10px]" style={{ color:`${V2}66` }}>Сгенерировано RConf AI · только что</span>
                       </div>
                     </motion.div>
                   </div>
 
-                  {/* Participants */}
+                  {/* Participants list */}
                   <div className="space-y-2">
                     {[
-                      { n:"Александр К.", r:"Тимлид",      pct:87, status:"ok",  time:"14 мин" },
-                      { n:"Мария С.",     r:"Разработчик", pct:74, status:"ok",  time:"9 мин"  },
-                      { n:"Дмитрий В.",   r:"QA Engineer", pct:38, status:"low", time:"2 мин"  },
-                      { n:"Елена П.",     r:"PM",          pct:81, status:"ok",  time:"11 мин" },
-                    ].map((m, i) => (
+                      { n:"Александр К.", r:"Тимлид",      pct:87, low:false },
+                      { n:"Мария С.",     r:"Разработчик", pct:74, low:false },
+                      { n:"Дмитрий В.",   r:"QA Engineer", pct:38, low:true  },
+                      { n:"Елена П.",     r:"PM",          pct:81, low:false },
+                    ].map((m,i) => (
                       <motion.div key={m.n}
-                        initial={{ opacity:0, x:8 }} animate={{ opacity:1, x:0 }}
-                        transition={{ delay:0.9+i*0.07 }}
+                        initial={{ opacity:0, x:10 }} animate={{ opacity:1, x:0 }}
+                        transition={{ delay:0.85+i*0.07 }}
                         className="flex items-center gap-3 rounded-xl px-3.5 py-2.5"
-                        style={{ background: m.status==="low" ? `${PINK}08` : "rgba(255,255,255,0.02)",
-                          border:`1px solid ${m.status==="low" ? `${PINK}20` : BORDER}` }}>
-                        <div className="w-2 h-2 rounded-full shrink-0"
-                          style={{ background: m.status==="low" ? PINK : "#4ade80" }}/>
-                        <span className="text-[13px] text-zinc-300 w-24 truncate">{m.n}</span>
+                        style={{ background: m.low ? `${PINK}08` : "rgba(255,255,255,0.02)",
+                          border:`1px solid ${m.low ? `${PINK}20` : BORDER}` }}>
+                        <span className="w-2 h-2 rounded-full shrink-0"
+                          style={{ background: m.low ? PINK : "#4ade80" }}/>
+                        <span className="text-[13px] text-zinc-200 w-28 truncate">{m.n}</span>
                         <span className="text-[11px] text-zinc-500 flex-1">{m.r}</span>
-                        <span className="text-[11px] text-zinc-600 w-12 text-right">{m.time}</span>
-                        <div className="w-24 h-1.5 rounded-full" style={{ background:"rgba(255,255,255,0.06)" }}>
+                        <div className="w-28 h-1.5 rounded-full" style={{ background:"rgba(255,255,255,0.06)" }}>
                           <motion.div className="h-full rounded-full"
-                            style={{ background: m.status==="low" ? PINK : V2 }}
+                            style={{ background: m.low ? PINK : V2 }}
                             initial={{ width:0 }} animate={{ width:`${m.pct}%` }}
-                            transition={{ delay:1.1+i*0.07, duration:0.7 }}/>
+                            transition={{ delay:1.05+i*0.07, duration:0.7 }}/>
                         </div>
                         <span className="text-[12px] font-mono w-8 text-right"
-                          style={{ color: m.status==="low" ? PINK : "rgba(255,255,255,0.5)" }}>{m.pct}%</span>
+                          style={{ color: m.low ? PINK : "rgba(255,255,255,0.45)" }}>{m.pct}%</span>
                       </motion.div>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Bottom fade */}
-              <div className="h-16 pointer-events-none"
-                style={{ background:`linear-gradient(to bottom, transparent, ${BG}EE)` }}/>
+              {/* Нижний fade-out */}
+              <div className="h-20 pointer-events-none"
+                style={{ background:`linear-gradient(to bottom, transparent, ${BG})` }}/>
             </div>
-
-            {/* Float chips on mockup */}
-            <motion.div
-              animate={{ y:[0,-8,0] }} transition={{ duration:3.8, repeat:Infinity, ease:"easeInOut", delay:1.5 }}
-              className="absolute top-6 -right-3 rounded-xl px-3 py-2 border backdrop-blur-xl shadow-xl z-20"
-              style={{ background:"rgba(14,10,28,0.96)", borderColor: BORDER }}>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-3.5 h-3.5" style={{ color: V2 }}/>
-                <span className="text-xs font-medium text-white">ФЗ-152 · Серверы РФ</span>
-              </div>
-            </motion.div>
-            <motion.div
-              animate={{ y:[0,7,0] }} transition={{ duration:4.2, repeat:Infinity, ease:"easeInOut", delay:0.8 }}
-              className="absolute top-6 -left-3 rounded-xl px-3 py-2 border backdrop-blur-xl shadow-xl z-20"
-              style={{ background:"rgba(14,10,28,0.96)", borderColor:`${PINK}30` }}>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-3.5 h-3.5" style={{ color: PINK }}/>
-                <span className="text-xs font-medium text-white">+62% эффективность</span>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
 
-        {/* ── Trust logos strip ── */}
+        {/* ═══ Полоса доверия ═══ */}
         <motion.div
           initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.9 }}
-          className="border-t mt-0 py-8 px-5"
+          className="border-t py-8 px-5"
           style={{ borderColor: BORDER }}>
-          <p className="text-center text-[12px] text-zinc-600 uppercase tracking-widest mb-7">
-            Используют команды в компаниях
+          <p className="text-center text-[11px] uppercase tracking-[0.18em] text-zinc-600 mb-7">
+            Используют HR-команды в компаниях
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16">
-            {[
-              { name:"Сбер",     color:"#21A038" },
-              { name:"Яндекс",   color:"#FC3F1D" },
-              { name:"ВКонтакте",color:"#0077FF" },
-              { name:"МТС",      color:"#E30611" },
-              { name:"Мегафон",  color:"#00B956" },
-              { name:"Ozon",     color:"#005BFF" },
-            ].map(c => (
-              <span key={c.name} className="font-bold tracking-tight text-[16px] opacity-30 hover:opacity-60 transition-opacity"
-                style={{ color:"#fff" }}>
-                {c.name}
+          <div className="flex flex-wrap items-center justify-center gap-10 md:gap-14">
+            {["Сбер","Яндекс","ВКонтакте","МТС","Мегафон","Ozon"].map(name => (
+              <span key={name}
+                className="font-bold text-[15px] tracking-tight text-white opacity-25 hover:opacity-55 transition-opacity select-none">
+                {name}
               </span>
             ))}
           </div>
