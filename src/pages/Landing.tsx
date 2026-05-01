@@ -252,8 +252,8 @@ function Hero() {
             initial={{ opacity:0, y:32 }} animate={{ opacity:1, y:0 }}
             transition={{ duration:0.75, delay:0.05, ease:[0.22,1,0.36,1] }}
             style={{ fontWeight:800, color:"#FFFFFF", lineHeight:1.06,
-              letterSpacing:"-0.01em", marginBottom:24, maxWidth:860,
-              fontSize:"clamp(36px,4.8vw,64px)", textAlign:"center",
+              letterSpacing:"-0.01em", marginBottom:24, maxWidth:960,
+              fontSize:"clamp(28px,3.6vw,52px)", textAlign:"center",
               textTransform:"uppercase", fontFeatureSettings:"normal",
               fontVariant:"normal", fontStyle:"normal" }}>
             Выявляйте слабые места команды<br/>после каждой сессии
