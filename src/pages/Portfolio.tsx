@@ -2,8 +2,8 @@ import { useRef } from "react";
 import { m, useInView } from "framer-motion";
 
 // ─── Links (replace with real) ───────────────────────────────────────────────
-const TG_LINK = "https://t.me/username";       // ← замените на ваш username
-const BEHANCE_LINK = "https://behance.net/username"; // ← ваш Behance
+const TG_LINK = "https://t.me/AlexanderPanurin";
+const BEHANCE_LINK = "https://www.behance.net/alexandpanurin";
 
 // ─── Animation helpers ───────────────────────────────────────────────────────
 const fadeUp = {
