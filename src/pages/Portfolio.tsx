@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { m, useInView } from "framer-motion";
 
-// ─── Links (replace with real) ───────────────────────────────────────────────
+// ─── Links ───────────────────────────────────────────────────────────────────
 const TG_LINK = "https://t.me/AlexanderPanurin";
 const BEHANCE_LINK = "https://www.behance.net/alexanderpanurin";
 
@@ -41,7 +41,6 @@ function Reveal({
   );
 }
 
-// ─── Section label ────────────────────────────────────────────────────────────
 function Label({ children }: { children: React.ReactNode }) {
   return (
     <m.p
@@ -63,15 +62,12 @@ function Nav() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/[0.06] backdrop-blur-xl bg-canvas/80">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10 h-full flex items-center justify-between">
-        {/* Logo */}
         <a
           href="#"
           className="text-sm font-semibold tracking-[0.18em] uppercase text-white"
         >
           MAX<span className="text-accent">.</span>DESIGN
         </a>
-
-        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
           {links.map(({ label, href }) => (
             <a
@@ -83,8 +79,6 @@ function Nav() {
             </a>
           ))}
         </nav>
-
-        {/* CTA */}
         <a
           href={TG_LINK}
           target="_blank"
@@ -98,123 +92,453 @@ function Nav() {
   );
 }
 
-// ─── HERO ────────────────────────────────────────────────────────────────────
-function Hero() {
-  const platforms = ["WB", "Ozon", "e-commerce", "упаковка"];
+// ─── HERO — floating product cards ───────────────────────────────────────────
+
+type HeroCard = {
+  id: string;
+  title: string;
+  sub: string;
+  tag?: string;
+  /** Unsplash image URL — replace with your actual portfolio images */
+  img: string;
+  imgH: number;
+  specs: Array<{ icon?: string; text: string; em?: boolean }>;
+  rating: string;
+  reviews: string;
+  platform: "WB" | "Ozon";
+  metric?: { label: string; value: string };
+  rotate: number;
+  floatY: number;
+  dur: number;
+  delay: number;
+  side: "left" | "right";
+  vSide: "top" | "bottom";
+};
+
+const HERO_CARDS: HeroCard[] = [
+  {
+    id: "headphones",
+    title: "НАУШНИКИ",
+    sub: "БЕСПРОВОДНЫЕ",
+    tag: "PREMIUM SOUND",
+    img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=280&h=158&fit=crop&q=80&auto=format",
+    imgH: 158,
+    specs: [
+      { text: "• Чистый звук" },
+      { text: "• Глубокие басы" },
+      { text: "• До 30 часов" },
+    ],
+    rating: "4.8",
+    reviews: "12 500",
+    platform: "WB",
+    metric: { label: "CTR", value: "+32%" },
+    rotate: -9,
+    floatY: 14,
+    dur: 5,
+    delay: 0,
+    side: "left",
+    vSide: "top",
+  },
+  {
+    id: "drill",
+    title: "ДРЕЛЬ",
+    sub: "АККУМУЛЯТОРНАЯ",
+    img: "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=280&h=178&fit=crop&q=80&auto=format",
+    imgH: 178,
+    specs: [
+      { text: "21V мощность", em: true },
+      { text: "2 АКБ В КОМПЛЕКТЕ" },
+      { text: "КЕЙС В ПОДАРОК" },
+    ],
+    rating: "4.8",
+    reviews: "9 210",
+    platform: "WB",
+    metric: { label: "Просмотры", value: "+47%" },
+    rotate: 7,
+    floatY: 10,
+    dur: 4.5,
+    delay: 1.3,
+    side: "right",
+    vSide: "top",
+  },
+  {
+    id: "thermos",
+    title: "ТЕРМОБУТЫЛКА",
+    sub: "500 ML",
+    img: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=220&h=218&fit=crop&q=80&auto=format",
+    imgH: 218,
+    specs: [
+      { icon: "❄", text: "24ч холод" },
+      { icon: "🌡", text: "12ч тепло" },
+      { text: "Стильный дизайн" },
+    ],
+    rating: "4.9",
+    reviews: "8 432",
+    platform: "Ozon",
+    rotate: -5,
+    floatY: 16,
+    dur: 5.5,
+    delay: 0.7,
+    side: "left",
+    vSide: "bottom",
+  },
+  {
+    id: "serum",
+    title: "СЫВОРОТКА",
+    sub: "ДЛЯ ЛИЦА",
+    img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=220&h=218&fit=crop&q=80&auto=format",
+    imgH: 218,
+    specs: [
+      { text: "Глубокое увлажнение", em: true },
+      { text: "Витамин С + Гиалурон." },
+      { text: "30 ML" },
+    ],
+    rating: "4.9",
+    reviews: "15 892",
+    platform: "Ozon",
+    metric: { label: "Конверсия", value: "+28%" },
+    rotate: 8,
+    floatY: 12,
+    dur: 4.8,
+    delay: 2,
+    side: "right",
+    vSide: "bottom",
+  },
+];
+
+/** Upward trend line SVG — matches the screenshot's chart lines */
+function TrendLine({ flip = false }: { flip?: boolean }) {
   return (
-    <section className="relative min-h-[100dvh] flex flex-col justify-center pt-16">
-      {/* Ambient glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-      >
+    <svg
+      width="52"
+      height="20"
+      viewBox="0 0 52 20"
+      fill="none"
+      style={{ transform: flip ? "scaleX(-1)" : "none", marginTop: 5 }}
+    >
+      <polyline
+        points="2,17 11,11 21,13 32,5 42,8 50,1"
+        stroke="#CBFF00"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.5"
+      />
+    </svg>
+  );
+}
+
+function FloatingCard({ card }: { card: HeroCard }) {
+  const isLeft = card.side === "left";
+  const isBottom = card.vSide === "bottom";
+
+  // Absolute position classes for the animated wrapper
+  const posClass = [
+    isLeft ? "left-0" : "right-0",
+    isBottom ? "bottom-0" : "top-16",
+  ].join(" ");
+
+  // Metric badge: placed OUTSIDE the card (to the inner side = toward center)
+  // For left cards → right side of wrapper; for right cards → left side of wrapper
+  const metricStyle: React.CSSProperties = card.metric
+    ? {
+        position: "absolute",
+        zIndex: 20,
+        top: isBottom ? "auto" : 16,
+        bottom: isBottom ? 16 : "auto",
+        ...(isLeft
+          ? { right: -80, textAlign: "left" }
+          : { left: -80, textAlign: "right" }),
+        width: 74,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: isLeft ? "flex-start" : "flex-end",
+      }
+    : {};
+
+  return (
+    <m.div
+      className={`absolute ${posClass} w-[272px]`}
+      animate={{ y: [0, -card.floatY, 0] }}
+      transition={{
+        duration: card.dur,
+        ease: "easeInOut",
+        repeat: Infinity,
+        delay: card.delay,
+      }}
+    >
+      {/* Rotate wrapper — rotate the card + keep metric upright */}
+      <div style={{ transform: `rotate(${card.rotate}deg)`, position: "relative" }}>
+
+        {/* ── Metric badge (outside card) ── */}
+        {card.metric && (
+          <div style={metricStyle}>
+            <span
+              style={{
+                fontSize: 9,
+                fontFamily: "monospace",
+                color: "#555",
+                letterSpacing: "0.13em",
+                textTransform: "uppercase",
+                lineHeight: 1.6,
+              }}
+            >
+              {card.metric.label}
+            </span>
+            <span
+              style={{
+                fontSize: 30,
+                fontWeight: 900,
+                color: "#CBFF00",
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {card.metric.value}
+            </span>
+            <TrendLine flip={!isLeft} />
+          </div>
+        )}
+
+        {/* ── Card body ── */}
         <div
-          className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-20"
+          className="rounded-2xl overflow-hidden border border-white/[0.08] bg-[#0D0D0D]"
+          style={{
+            boxShadow:
+              "0 24px 60px -16px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04), 0 0 80px -20px rgba(203,255,0,0.25)",
+          }}
+        >
+          {/* Header */}
+          <div className="px-4 pt-4 pb-2">
+            <p className="text-[10px] font-mono text-zinc-600 tracking-[0.14em] mb-0.5">
+              {card.sub}
+            </p>
+            <h3 className="text-[13px] font-bold text-white tracking-[0.04em]">
+              {card.title}
+            </h3>
+            {card.tag && (
+              <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-md bg-accent/10 border border-accent/25 text-accent text-[10px] font-mono font-medium">
+                {card.tag}
+              </span>
+            )}
+          </div>
+
+          {/* Product image */}
+          <div
+            className="mx-3 rounded-xl overflow-hidden relative bg-[#131313]"
+            style={{ height: card.imgH }}
+          >
+            <img
+              src={card.img}
+              alt={card.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Green glow overlay on bottom of image */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 50% 110%, rgba(203,255,0,0.2) 0%, transparent 60%)",
+              }}
+            />
+          </div>
+
+          {/* Specs */}
+          <div className="px-4 pt-3 pb-2 space-y-1">
+            {card.specs.map((s, i) => (
+              <p
+                key={i}
+                className={`text-[11px] leading-relaxed ${
+                  s.em ? "text-zinc-300 font-medium" : "text-zinc-600"
+                }`}
+              >
+                {s.icon && <span className="mr-1">{s.icon}</span>}
+                {s.text}
+              </p>
+            ))}
+          </div>
+
+          {/* Footer: rating + platform badge */}
+          <div className="px-4 pb-4 pt-1 flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-accent text-xs">★</span>
+              <span className="text-xs font-semibold text-white">
+                {card.rating}
+              </span>
+              <span className="text-[10px] text-zinc-700">
+                {card.reviews} отз.
+              </span>
+            </div>
+            <span
+              className="text-[10px] font-bold px-2.5 py-0.5 rounded-md text-white"
+              style={{
+                background: card.platform === "WB" ? "#9C27B0" : "#005BFF",
+              }}
+            >
+              {card.platform}
+            </span>
+          </div>
+        </div>
+
+        {/* Under-card green glow */}
+        <div
+          aria-hidden
+          className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-48 h-12 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse, #CBFF00 0%, transparent 65%)",
-            filter: "blur(80px)",
+              "radial-gradient(ellipse, rgba(203,255,0,0.3) 0%, transparent 70%)",
+            filter: "blur(10px)",
+          }}
+        />
+      </div>
+    </m.div>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="relative min-h-[100dvh] flex items-center overflow-hidden pt-16">
+
+      {/* ── Corner ambient glows ── */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <div
+          className="absolute -left-40 -top-20 w-[700px] h-[700px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(203,255,0,0.11) 0%, transparent 60%)",
+            filter: "blur(70px)",
+          }}
+        />
+        <div
+          className="absolute -right-40 -top-20 w-[700px] h-[700px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(203,255,0,0.11) 0%, transparent 60%)",
+            filter: "blur(70px)",
+          }}
+        />
+        <div
+          className="absolute -left-40 bottom-0 w-[700px] h-[700px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(203,255,0,0.08) 0%, transparent 60%)",
+            filter: "blur(70px)",
+          }}
+        />
+        <div
+          className="absolute -right-40 bottom-0 w-[700px] h-[700px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(203,255,0,0.08) 0%, transparent 60%)",
+            filter: "blur(70px)",
           }}
         />
       </div>
 
-      <div className="relative z-10 max-w-[1280px] mx-auto px-5 md:px-10 py-20">
-        {/* Badge */}
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-flex items-center gap-2 mb-8"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-          <span className="text-xs font-mono tracking-[0.2em] uppercase text-zinc-400">
-            Дизайн маркетплейсов · AI Creator
-          </span>
-        </m.div>
+      {/* ── Floating product cards (visible xl+) ── */}
+      <div className="absolute inset-0 z-10 pointer-events-none hidden xl:block">
+        {HERO_CARDS.map((card) => (
+          <FloatingCard key={card.id} card={card} />
+        ))}
+      </div>
 
-        {/* Headline */}
-        <m.h1
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="text-[clamp(2.4rem,7vw,5.5rem)] font-bold leading-[1.03] tracking-[-0.035em] text-white max-w-[900px]"
-        >
-          Создаю продающие карточки и HERO-визуалы для{" "}
-          <span className="text-accent">WB и Ozon</span>
-        </m.h1>
+      {/* ── Center text content ── */}
+      <div className="relative z-20 w-full max-w-[1280px] mx-auto px-5 md:px-10">
+        <div className="max-w-[500px] mx-auto">
 
-        {/* Sub */}
-        <m.p
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 text-lg md:text-xl text-zinc-400 leading-relaxed max-w-[620px]"
-        >
-          Помогаю выделиться в выдаче и увеличить CTR через коммерческий дизайн
-          и AI-визуалы
-        </m.p>
-
-        {/* Platform pills */}
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-wrap gap-2 mt-8"
-        >
-          {platforms.map((p) => (
-            <span
-              key={p}
-              className="px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] text-xs font-mono text-zinc-400"
-            >
-              {p}
+          {/* Badge */}
+          <m.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2 mb-8"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-zinc-400">
+              Дизайн маркетплейсов · AI Creator
             </span>
-          ))}
-        </m.div>
+          </m.div>
 
-        {/* CTAs */}
-        <m.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-wrap items-center gap-4 mt-10"
-        >
-          <a
-            href={TG_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 h-12 px-7 rounded-full bg-accent text-black text-sm font-semibold hover:bg-accent-dim transition-colors duration-200 shadow-[0_0_40px_-8px_rgba(203,255,0,0.5)]"
+          {/* Headline */}
+          <m.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[clamp(2.1rem,4.5vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
           >
-            <TelegramIcon />
-            Написать в Telegram
-          </a>
-          <a
-            href="#cases"
-            className="inline-flex items-center gap-2 h-12 px-7 rounded-full border border-white/15 text-white text-sm font-medium hover:border-white/30 hover:bg-white/[0.04] transition-all duration-200"
-          >
-            Смотреть кейсы
-            <ArrowDownIcon />
-          </a>
-        </m.div>
+            Создаю продающие карточки и HERO-визуалы для{" "}
+            <span className="text-accent">WB и Ozon</span>
+          </m.h1>
 
-        {/* Stats row */}
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-wrap gap-8 mt-16 pt-16 border-t border-white/[0.06]"
-        >
-          {[
-            { value: "40+", label: "проектов" },
-            { value: "+30%", label: "средний рост CTR" },
-            { value: "24 ч", label: "первая версия" },
-            { value: "AI+", label: "инструментарий" },
-          ].map(({ value, label }) => (
-            <div key={label}>
-              <p className="text-2xl font-bold text-white">{value}</p>
-              <p className="text-xs text-zinc-500 mt-1">{label}</p>
-            </div>
-          ))}
-        </m.div>
+          {/* Sub */}
+          <m.p
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-5 text-base md:text-lg text-zinc-400 leading-relaxed"
+          >
+            Помогаю выделиться в выдаче и увеличить CTR через коммерческий
+            дизайн и AI-визуалы
+          </m.p>
+
+          {/* Platform pills */}
+          <m.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-wrap gap-2 mt-6"
+          >
+            {["WB", "Ozon", "e-commerce", "упаковка"].map((p) => (
+              <span
+                key={p}
+                className="px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] text-xs font-mono text-zinc-400"
+              >
+                {p}
+              </span>
+            ))}
+          </m.div>
+
+          {/* CTAs */}
+          <m.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-wrap items-center gap-4 mt-8"
+          >
+            <a
+              href={TG_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 h-12 px-7 rounded-full bg-accent text-black text-sm font-semibold hover:bg-accent-dim transition-colors duration-200 shadow-[0_0_40px_-8px_rgba(203,255,0,0.5)]"
+            >
+              <TelegramIcon />
+              Написать в Telegram
+            </a>
+            <a
+              href="#cases"
+              className="inline-flex items-center gap-2 h-12 px-7 rounded-full border border-white/15 text-white text-sm font-medium hover:border-white/30 hover:bg-white/[0.04] transition-all duration-200"
+            >
+              Смотреть кейсы
+              <ArrowDownIcon />
+            </a>
+          </m.div>
+
+          {/* Stats */}
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="flex flex-wrap gap-8 mt-12 pt-12 border-t border-white/[0.06]"
+          >
+            {[
+              { value: "40+", label: "проектов" },
+              { value: "+30%", label: "средний рост CTR" },
+              { value: "24 ч", label: "первая версия" },
+              { value: "AI+", label: "инструментарий" },
+            ].map(({ value, label }) => (
+              <div key={label}>
+                <p className="text-2xl font-bold text-white">{value}</p>
+                <p className="text-xs text-zinc-500 mt-1">{label}</p>
+              </div>
+            ))}
+          </m.div>
+        </div>
       </div>
     </section>
   );
@@ -306,23 +630,13 @@ function Services() {
                 variants={fadeUp}
                 className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:border-accent/30 hover:bg-surface-2 transition-all duration-300 cursor-default"
               >
-                {/* Number */}
                 <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700">
                   {s.num}
                 </span>
-
-                {/* Icon */}
                 <span className="text-2xl mb-4 block">{s.icon}</span>
-
-                <h3 className="text-lg font-semibold text-white">
-                  {s.title}
-                </h3>
-                <p className="text-sm text-accent/70 font-mono mb-3">
-                  {s.subtitle}
-                </p>
+                <h3 className="text-lg font-semibold text-white">{s.title}</h3>
+                <p className="text-sm text-accent/70 font-mono mb-3">{s.subtitle}</p>
                 <p className="text-sm text-zinc-400 leading-relaxed">{s.desc}</p>
-
-                {/* Tags */}
                 <div className="flex flex-wrap gap-1.5 mt-5">
                   {s.tags.map((t) => (
                     <span
@@ -333,9 +647,7 @@ function Services() {
                     </span>
                   ))}
                 </div>
-
-                {/* Hover accent line */}
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               </m.div>
             </Reveal>
           ))}
@@ -435,7 +747,6 @@ function CaseCard({ c }: { c: (typeof CASES)[0] }) {
         variants={fadeUp}
         className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${c.gradient} border border-white/[0.07] h-[320px] md:h-[360px] cursor-default`}
       >
-        {/* Abstract mockup shapes */}
         {(c.shapes as Shape[]).map((s, i) => (
           <div
             key={i}
@@ -453,13 +764,8 @@ function CaseCard({ c }: { c: (typeof CASES)[0] }) {
             }}
           />
         ))}
-
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-
-        {/* Content */}
         <div className="absolute inset-0 flex flex-col justify-end p-7">
-          {/* Tags */}
           <div className="flex gap-2 mb-3">
             {c.tags.map((t) => (
               <span
@@ -475,16 +781,11 @@ function CaseCard({ c }: { c: (typeof CASES)[0] }) {
               </span>
             ))}
           </div>
-
           <h3 className="text-base md:text-lg font-semibold text-white leading-snug mb-2.5">
             {c.title}
           </h3>
-
-          {/* Result */}
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono" style={{ color: c.accent }}>
-              ↑
-            </span>
+            <span className="text-xs font-mono" style={{ color: c.accent }}>↑</span>
             <span className="text-sm font-mono text-zinc-300">{c.result}</span>
           </div>
         </div>
@@ -499,17 +800,13 @@ function Cases() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Кейсы</Label>
-          <m.h2
-            variants={fadeUp}
-            className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-3"
-          >
+          <m.h2 variants={fadeUp} className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-3">
             Проекты
           </m.h2>
           <m.p variants={fadeUp} className="text-zinc-500 text-base mb-14">
             Реальные результаты — CTR, позиции в выдаче, конверсия
           </m.p>
         </Reveal>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {CASES.map((c) => (
             <CaseCard key={c.id} c={c} />
@@ -522,31 +819,11 @@ function Cases() {
 
 // ─── WHY ME ───────────────────────────────────────────────────────────────────
 const WHY = [
-  {
-    n: "01",
-    title: "Работа на результат",
-    desc: "Не «красиво» — а CTR и продажи. Дизайн — это инструмент, а не искусство.",
-  },
-  {
-    n: "02",
-    title: "Знаю маркетплейсы изнутри",
-    desc: "Понимаю алгоритмы, конкурентный анализ, логику выдачи WB и Ozon.",
-  },
-  {
-    n: "03",
-    title: "AI как конкурентное преимущество",
-    desc: "Midjourney, Flux, ControlNet — генерирую уникальный визуал за часы, а не дни.",
-  },
-  {
-    n: "04",
-    title: "Коммерческий уровень",
-    desc: "Дизайн как у топ-продавцов. Без стоков, без шаблонов, без «просто красиво».",
-  },
-  {
-    n: "05",
-    title: "Скорость без потери качества",
-    desc: "Первые концепции — за 24–48 часов. Правки — в тот же день.",
-  },
+  { n: "01", title: "Работа на результат", desc: "Не «красиво» — а CTR и продажи. Дизайн — это инструмент, а не искусство." },
+  { n: "02", title: "Знаю маркетплейсы изнутри", desc: "Понимаю алгоритмы, конкурентный анализ, логику выдачи WB и Ozon." },
+  { n: "03", title: "AI как конкурентное преимущество", desc: "Midjourney, Flux, ControlNet — генерирую уникальный визуал за часы, а не дни." },
+  { n: "04", title: "Коммерческий уровень", desc: "Дизайн как у топ-продавцов. Без стоков, без шаблонов, без «просто красиво»." },
+  { n: "05", title: "Скорость без потери качества", desc: "Первые концепции — за 24–48 часов. Правки — в тот же день." },
 ];
 
 function WhyMe() {
@@ -555,34 +832,22 @@ function WhyMe() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Почему я</Label>
-          <m.h2
-            variants={fadeUp}
-            className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-14"
-          >
+          <m.h2 variants={fadeUp} className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-14">
             Как я работаю
           </m.h2>
         </Reveal>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.05]">
-          {WHY.map((item, i) => (
+          {WHY.map((item) => (
             <Reveal key={item.n}>
               <m.div
                 variants={fadeUp}
-                className={`relative bg-canvas p-8 group hover:bg-surface transition-colors duration-300 ${
-                  i === WHY.length - 1 && WHY.length % 3 !== 0
-                    ? "md:col-span-2 lg:col-span-1"
-                    : ""
-                }`}
+                className="relative bg-canvas p-8 group hover:bg-surface transition-colors duration-300"
               >
                 <span className="block text-[42px] font-bold text-white/[0.06] font-mono mb-5 leading-none group-hover:text-accent/15 transition-colors duration-300">
                   {item.n}
                 </span>
-                <h3 className="text-base font-semibold text-white mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-zinc-500 leading-relaxed">
-                  {item.desc}
-                </p>
+                <h3 className="text-base font-semibold text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
               </m.div>
             </Reveal>
           ))}
@@ -594,31 +859,11 @@ function WhyMe() {
 
 // ─── PROCESS ─────────────────────────────────────────────────────────────────
 const PROCESS = [
-  {
-    n: "01",
-    title: "Бриф",
-    desc: "Разбираем задачу, нишу, конкурентов и цели.",
-  },
-  {
-    n: "02",
-    title: "Анализ",
-    desc: "Смотрю топ выдачи, нахожу точки роста и слабые места.",
-  },
-  {
-    n: "03",
-    title: "Концепция",
-    desc: "Предлагаю 2–3 направления на выбор.",
-  },
-  {
-    n: "04",
-    title: "Производство",
-    desc: "Дизайн, итерации, правки — до финального результата.",
-  },
-  {
-    n: "05",
-    title: "Сдача",
-    desc: "Готовые файлы в нужных форматах. Без доработок за доплату.",
-  },
+  { n: "01", title: "Бриф", desc: "Разбираем задачу, нишу, конкурентов и цели." },
+  { n: "02", title: "Анализ", desc: "Смотрю топ выдачи, нахожу точки роста и слабые места." },
+  { n: "03", title: "Концепция", desc: "Предлагаю 2–3 направления на выбор." },
+  { n: "04", title: "Производство", desc: "Дизайн, итерации, правки — до финального результата." },
+  { n: "05", title: "Сдача", desc: "Готовые файлы в нужных форматах. Без доработок за доплату." },
 ];
 
 function Process() {
@@ -627,25 +872,16 @@ function Process() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Процесс</Label>
-          <m.h2
-            variants={fadeUp}
-            className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-14"
-          >
+          <m.h2 variants={fadeUp} className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-14">
             Как работаем
           </m.h2>
         </Reveal>
-
         <div className="relative">
-          {/* Connecting line (desktop) */}
           <div
             aria-hidden
             className="hidden lg:block absolute top-[28px] left-0 right-0 h-px"
-            style={{
-              background:
-                "linear-gradient(to right, transparent, rgba(203,255,0,0.2) 15%, rgba(203,255,0,0.2) 85%, transparent)",
-            }}
+            style={{ background: "linear-gradient(to right, transparent, rgba(203,255,0,0.2) 15%, rgba(203,255,0,0.2) 85%, transparent)" }}
           />
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {PROCESS.map((step) => (
               <Reveal key={step.n}>
@@ -653,20 +889,12 @@ function Process() {
                   variants={fadeUp}
                   className="relative flex flex-col gap-4 rounded-2xl border border-white/[0.07] bg-canvas p-6 hover:border-accent/25 hover:bg-surface transition-all duration-300"
                 >
-                  {/* Circle number */}
                   <div className="w-10 h-10 rounded-full border border-accent/30 bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-mono font-bold text-accent">
-                      {step.n}
-                    </span>
+                    <span className="text-xs font-mono font-bold text-accent">{step.n}</span>
                   </div>
-
                   <div>
-                    <h3 className="font-semibold text-white mb-1.5">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm text-zinc-500 leading-relaxed">
-                      {step.desc}
-                    </p>
+                    <h3 className="font-semibold text-white mb-1.5">{step.title}</h3>
+                    <p className="text-sm text-zinc-500 leading-relaxed">{step.desc}</p>
                   </div>
                 </m.div>
               </Reveal>
@@ -685,41 +913,22 @@ function Contacts() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <div className="relative overflow-hidden rounded-3xl border border-white/[0.07] bg-surface p-10 md:p-16">
-            {/* Glow */}
             <div
               aria-hidden
               className="pointer-events-none absolute -top-32 -right-32 w-80 h-80 rounded-full opacity-30"
-              style={{
-                background:
-                  "radial-gradient(circle, #CBFF00 0%, transparent 70%)",
-                filter: "blur(60px)",
-              }}
+              style={{ background: "radial-gradient(circle, #CBFF00 0%, transparent 70%)", filter: "blur(60px)" }}
             />
-
             <div className="relative">
-              <m.p
-                variants={fadeUp}
-                className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-5"
-              >
+              <m.p variants={fadeUp} className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-5">
                 Контакты
               </m.p>
-              <m.h2
-                variants={fadeUp}
-                className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4"
-              >
+              <m.h2 variants={fadeUp} className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">
                 Готов к работе?
               </m.h2>
-              <m.p
-                variants={fadeUp}
-                className="text-lg text-zinc-400 mb-10 max-w-[480px]"
-              >
+              <m.p variants={fadeUp} className="text-lg text-zinc-400 mb-10 max-w-[480px]">
                 Расскажите о задаче — отвечу в течение часа и предложу решение.
               </m.p>
-
-              <m.div
-                variants={fadeUp}
-                className="flex flex-wrap gap-4"
-              >
+              <m.div variants={fadeUp} className="flex flex-wrap gap-4">
                 <a
                   href={TG_LINK}
                   target="_blank"
@@ -756,26 +965,10 @@ function Footer() {
           MAX<span className="text-accent/50">.</span>DESIGN
         </span>
         <div className="flex items-center gap-6">
-          <a
-            href={TG_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors"
-          >
-            Telegram
-          </a>
-          <a
-            href={BEHANCE_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors"
-          >
-            Behance
-          </a>
+          <a href={TG_LINK} target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors">Telegram</a>
+          <a href={BEHANCE_LINK} target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors">Behance</a>
         </div>
-        <span className="text-xs text-zinc-800">
-          © {new Date().getFullYear()}
-        </span>
+        <span className="text-xs text-zinc-800">© {new Date().getFullYear()}</span>
       </div>
     </footer>
   );
@@ -792,8 +985,8 @@ function TelegramIcon() {
 
 function BehanceIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 3.211 3.483 3.312 4.588 2.029H23.7zm-7.shutterstock 2c.182-.629.29-1.36.29-2.2 0-2.042-.873-3.354-2.483-3.354-1.649 0-2.604 1.331-2.604 3.354v2.2h4.797zM7.628 23H0V1h7.628c4.46 0 7.179 1.765 7.179 5.17 0 2.37-1.35 3.953-3.43 4.736C13.85 11.685 15.5 13.3 15.5 15.94c0 4.244-3.208 7.06-7.872 7.06zm-.952-14.5c2.006 0 3.126-.968 3.126-2.742 0-1.79-1.12-2.658-3.126-2.658H3V8.5h3.676zm.337 8.4c2.2 0 3.41-1.082 3.41-3.038 0-1.957-1.21-2.962-3.41-2.962H3V16.9h4.013z" />
+    <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor" aria-hidden>
+      <path d="M20 4h8v2h-8zM6 4h9c3 0 5 1.5 5 4.5S17 13 14 13H6zm0 11h9c3.5 0 6 1.8 6 5.2S18.5 26 15 26H6zM9 7v4h4c1.5 0 2.5-.8 2.5-2S14.5 7 13 7zm0 11v5h5c1.8 0 3-1 3-2.5S15.8 18 14 18zm13.5 0c-3 0-5.5 2-5.5 5.5S19.5 29 22.5 29c2.3 0 4.2-1.2 5-3h-3c-.5.8-1.2 1.2-2 1.2-1.5 0-2.5-1-2.8-2.5H28v-1c0-3.3-2.2-5.7-5.5-5.7zm-2.8 4.5c.3-1.3 1.3-2 2.8-2s2.5.8 2.8 2z" />
     </svg>
   );
 }
