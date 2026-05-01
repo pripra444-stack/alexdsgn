@@ -264,7 +264,7 @@ function Hero() {
             initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }}
             transition={{ duration:0.6, delay:0.15 }}
             style={{ fontSize:15, lineHeight:1.65, color:"#94A3B8",
-              maxWidth:"56ch", marginBottom:28, textAlign:"center" }}>
+              maxWidth:680, marginBottom:28, textAlign:"center" }}>
             RConf AI анализирует встречи и показывает HR-директору,
             кто выгорает, кто готов к росту и где команда теряет эффективность —
             {" "}<span style={{ color:"#fff", fontWeight:500 }}>автоматически после каждой сессии.</span>
@@ -314,30 +314,6 @@ function Hero() {
           initial={{ opacity:0, y:60, scale:0.97 }} animate={{ opacity:1, y:0, scale:1 }}
           transition={{ duration:1.1, delay:0.35, ease:[0.22,1,0.36,1] }}
           style={{ position:"relative", maxWidth:1160, margin:"0 auto", padding:"0 20px" }}>
-
-          {/* Floating chip — ФЗ */}
-          <motion.div
-            animate={{ y:[0,-6,0] }} transition={{ duration:3.8, repeat:Infinity, ease:"easeInOut", delay:1.3 }}
-            style={{ position:"absolute", top:-18, right:32, zIndex:20,
-              display:"inline-flex", alignItems:"center", gap:8,
-              borderRadius:14, padding:"8px 14px", backdropFilter:"blur(20px)",
-              background:"rgba(14,10,28,0.97)", border:`1px solid ${BORDER}`,
-              boxShadow:"0 8px 32px rgba(0,0,0,0.4)" }}>
-            <ShieldCheck style={{ width:15, height:15, color: V2 }}/>
-            <span style={{ fontSize:13, fontWeight:500, color:"#fff" }}>ФЗ-152 · Серверы РФ</span>
-          </motion.div>
-
-          {/* Floating chip — эффективность */}
-          <motion.div
-            animate={{ y:[0,6,0] }} transition={{ duration:4.2, repeat:Infinity, ease:"easeInOut", delay:0.6 }}
-            style={{ position:"absolute", top:-18, left:32, zIndex:20,
-              display:"inline-flex", alignItems:"center", gap:8,
-              borderRadius:14, padding:"8px 14px", backdropFilter:"blur(20px)",
-              background:"rgba(14,10,28,0.97)", border:`1px solid ${PINK}35`,
-              boxShadow:"0 8px 32px rgba(0,0,0,0.4)" }}>
-            <TrendingUp style={{ width:15, height:15, color: PINK }}/>
-            <span style={{ fontSize:13, fontWeight:500, color:"#fff" }}>+62% эффективность</span>
-          </motion.div>
 
           {/* Browser frame */}
           <div style={{ borderRadius:"16px 16px 0 0", overflow:"hidden",
