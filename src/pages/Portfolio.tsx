@@ -277,9 +277,9 @@ function FloatingCard({ card }: { card: HeroCard }) {
     isBottom ? "bottom-0" : "top-14",
   ].join(" ");
 
-  // 3D tilt: outer corner of each card faces the viewer
-  const rotX = isBottom ? 5 : -5;
-  const rotY = isLeft ? 12 : -12;
+  // 3D tilt: steep angle — outer corner faces viewer
+  const rotX = isBottom ? 10 : -10;
+  const rotY = isLeft ? 22 : -22;
 
   // Metric badge: flat, outside the 3D wrapper so it stays upright
   const metricStyle: React.CSSProperties = card.metric
@@ -343,21 +343,31 @@ function FloatingCard({ card }: { card: HeroCard }) {
         </div>
       )}
 
-      {/* ── 3D card: perspective tilt toward corner ── */}
+      {/* ── 3D glass card: steep perspective tilt toward corner ── */}
       <div
         style={{
-          transform: `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) rotate(${card.rotate}deg)`,
+          transform: `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg) rotate(${card.rotate}deg)`,
           position: "relative",
+          opacity: 0.92,
         }}
       >
-        {/* White-border clip: overflow hides the PNG's outer rectangular frame.
-            scale(1.09) pushes the frame outside the rounded clip area. */}
+        {/* Neon glass shell:
+            - overflow:hidden clips the PNG's rectangular white frame
+            - scale(1.09) pushes the frame outside the rounded clip
+            - border = lime neon edge
+            - multi-layer box-shadow = inner glow + outer atmospheric halo */}
         <div
           style={{
-            borderRadius: 18,
+            borderRadius: 20,
             overflow: "hidden",
-            boxShadow:
-              "0 24px 50px rgba(0,0,0,0.75), 0 0 80px rgba(203,255,0,0.13)",
+            border: "1px solid rgba(203,255,0,0.38)",
+            boxShadow: [
+              "0 0 0 1px rgba(203,255,0,0.10)",          /* tight rim */
+              "0 0 18px 2px rgba(203,255,0,0.30)",       /* close neon glow */
+              "0 0 55px 8px rgba(203,255,0,0.12)",       /* wide halo */
+              "inset 0 0 22px rgba(203,255,0,0.06)",     /* inner glass light */
+              "0 28px 55px rgba(0,0,0,0.80)",            /* depth shadow */
+            ].join(", "),
           }}
         >
           <img
@@ -377,11 +387,11 @@ function FloatingCard({ card }: { card: HeroCard }) {
         {/* Under-card green glow */}
         <div
           aria-hidden
-          className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-44 h-10 pointer-events-none"
+          className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-52 h-10 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse, rgba(203,255,0,0.28) 0%, transparent 70%)",
-            filter: "blur(10px)",
+              "radial-gradient(ellipse, rgba(203,255,0,0.32) 0%, transparent 70%)",
+            filter: "blur(12px)",
           }}
         />
       </div>
