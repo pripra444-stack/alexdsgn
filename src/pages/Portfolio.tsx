@@ -128,20 +128,28 @@ function Nav() {
 }
 
 // ─── HERO — floating product cards ───────────────────────────────────────────
+//
+// IMPORTANT: cards are SOURCE-OF-TRUTH design assets — do NOT recreate via CSS.
+// Drop the 4 finished card images (PNG with transparent background recommended)
+// into:
+//   public/hero/card-headphones.png
+//   public/hero/card-drill.png
+//   public/hero/card-thermos.png
+//   public/hero/card-serum.png
+//
+// Only positioning / rotation / float-animation / glow are added in code.
 
 type HeroCard = {
   id: string;
-  title: string;
-  sub: string;
-  tag?: string;
-  /** Unsplash image URL — replace with your actual portfolio images */
-  img: string;
-  imgH: number;
-  specs: Array<{ icon?: string; text: string; em?: boolean }>;
-  rating: string;
-  reviews: string;
-  platform: "WB" | "Ozon";
-  metric?: { label: string; value: string; num: number; chart?: "line" | "ring" };
+  title: string; // alt text only — never rendered as visible text
+  img: string;   // path under /public — single <img> tag, no CSS card chrome
+  metric?: {
+    label: string;
+    num: number;
+    prefix?: string;
+    suffix?: string;
+    chart?: "line" | "ring";
+  };
   rotate: number;
   floatY: number;
   dur: number;
@@ -153,20 +161,9 @@ type HeroCard = {
 const HERO_CARDS: HeroCard[] = [
   {
     id: "headphones",
-    title: "НАУШНИКИ",
-    sub: "БЕСПРОВОДНЫЕ",
-    tag: "PREMIUM SOUND",
-    img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=280&h=158&fit=crop&q=80&auto=format",
-    imgH: 158,
-    specs: [
-      { text: "• Чистый звук" },
-      { text: "• Глубокие басы" },
-      { text: "• До 30 часов" },
-    ],
-    rating: "4.8",
-    reviews: "12 500",
-    platform: "WB",
-    metric: { label: "CTR", value: "+32%", num: 32, chart: "line" },
+    title: "Карточка наушников",
+    img: "/hero/card-headphones.png",
+    metric: { label: "CTR", num: 32, chart: "line" },
     rotate: -9,
     floatY: 14,
     dur: 5,
@@ -176,19 +173,9 @@ const HERO_CARDS: HeroCard[] = [
   },
   {
     id: "drill",
-    title: "ДРЕЛЬ",
-    sub: "АККУМУЛЯТОРНАЯ",
-    img: "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=280&h=178&fit=crop&q=80&auto=format",
-    imgH: 178,
-    specs: [
-      { text: "21V мощность", em: true },
-      { text: "2 АКБ В КОМПЛЕКТЕ" },
-      { text: "КЕЙС В ПОДАРОК" },
-    ],
-    rating: "4.8",
-    reviews: "9 210",
-    platform: "WB",
-    metric: { label: "Просмотры", value: "+47%", num: 47, chart: "line" },
+    title: "Карточка дрели",
+    img: "/hero/card-drill.png",
+    metric: { label: "Просмотры", num: 47, chart: "line" },
     rotate: 7,
     floatY: 10,
     dur: 4.5,
@@ -198,18 +185,8 @@ const HERO_CARDS: HeroCard[] = [
   },
   {
     id: "thermos",
-    title: "ТЕРМОБУТЫЛКА",
-    sub: "500 ML",
-    img: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=220&h=218&fit=crop&q=80&auto=format",
-    imgH: 218,
-    specs: [
-      { icon: "❄", text: "24ч холод" },
-      { icon: "🌡", text: "12ч тепло" },
-      { text: "Стильный дизайн" },
-    ],
-    rating: "4.9",
-    reviews: "8 432",
-    platform: "Ozon",
+    title: "Карточка термобутылки",
+    img: "/hero/card-thermos.png",
     rotate: -5,
     floatY: 16,
     dur: 5.5,
@@ -219,19 +196,9 @@ const HERO_CARDS: HeroCard[] = [
   },
   {
     id: "serum",
-    title: "СЫВОРОТКА",
-    sub: "ДЛЯ ЛИЦА",
-    img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=220&h=218&fit=crop&q=80&auto=format",
-    imgH: 218,
-    specs: [
-      { text: "Глубокое увлажнение", em: true },
-      { text: "Витамин С + Гиалурон." },
-      { text: "30 ML" },
-    ],
-    rating: "4.9",
-    reviews: "15 892",
-    platform: "Ozon",
-    metric: { label: "Конверсия", value: "+28%", num: 28, chart: "ring" },
+    title: "Карточка сыворотки",
+    img: "/hero/card-serum.png",
+    metric: { label: "Конверсия", num: 28, chart: "ring" },
     rotate: 8,
     floatY: 12,
     dur: 4.8,
@@ -378,85 +345,22 @@ function FloatingCard({ card }: { card: HeroCard }) {
           </div>
         )}
 
-        {/* ── Card body ── */}
-        <div
-          className="rounded-2xl overflow-hidden border border-white/[0.08] bg-[#0D0D0D]"
+        {/* ── CARD = source-of-truth design asset ──
+             Single <img> — no CSS chrome, no overlays on top of the design.
+             Only outer effects (drop-shadow / glow) are applied to enhance
+             depth without modifying the card itself. */}
+        <img
+          src={card.img}
+          alt={card.title}
+          loading="eager"
+          decoding="async"
+          className="block w-full h-auto select-none"
+          draggable={false}
           style={{
-            boxShadow:
-              "0 24px 60px -16px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04), 0 0 80px -20px rgba(203,255,0,0.25)",
+            filter:
+              "drop-shadow(0 24px 40px rgba(0,0,0,0.65)) drop-shadow(0 0 60px rgba(203,255,0,0.18))",
           }}
-        >
-          {/* Header */}
-          <div className="px-4 pt-4 pb-2">
-            <p className="text-[10px] font-mono text-zinc-600 tracking-[0.14em] mb-0.5">
-              {card.sub}
-            </p>
-            <h3 className="text-[13px] font-bold text-white tracking-[0.04em]">
-              {card.title}
-            </h3>
-            {card.tag && (
-              <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-md bg-accent/10 border border-accent/25 text-accent text-[10px] font-mono font-medium">
-                {card.tag}
-              </span>
-            )}
-          </div>
-
-          {/* Product image */}
-          <div
-            className="mx-3 rounded-xl overflow-hidden relative bg-[#131313]"
-            style={{ height: card.imgH }}
-          >
-            <img
-              src={card.img}
-              alt={card.title}
-              className="w-full h-full object-cover"
-            />
-            {/* Green glow overlay on bottom of image */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(ellipse at 50% 110%, rgba(203,255,0,0.2) 0%, transparent 60%)",
-              }}
-            />
-          </div>
-
-          {/* Specs */}
-          <div className="px-4 pt-3 pb-2 space-y-1">
-            {card.specs.map((s, i) => (
-              <p
-                key={i}
-                className={`text-[11px] leading-relaxed ${
-                  s.em ? "text-zinc-300 font-medium" : "text-zinc-600"
-                }`}
-              >
-                {s.icon && <span className="mr-1">{s.icon}</span>}
-                {s.text}
-              </p>
-            ))}
-          </div>
-
-          {/* Footer: rating + platform badge */}
-          <div className="px-4 pb-4 pt-1 flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-accent text-xs">★</span>
-              <span className="text-xs font-semibold text-white">
-                {card.rating}
-              </span>
-              <span className="text-[10px] text-zinc-700">
-                {card.reviews} отз.
-              </span>
-            </div>
-            <span
-              className="text-[10px] font-bold px-2.5 py-0.5 rounded-md text-white"
-              style={{
-                background: card.platform === "WB" ? "#9C27B0" : "#005BFF",
-              }}
-            >
-              {card.platform}
-            </span>
-          </div>
-        </div>
+        />
 
         {/* Under-card green glow */}
         <div
