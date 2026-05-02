@@ -473,8 +473,8 @@ function Hero() {
         />
       </div>
 
-      {/* ── Floating product cards (visible xl+) ── */}
-      <div className="absolute inset-0 z-10 pointer-events-none hidden xl:block">
+      {/* ── Floating product cards (visible lg+) ── */}
+      <div className="absolute inset-0 z-10 pointer-events-none hidden lg:block scale-[0.82] xl:scale-100 origin-center">
         {HERO_CARDS.map((card) => (
           <FloatingCard key={card.id} card={card} />
         ))}
