@@ -272,15 +272,16 @@ function FloatingCard({ card }: { card: HeroCard }) {
   const isLeft = card.side === "left";
   const isBottom = card.vSide === "bottom";
 
-  // Absolute position classes for the animated wrapper
-  // left/right offset pulls cards inward (closer to center text)
   const posClass = [
     isLeft ? "left-[3%]" : "right-[3%]",
     isBottom ? "bottom-0" : "top-14",
   ].join(" ");
 
-  // Metric badge: placed OUTSIDE the card (to the inner side = toward center)
-  // For left cards → right side of wrapper; for right cards → left side of wrapper
+  // 3D tilt: outer corner of each card faces the viewer
+  const rotX = isBottom ? 5 : -5;
+  const rotY = isLeft ? 12 : -12;
+
+  // Metric badge: flat, outside the 3D wrapper so it stays upright
   const metricStyle: React.CSSProperties = card.metric
     ? {
         position: "absolute",
@@ -288,11 +289,11 @@ function FloatingCard({ card }: { card: HeroCard }) {
         top: isBottom ? "auto" : 16,
         bottom: isBottom ? 16 : "auto",
         ...(isLeft
-          ? { right: -80, textAlign: "left" }
-          : { left: -80, textAlign: "right" }),
-        width: 74,
+          ? { right: -84, textAlign: "left" as const }
+          : { left: -84, textAlign: "right" as const }),
+        width: 78,
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "column" as const,
         alignItems: isLeft ? "flex-start" : "flex-end",
       }
     : {};
@@ -308,67 +309,78 @@ function FloatingCard({ card }: { card: HeroCard }) {
         delay: card.delay,
       }}
     >
-      {/* Rotate wrapper — rotate the card + keep metric upright */}
-      <div style={{ transform: `rotate(${card.rotate}deg)`, position: "relative" }}>
+      {/* ── Metric badge — flat, NOT inside the 3D wrapper ── */}
+      {card.metric && (
+        <div style={metricStyle}>
+          <span
+            style={{
+              fontSize: 9,
+              fontFamily: "monospace",
+              color: "#666",
+              letterSpacing: "0.13em",
+              textTransform: "uppercase",
+              lineHeight: 1.6,
+            }}
+          >
+            {card.metric.label}
+          </span>
+          <span
+            style={{
+              fontSize: 34,
+              fontWeight: 900,
+              color: "#CBFF00",
+              lineHeight: 1,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            <CountUp to={card.metric.num} duration={2} />
+          </span>
+          {card.metric.chart === "ring" ? (
+            <RingChart />
+          ) : (
+            <TrendLine flip={!isLeft} />
+          )}
+        </div>
+      )}
 
-        {/* ── Metric badge (outside card) ── */}
-        {card.metric && (
-          <div style={metricStyle}>
-            <span
-              style={{
-                fontSize: 9,
-                fontFamily: "monospace",
-                color: "#666",
-                letterSpacing: "0.13em",
-                textTransform: "uppercase",
-                lineHeight: 1.6,
-              }}
-            >
-              {card.metric.label}
-            </span>
-            <span
-              style={{
-                fontSize: 34,
-                fontWeight: 900,
-                color: "#CBFF00",
-                lineHeight: 1,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              <CountUp to={card.metric.num} duration={2} />
-            </span>
-            {card.metric.chart === "ring" ? (
-              <RingChart />
-            ) : (
-              <TrendLine flip={!isLeft} />
-            )}
-          </div>
-        )}
-
-        {/* ── CARD = source-of-truth design asset ──
-             Single <img> — no CSS chrome, no overlays on top of the design.
-             Only outer effects (drop-shadow / glow) are applied to enhance
-             depth without modifying the card itself. */}
-        <img
-          src={card.img}
-          alt={card.title}
-          loading="eager"
-          decoding="async"
-          className="block w-full h-auto select-none"
-          draggable={false}
+      {/* ── 3D card: perspective tilt toward corner ── */}
+      <div
+        style={{
+          transform: `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) rotate(${card.rotate}deg)`,
+          position: "relative",
+        }}
+      >
+        {/* White-border clip: overflow hides the PNG's outer rectangular frame.
+            scale(1.09) pushes the frame outside the rounded clip area. */}
+        <div
           style={{
-            filter:
-              "drop-shadow(0 24px 40px rgba(0,0,0,0.65)) drop-shadow(0 0 60px rgba(203,255,0,0.18))",
+            borderRadius: 18,
+            overflow: "hidden",
+            boxShadow:
+              "0 24px 50px rgba(0,0,0,0.75), 0 0 80px rgba(203,255,0,0.13)",
           }}
-        />
+        >
+          <img
+            src={card.img}
+            alt={card.title}
+            loading="eager"
+            decoding="async"
+            draggable={false}
+            className="block w-full h-auto select-none"
+            style={{
+              transform: "scale(1.09)",
+              transformOrigin: "center center",
+            }}
+          />
+        </div>
 
         {/* Under-card green glow */}
         <div
           aria-hidden
-          className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-48 h-12 pointer-events-none"
+          className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-44 h-10 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse, rgba(203,255,0,0.3) 0%, transparent 70%)",
+              "radial-gradient(ellipse, rgba(203,255,0,0.28) 0%, transparent 70%)",
             filter: "blur(10px)",
           }}
         />
@@ -377,179 +389,91 @@ function FloatingCard({ card }: { card: HeroCard }) {
   );
 }
 
-/** Glowing wisp / energy streaks behind the cards (4 corners) */
+/** Thin diagonal light rays from each corner — glowing lime-green energy streaks */
 function HeroStreaks() {
   return (
     <svg
       aria-hidden
       className="pointer-events-none absolute inset-0 w-full h-full"
-      viewBox="0 0 1920 1080"
+      viewBox="0 0 1920 900"
       preserveAspectRatio="xMidYMid slice"
       style={{ zIndex: 5 }}
     >
       <defs>
-        <filter id="streakBlur" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.5" />
+        {/* wide ambient halo — very soft diffuse light */}
+        <filter id="rH" x="-200%" y="-200%" width="500%" height="500%">
+          <feGaussianBlur stdDeviation="28" />
         </filter>
-        <filter id="streakHalo" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="24" />
+        {/* mid glow — visible beam shape */}
+        <filter id="rG" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="7" />
+        </filter>
+        {/* tight core — bright crisp line */}
+        <filter id="rC" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1.2" />
         </filter>
       </defs>
 
-      {/* TOP-LEFT — behind headphones card */}
+      {/* ── TOP-LEFT — behind headphones card ── */}
       <g style={{ mixBlendMode: "screen" }}>
-        <path
-          d="M -150 200 Q 100 80 320 220 Q 540 360 380 500 Q 220 640 20 540 Q -180 440 -150 200 Z"
-          fill="#CBFF00"
-          filter="url(#streakHalo)"
-          opacity="0.22"
-        />
-        <path
-          d="M -60 240 C 80 180, 240 200, 420 320"
-          stroke="#CBFF00"
-          strokeWidth="2.2"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.95"
-          strokeLinecap="round"
-        />
-        <path
-          d="M -60 290 C 100 230, 280 270, 460 380"
-          stroke="#CBFF00"
-          strokeWidth="1.6"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.75"
-          strokeLinecap="round"
-        />
-        <path
-          d="M -40 340 C 130 290, 320 360, 480 460"
-          stroke="#CBFF00"
-          strokeWidth="1.1"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.55"
-          strokeLinecap="round"
-        />
+        <line x1="-80" y1="10"  x2="500" y2="370" stroke="#CBFF00" strokeWidth="80"  filter="url(#rH)" opacity="0.15" strokeLinecap="round" />
+        <line x1="10"  y1="-80" x2="520" y2="310" stroke="#CBFF00" strokeWidth="55"  filter="url(#rH)" opacity="0.10" strokeLinecap="round" />
+        <line x1="-80" y1="10"  x2="500" y2="370" stroke="#CBFF00" strokeWidth="12"  filter="url(#rG)" opacity="0.58" strokeLinecap="round" />
+        <line x1="10"  y1="-80" x2="520" y2="310" stroke="#CBFF00" strokeWidth="8"   filter="url(#rG)" opacity="0.42" strokeLinecap="round" />
+        <line x1="-80" y1="120" x2="440" y2="420" stroke="#CBFF00" strokeWidth="5"   filter="url(#rG)" opacity="0.22" strokeLinecap="round" />
+        <line x1="-80" y1="10"  x2="500" y2="370" stroke="#CBFF00" strokeWidth="1.8" filter="url(#rC)" opacity="1"    strokeLinecap="round" />
+        <line x1="10"  y1="-80" x2="520" y2="310" stroke="#CBFF00" strokeWidth="1.2" filter="url(#rC)" opacity="0.85" strokeLinecap="round" />
       </g>
 
-      {/* TOP-RIGHT — behind drill card */}
+      {/* ── TOP-RIGHT — behind drill card ── */}
       <g style={{ mixBlendMode: "screen" }}>
-        <path
-          d="M 2070 200 Q 1820 80 1600 220 Q 1380 360 1540 500 Q 1700 640 1900 540 Q 2100 440 2070 200 Z"
-          fill="#CBFF00"
-          filter="url(#streakHalo)"
-          opacity="0.22"
-        />
-        <path
-          d="M 1980 240 C 1840 180, 1680 200, 1500 320"
-          stroke="#CBFF00"
-          strokeWidth="2.2"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.95"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 1980 290 C 1820 230, 1640 270, 1460 380"
-          stroke="#CBFF00"
-          strokeWidth="1.6"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.75"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 1960 340 C 1790 290, 1600 360, 1440 460"
-          stroke="#CBFF00"
-          strokeWidth="1.1"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.55"
-          strokeLinecap="round"
-        />
+        <line x1="2000" y1="10"  x2="1420" y2="370" stroke="#CBFF00" strokeWidth="80"  filter="url(#rH)" opacity="0.15" strokeLinecap="round" />
+        <line x1="1910" y1="-80" x2="1400" y2="310" stroke="#CBFF00" strokeWidth="55"  filter="url(#rH)" opacity="0.10" strokeLinecap="round" />
+        <line x1="2000" y1="10"  x2="1420" y2="370" stroke="#CBFF00" strokeWidth="12"  filter="url(#rG)" opacity="0.58" strokeLinecap="round" />
+        <line x1="1910" y1="-80" x2="1400" y2="310" stroke="#CBFF00" strokeWidth="8"   filter="url(#rG)" opacity="0.42" strokeLinecap="round" />
+        <line x1="2000" y1="120" x2="1480" y2="420" stroke="#CBFF00" strokeWidth="5"   filter="url(#rG)" opacity="0.22" strokeLinecap="round" />
+        <line x1="2000" y1="10"  x2="1420" y2="370" stroke="#CBFF00" strokeWidth="1.8" filter="url(#rC)" opacity="1"    strokeLinecap="round" />
+        <line x1="1910" y1="-80" x2="1400" y2="310" stroke="#CBFF00" strokeWidth="1.2" filter="url(#rC)" opacity="0.85" strokeLinecap="round" />
       </g>
 
-      {/* BOTTOM-LEFT — behind thermos card */}
+      {/* ── BOTTOM-LEFT — behind thermos card ── */}
       <g style={{ mixBlendMode: "screen" }}>
-        <path
-          d="M -150 700 Q 80 580 320 720 Q 560 860 380 980 Q 200 1100 0 1020 Q -200 940 -150 700 Z"
-          fill="#CBFF00"
-          filter="url(#streakHalo)"
-          opacity="0.20"
-        />
-        <path
-          d="M -60 760 C 110 720, 280 780, 440 900"
-          stroke="#CBFF00"
-          strokeWidth="2.2"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.85"
-          strokeLinecap="round"
-        />
-        <path
-          d="M -40 820 C 140 780, 320 840, 460 960"
-          stroke="#CBFF00"
-          strokeWidth="1.6"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.65"
-          strokeLinecap="round"
-        />
+        <line x1="-80" y1="890" x2="460" y2="530" stroke="#CBFF00" strokeWidth="80"  filter="url(#rH)" opacity="0.13" strokeLinecap="round" />
+        <line x1="10"  y1="980" x2="500" y2="590" stroke="#CBFF00" strokeWidth="55"  filter="url(#rH)" opacity="0.08" strokeLinecap="round" />
+        <line x1="-80" y1="890" x2="460" y2="530" stroke="#CBFF00" strokeWidth="12"  filter="url(#rG)" opacity="0.52" strokeLinecap="round" />
+        <line x1="10"  y1="980" x2="500" y2="590" stroke="#CBFF00" strokeWidth="8"   filter="url(#rG)" opacity="0.36" strokeLinecap="round" />
+        <line x1="-80" y1="780" x2="420" y2="490" stroke="#CBFF00" strokeWidth="5"   filter="url(#rG)" opacity="0.20" strokeLinecap="round" />
+        <line x1="-80" y1="890" x2="460" y2="530" stroke="#CBFF00" strokeWidth="1.8" filter="url(#rC)" opacity="0.95" strokeLinecap="round" />
+        <line x1="10"  y1="980" x2="500" y2="590" stroke="#CBFF00" strokeWidth="1.2" filter="url(#rC)" opacity="0.75" strokeLinecap="round" />
       </g>
 
-      {/* BOTTOM-RIGHT — behind serum card */}
+      {/* ── BOTTOM-RIGHT — behind serum card ── */}
       <g style={{ mixBlendMode: "screen" }}>
-        <path
-          d="M 2070 700 Q 1840 580 1600 720 Q 1360 860 1540 980 Q 1720 1100 1920 1020 Q 2120 940 2070 700 Z"
-          fill="#CBFF00"
-          filter="url(#streakHalo)"
-          opacity="0.20"
-        />
-        <path
-          d="M 1980 760 C 1810 720, 1640 780, 1480 900"
-          stroke="#CBFF00"
-          strokeWidth="2.2"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.85"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 1960 820 C 1780 780, 1600 840, 1460 960"
-          stroke="#CBFF00"
-          strokeWidth="1.6"
-          fill="none"
-          filter="url(#streakBlur)"
-          opacity="0.65"
-          strokeLinecap="round"
-        />
+        <line x1="2000" y1="890" x2="1460" y2="530" stroke="#CBFF00" strokeWidth="80"  filter="url(#rH)" opacity="0.13" strokeLinecap="round" />
+        <line x1="1910" y1="980" x2="1420" y2="590" stroke="#CBFF00" strokeWidth="55"  filter="url(#rH)" opacity="0.08" strokeLinecap="round" />
+        <line x1="2000" y1="890" x2="1460" y2="530" stroke="#CBFF00" strokeWidth="12"  filter="url(#rG)" opacity="0.52" strokeLinecap="round" />
+        <line x1="1910" y1="980" x2="1420" y2="590" stroke="#CBFF00" strokeWidth="8"   filter="url(#rG)" opacity="0.36" strokeLinecap="round" />
+        <line x1="2000" y1="780" x2="1500" y2="490" stroke="#CBFF00" strokeWidth="5"   filter="url(#rG)" opacity="0.20" strokeLinecap="round" />
+        <line x1="2000" y1="890" x2="1460" y2="530" stroke="#CBFF00" strokeWidth="1.8" filter="url(#rC)" opacity="0.95" strokeLinecap="round" />
+        <line x1="1910" y1="980" x2="1420" y2="590" stroke="#CBFF00" strokeWidth="1.2" filter="url(#rC)" opacity="0.75" strokeLinecap="round" />
       </g>
 
-      {/* Particle splatter — small dots scattered near each wisp */}
-      <g fill="#CBFF00" filter="url(#streakBlur)">
-        {/* top-left */}
-        <circle cx="180" cy="280" r="2.2" opacity="0.8" />
-        <circle cx="280" cy="220" r="1.4" opacity="0.55" />
-        <circle cx="360" cy="380" r="2.6" opacity="0.85" />
-        <circle cx="100" cy="320" r="1" opacity="0.45" />
-        <circle cx="420" cy="300" r="1.6" opacity="0.6" />
-        {/* top-right */}
-        <circle cx="1740" cy="280" r="2.2" opacity="0.8" />
-        <circle cx="1640" cy="220" r="1.4" opacity="0.55" />
-        <circle cx="1560" cy="380" r="2.6" opacity="0.85" />
-        <circle cx="1820" cy="320" r="1" opacity="0.45" />
-        <circle cx="1500" cy="300" r="1.6" opacity="0.6" />
-        {/* bottom-left */}
-        <circle cx="220" cy="820" r="2.2" opacity="0.75" />
-        <circle cx="340" cy="900" r="1.4" opacity="0.55" />
-        <circle cx="100" cy="860" r="2.6" opacity="0.8" />
-        <circle cx="420" cy="940" r="1.2" opacity="0.5" />
-        {/* bottom-right */}
-        <circle cx="1700" cy="820" r="2.2" opacity="0.75" />
-        <circle cx="1580" cy="900" r="1.4" opacity="0.55" />
-        <circle cx="1820" cy="860" r="2.6" opacity="0.8" />
-        <circle cx="1500" cy="940" r="1.2" opacity="0.5" />
+      {/* Sparkle particles along rays */}
+      <g fill="#CBFF00" style={{ mixBlendMode: "screen" }} filter="url(#rC)">
+        <circle cx="210" cy="175" r="2.2" opacity="0.9" />
+        <circle cx="310" cy="120" r="1.4" opacity="0.7" />
+        <circle cx="165" cy="285" r="1.8" opacity="0.6" />
+        <circle cx="400" cy="255" r="1.2" opacity="0.5" />
+        <circle cx="1710" cy="175" r="2.2" opacity="0.9" />
+        <circle cx="1610" cy="120" r="1.4" opacity="0.7" />
+        <circle cx="1755" cy="285" r="1.8" opacity="0.6" />
+        <circle cx="1520" cy="255" r="1.2" opacity="0.5" />
+        <circle cx="215" cy="725" r="2.2" opacity="0.8" />
+        <circle cx="160" cy="620" r="1.6" opacity="0.6" />
+        <circle cx="375" cy="675" r="1.4" opacity="0.5" />
+        <circle cx="1705" cy="725" r="2.2" opacity="0.8" />
+        <circle cx="1760" cy="620" r="1.6" opacity="0.6" />
+        <circle cx="1545" cy="675" r="1.4" opacity="0.5" />
       </g>
     </svg>
   );
