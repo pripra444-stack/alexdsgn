@@ -434,14 +434,26 @@ function HeroStreaks() {
         <filter id="wC" x="-5%" y="-60%" width="110%" height="220%">
           <feGaussianBlur stdDeviation="1.4" />
         </filter>
+
+        {/* Horizontal mask: bright on left+right edges, transparent in center */}
+        <linearGradient id="edgeFade" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stopColor="white" stopOpacity="1"   />
+          <stop offset="18%"  stopColor="white" stopOpacity="1"   />
+          <stop offset="36%"  stopColor="white" stopOpacity="0"   />
+          <stop offset="64%"  stopColor="white" stopOpacity="0"   />
+          <stop offset="82%"  stopColor="white" stopOpacity="1"   />
+          <stop offset="100%" stopColor="white" stopOpacity="1"   />
+        </linearGradient>
+        <mask id="edgeMask">
+          <rect x="0" y="0" width="1920" height="900" fill="url(#edgeFade)" />
+        </mask>
       </defs>
 
-      <g style={{ mixBlendMode: "screen" }}>
+      <g style={{ mixBlendMode: "screen" }} mask="url(#edgeMask)">
         {waves.map((d, i) => {
-          // alternate opacity so waves feel layered, not uniform
-          const baseOp = [0.18, 0.13, 0.16, 0.13, 0.10][i];
-          const glowOp = [0.55, 0.42, 0.50, 0.40, 0.32][i];
-          const coreOp = [1.00, 0.80, 0.90, 0.75, 0.60][i];
+          const baseOp = [0.22, 0.16, 0.20, 0.16, 0.12][i];
+          const glowOp = [0.70, 0.52, 0.62, 0.50, 0.40][i];
+          const coreOp = [1.00, 0.88, 0.95, 0.82, 0.65][i];
           return (
             <g key={i}>
               {/* halo */}
@@ -522,7 +534,36 @@ function Hero() {
 
       {/* ── Center text content ── */}
       <div className="relative z-20 w-full max-w-[1280px] mx-auto px-5 md:px-10">
-        <div className="max-w-[500px] mx-auto">
+        <div className="flex items-center justify-center gap-10 xl:gap-14">
+
+        {/* ── Avatar photo ── */}
+        <div className="hidden lg:block flex-shrink-0">
+          <div
+            className="relative w-[200px] xl:w-[230px] rounded-3xl overflow-hidden"
+            style={{
+              border: "1px solid rgba(203,255,0,0.30)",
+              boxShadow: "0 0 24px rgba(203,255,0,0.20), 0 0 60px rgba(203,255,0,0.08)",
+              aspectRatio: "3/4",
+            }}
+          >
+            <img
+              src="/hero/avatar.png"
+              alt="Max"
+              className="w-full h-full object-cover object-top"
+              draggable={false}
+            />
+            {/* subtle neon overlay on bottom */}
+            <div
+              aria-hidden
+              className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+              style={{
+                background: "linear-gradient(to top, rgba(203,255,0,0.08), transparent)",
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="max-w-[480px]">
 
           {/* Badge */}
           <m.div
@@ -621,6 +662,7 @@ function Hero() {
             ))}
           </m.div>
         </div>
+        </div>{/* end photo+text flex */}
       </div>
     </section>
   );
