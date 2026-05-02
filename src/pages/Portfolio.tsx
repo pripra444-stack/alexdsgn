@@ -486,6 +486,95 @@ function HeroStreaks() {
   );
 }
 
+// ─── FLOATING AVATAR ─────────────────────────────────────────────────────────
+// Y keyframes: rise to badge level → soft bounce → sink to button level → soft bounce → repeat
+const FLOAT_Y  = [0, -155, -142, 0, 155, 142, 0];
+const FLOAT_T  = [0, 0.40,  0.47, 0.50, 0.90, 0.97, 1.0];
+const FLOAT_DUR = 10;
+const FLOAT_EASE: Parameters<typeof m.div>[0]["transition"] = ["easeInOut", "easeOut", "easeIn", "easeInOut", "easeOut", "easeIn"];
+
+// Neon bubble trail — each bubble follows same path with increasing delay
+const BUBBLES = [
+  { dx:  3, r:  9, delay: 0.28, blur: 4.0, op: 0.55 },
+  { dx: -9, r:  7, delay: 0.55, blur: 3.0, op: 0.42 },
+  { dx: 12, r:  5, delay: 0.82, blur: 2.5, op: 0.32 },
+  { dx: -5, r:  8, delay: 1.10, blur: 3.5, op: 0.24 },
+  { dx:  8, r:  4, delay: 1.38, blur: 2.0, op: 0.18 },
+  { dx:-12, r:  5, delay: 1.66, blur: 2.5, op: 0.13 },
+  { dx:  4, r:  3, delay: 1.94, blur: 1.5, op: 0.08 },
+];
+
+function FloatingAvatar() {
+  const floatTrans = {
+    duration: FLOAT_DUR,
+    times: [...FLOAT_T],
+    ease: FLOAT_EASE as any,
+    repeat: Infinity,
+  };
+
+  return (
+    // outer wrapper gives the bubbles a coordinate origin; overflow:visible lets them escape
+    <div className="relative flex-shrink-0" style={{ width: 260, height: 347 }}>
+
+      {/* Neon bubble trail — lagging copies of the card's Y animation */}
+      {BUBBLES.map((b, i) => (
+        <m.div
+          key={i}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            left:   `calc(50% + ${b.dx}px)`,
+            top:    "50%",
+            width:  b.r * 2,
+            height: b.r * 2,
+            marginLeft: -b.r,
+            marginTop:  -b.r,
+            background:  "#CBFF00",
+            opacity:     b.op,
+            filter:     `blur(${b.blur}px)`,
+            mixBlendMode: "screen" as const,
+            zIndex: 0,
+          }}
+          animate={{ y: [...FLOAT_Y] }}
+          transition={{ ...floatTrans, delay: b.delay }}
+        />
+      ))}
+
+      {/* The avatar card — foreground, z:1 above bubbles */}
+      <m.div
+        className="absolute inset-0"
+        style={{ zIndex: 1 }}
+        animate={{ y: [...FLOAT_Y] }}
+        transition={floatTrans}
+      >
+        <div
+          className="w-full h-full rounded-3xl overflow-hidden"
+          style={{
+            border:    "1px solid rgba(203,255,0,0.34)",
+            boxShadow: [
+              "0 0 20px rgba(203,255,0,0.24)",
+              "0 0 55px rgba(203,255,0,0.10)",
+              "0 24px 48px rgba(0,0,0,0.65)",
+            ].join(", "),
+          }}
+        >
+          <img
+            src="/hero/avatar.png"
+            alt="Max"
+            className="w-full h-full object-cover object-top select-none"
+            draggable={false}
+          />
+          {/* neon gradient overlay at bottom */}
+          <div
+            aria-hidden
+            className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
+            style={{ background: "linear-gradient(to top, rgba(203,255,0,0.10), transparent)" }}
+          />
+        </div>
+      </m.div>
+    </div>
+  );
+}
+
 function Hero() {
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden pt-16">
@@ -536,34 +625,31 @@ function Hero() {
       <div className="relative z-20 w-full max-w-[1280px] mx-auto px-5 md:px-10">
         <div className="flex items-center justify-center gap-10 xl:gap-14">
 
-        {/* ── Avatar photo ── */}
-        <div className="hidden lg:block flex-shrink-0">
-          <div
-            className="relative w-[200px] xl:w-[230px] rounded-3xl overflow-hidden"
-            style={{
-              border: "1px solid rgba(203,255,0,0.30)",
-              boxShadow: "0 0 24px rgba(203,255,0,0.20), 0 0 60px rgba(203,255,0,0.08)",
-              aspectRatio: "3/4",
-            }}
-          >
-            <img
-              src="/hero/avatar.png"
-              alt="Max"
-              className="w-full h-full object-cover object-top"
-              draggable={false}
-            />
-            {/* subtle neon overlay on bottom */}
-            <div
-              aria-hidden
-              className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
-              style={{
-                background: "linear-gradient(to top, rgba(203,255,0,0.08), transparent)",
-              }}
-            />
-          </div>
+        {/* ── Avatar — desktop: floating animated card with bubble trail ── */}
+        <div className="hidden lg:block">
+          <FloatingAvatar />
         </div>
 
         <div className="max-w-[480px]">
+
+          {/* ── Avatar — mobile: small portrait above badge ── */}
+          <div className="lg:hidden flex justify-center mb-6">
+            <div
+              className="w-[110px] rounded-2xl overflow-hidden"
+              style={{
+                border: "1px solid rgba(203,255,0,0.32)",
+                boxShadow: "0 0 18px rgba(203,255,0,0.22)",
+                aspectRatio: "3/4",
+              }}
+            >
+              <img
+                src="/hero/avatar.png"
+                alt="Max"
+                className="w-full h-full object-cover object-top select-none"
+                draggable={false}
+              />
+            </div>
+          </div>
 
           {/* Badge */}
           <m.div
