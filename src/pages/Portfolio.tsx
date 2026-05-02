@@ -53,11 +53,12 @@ function Label({ children }: { children: React.ReactNode }) {
 }
 
 // ─── Count-up animation ───────────────────────────────────────────────────────
+// Continuous ping-pong: counts 0 → N → 0 → N … at medium speed
 function CountUp({
   to,
   prefix = "+",
   suffix = "%",
-  duration = 1.8,
+  duration = 3,
 }: {
   to: number;
   prefix?: string;
@@ -65,18 +66,19 @@ function CountUp({
   duration?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
   const count = useMotionValue(0);
   const rounded = useTransform(count, (v) => Math.round(v));
 
   useEffect(() => {
-    if (!inView) return;
     const ctrl = animate(count, to, {
       duration,
-      ease: [0.22, 1, 0.36, 1],
+      ease: "easeInOut",
+      repeat: Infinity,
+      repeatType: "mirror", // counts up then back down, forever
+      repeatDelay: 0.4,     // brief pause at top and bottom
     });
     return ctrl.stop;
-  }, [inView]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <span ref={ref}>
@@ -273,7 +275,7 @@ function FloatingCard({ card }: { card: HeroCard }) {
   const isBottom = card.vSide === "bottom";
 
   const posClass = [
-    isLeft ? "left-[3%]" : "right-[3%]",
+    isLeft ? "left-[17%]" : "right-[17%]",
     isBottom ? "bottom-0" : "top-14",
   ].join(" ");
 
@@ -486,92 +488,40 @@ function HeroStreaks() {
   );
 }
 
-// ─── FLOATING AVATAR ─────────────────────────────────────────────────────────
-// Y keyframes: rise to badge level → soft bounce → sink to button level → soft bounce → repeat
-const FLOAT_Y  = [0, -155, -142, 0, 155, 142, 0];
-const FLOAT_T  = [0, 0.40,  0.47, 0.50, 0.90, 0.97, 1.0];
-const FLOAT_DUR = 10;
-const FLOAT_EASE: Parameters<typeof m.div>[0]["transition"] = ["easeInOut", "easeOut", "easeIn", "easeInOut", "easeOut", "easeIn"];
-
-// Neon bubble trail — each bubble follows same path with increasing delay
-const BUBBLES = [
-  { dx:  3, r:  9, delay: 0.28, blur: 4.0, op: 0.55 },
-  { dx: -9, r:  7, delay: 0.55, blur: 3.0, op: 0.42 },
-  { dx: 12, r:  5, delay: 0.82, blur: 2.5, op: 0.32 },
-  { dx: -5, r:  8, delay: 1.10, blur: 3.5, op: 0.24 },
-  { dx:  8, r:  4, delay: 1.38, blur: 2.0, op: 0.18 },
-  { dx:-12, r:  5, delay: 1.66, blur: 2.5, op: 0.13 },
-  { dx:  4, r:  3, delay: 1.94, blur: 1.5, op: 0.08 },
-];
-
-function FloatingAvatar() {
-  const floatTrans = {
-    duration: FLOAT_DUR,
-    times: [...FLOAT_T],
-    ease: FLOAT_EASE as any,
-    repeat: Infinity,
-  };
-
+// ─── AVATAR PANEL ────────────────────────────────────────────────────────────
+function AvatarPanel() {
   return (
-    // outer wrapper gives the bubbles a coordinate origin; overflow:visible lets them escape
-    <div className="relative flex-shrink-0" style={{ width: 260, height: 347 }}>
-
-      {/* Neon bubble trail — lagging copies of the card's Y animation */}
-      {BUBBLES.map((b, i) => (
-        <m.div
-          key={i}
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            left:   `calc(50% + ${b.dx}px)`,
-            top:    "50%",
-            width:  b.r * 2,
-            height: b.r * 2,
-            marginLeft: -b.r,
-            marginTop:  -b.r,
-            background:  "#CBFF00",
-            opacity:     b.op,
-            filter:     `blur(${b.blur}px)`,
-            mixBlendMode: "screen" as const,
-            zIndex: 0,
-          }}
-          animate={{ y: [...FLOAT_Y] }}
-          transition={{ ...floatTrans, delay: b.delay }}
-        />
-      ))}
-
-      {/* The avatar card — foreground, z:1 above bubbles */}
-      <m.div
-        className="absolute inset-0"
-        style={{ zIndex: 1 }}
-        animate={{ y: [...FLOAT_Y] }}
-        transition={floatTrans}
+    // opacity pulse: 100% → 55% → 100%, slow breathe, continuous
+    <m.div
+      className="relative flex-shrink-0 w-[270px] xl:w-[310px]"
+      animate={{ opacity: [1, 0.55, 1] }}
+      transition={{ duration: 4, ease: "easeInOut", repeat: Infinity }}
+      style={{ aspectRatio: "3/4" }}
+    >
+      <div
+        className="w-full h-full rounded-3xl overflow-hidden"
+        style={{
+          border:    "1px solid rgba(203,255,0,0.34)",
+          boxShadow: [
+            "0 0 22px rgba(203,255,0,0.26)",
+            "0 0 60px rgba(203,255,0,0.10)",
+            "0 28px 52px rgba(0,0,0,0.68)",
+          ].join(", "),
+        }}
       >
+        <img
+          src="/hero/avatar.png"
+          alt="Max"
+          className="w-full h-full object-cover object-top select-none"
+          draggable={false}
+        />
         <div
-          className="w-full h-full rounded-3xl overflow-hidden"
-          style={{
-            border:    "1px solid rgba(203,255,0,0.34)",
-            boxShadow: [
-              "0 0 20px rgba(203,255,0,0.24)",
-              "0 0 55px rgba(203,255,0,0.10)",
-              "0 24px 48px rgba(0,0,0,0.65)",
-            ].join(", "),
-          }}
-        >
-          <img
-            src="/hero/avatar.png"
-            alt="Max"
-            className="w-full h-full object-cover object-top select-none"
-            draggable={false}
-          />
-          {/* neon gradient overlay at bottom */}
-          <div
-            aria-hidden
-            className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
-            style={{ background: "linear-gradient(to top, rgba(203,255,0,0.10), transparent)" }}
-          />
-        </div>
-      </m.div>
-    </div>
+          aria-hidden
+          className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
+          style={{ background: "linear-gradient(to top, rgba(203,255,0,0.10), transparent)" }}
+        />
+      </div>
+    </m.div>
   );
 }
 
@@ -625,9 +575,9 @@ function Hero() {
       <div className="relative z-20 w-full max-w-[1280px] mx-auto px-5 md:px-10">
         <div className="flex items-center justify-center gap-10 xl:gap-14">
 
-        {/* ── Avatar — desktop: floating animated card with bubble trail ── */}
+        {/* ── Avatar — desktop ── */}
         <div className="hidden lg:block">
-          <FloatingAvatar />
+          <AvatarPanel />
         </div>
 
         <div className="max-w-[480px]">
@@ -671,7 +621,14 @@ function Hero() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="text-[clamp(2.1rem,4.5vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
           >
-            Создаю продающие карточки и HERO-визуалы для{" "}
+            Создаю{" "}
+            <span style={{
+              textDecoration: "underline",
+              textDecorationColor: "#CBFF00",
+              textDecorationThickness: "3px",
+              textUnderlineOffset: "6px",
+            }}>продающие</span>{" "}
+            карточки и HERO-визуалы для{" "}
             <span className="text-accent">WB и Ozon</span>
           </m.h1>
 
