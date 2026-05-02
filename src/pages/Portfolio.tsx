@@ -191,7 +191,7 @@ const HERO_CARDS: HeroCard[] = [
     floatY: 16,
     dur: 5.5,
     delay: 0.7,
-    pos: { bottom: "5%", left: "27%" },
+    pos: { bottom: "5%", left: "38%" },
     rotX: 10,
     rotY: 22,
     metricDir: "right",
@@ -703,35 +703,20 @@ function AvatarPanel() {
   return (
     // opacity pulse: 100% → 50% → 100%, slow breathe
     <m.div
-      className="relative flex-shrink-0 w-[460px] xl:w-[540px]"
-      animate={{ opacity: [1, 0.75, 1] }}
+      className="relative flex-shrink-0"
+      style={{ width: "clamp(460px, 48vw, 680px)" }}
+      animate={{ opacity: [1, 0.88, 1] }}
       transition={PULSE}
     >
-      {/* overflow-hidden clips the image frame; rounded corners for glass feel */}
-      <div
-        className="relative rounded-3xl overflow-hidden"
-        style={{
-          border:    "1px solid rgba(203,255,0,0.28)",
-          boxShadow: [
-            "0 0 40px rgba(203,255,0,0.22)",
-            "0 0 100px rgba(203,255,0,0.08)",
-            "0 40px 80px rgba(0,0,0,0.72)",
-          ].join(", "),
-        }}
-      >
-        <img
-          src="/hero/avatar.png"
-          alt="Alex"
-          className="w-full h-auto block select-none"
-          draggable={false}
-        />
-        {/* bottom gradient fade into dark canvas */}
-        <div
-          aria-hidden
-          className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
-          style={{ background: "linear-gradient(to top, rgba(8,8,8,0.7), transparent)" }}
-        />
-      </div>
+      {/* Raw image — no border, no shadow, no rounded clip.
+          Dark background in the PNG matches the site canvas so edges vanish. */}
+      <img
+        src="/hero/avatar.png"
+        alt="Alex"
+        className="w-full h-auto block select-none"
+        draggable={false}
+        style={{ filter: "drop-shadow(0 0 80px rgba(203,255,0,0.10))" }}
+      />
     </m.div>
   );
 }
@@ -760,6 +745,14 @@ function Hero() {
         {HERO_CARDS.map((card) => (
           <FloatingCard key={card.id} card={card} />
         ))}
+      </div>
+
+      {/* ── Animated donut analytics card — z-20, bottom-right ── */}
+      <div
+        className="hidden xl:block absolute z-20 pointer-events-none"
+        style={{ right: "2%", bottom: "7%" }}
+      >
+        <ConversionCard />
       </div>
 
       {/* ── Avatar — large centered visual, z-15 ── */}
