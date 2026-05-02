@@ -99,30 +99,22 @@ function Nav() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/[0.06] backdrop-blur-xl bg-canvas/80">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10 h-full flex items-center justify-between">
-        <a
-          href="#"
-          className="text-sm font-semibold tracking-[0.18em] uppercase text-white"
-        >
-          MAX<span className="text-accent">.</span>DESIGN
+        {/* Logo — left on desktop, hidden on mobile (appears right on mobile below) */}
+        <a href="#" className="hidden md:block text-sm font-semibold tracking-[0.18em] uppercase text-white">
+          ALEXDSGN
         </a>
+        {/* Desktop nav links */}
         <nav className="hidden md:flex items-center gap-8">
           {links.map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              className="text-sm text-zinc-400 hover:text-white transition-colors duration-200"
-            >
+            <a key={label} href={href}
+              className="text-sm text-zinc-400 hover:text-white transition-colors duration-200">
               {label}
             </a>
           ))}
         </nav>
-        <a
-          href={TG_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 h-9 px-5 rounded-full bg-accent text-black text-sm font-semibold hover:bg-accent-dim transition-colors duration-200"
-        >
-          Написать
+        {/* Mobile: logo on right, no button */}
+        <a href="#" className="md:hidden ml-auto text-sm font-semibold tracking-[0.18em] uppercase text-white">
+          ALEXDSGN
         </a>
       </div>
     </header>
@@ -488,14 +480,17 @@ function HeroStreaks() {
   );
 }
 
+// Shared pulse timing — avatar photo and "продающие" use identical values to stay in sync
+const PULSE = { duration: 4, ease: "easeInOut" as const, repeat: Infinity };
+
 // ─── AVATAR PANEL ────────────────────────────────────────────────────────────
 function AvatarPanel() {
   return (
-    // opacity pulse: 100% → 55% → 100%, slow breathe, continuous
+    // opacity pulse: 100% → 50% → 100%, slow breathe
     <m.div
       className="relative flex-shrink-0 w-[270px] xl:w-[310px]"
-      animate={{ opacity: [1, 0.55, 1] }}
-      transition={{ duration: 4, ease: "easeInOut", repeat: Infinity }}
+      animate={{ opacity: [1, 0.5, 1] }}
+      transition={PULSE}
       style={{ aspectRatio: "3/4" }}
     >
       <div
@@ -573,19 +568,22 @@ function Hero() {
 
       {/* ── Center text content ── */}
       <div className="relative z-20 w-full max-w-[1280px] mx-auto px-5 md:px-10">
-        <div className="flex items-center justify-center gap-10 xl:gap-14">
+        {/* items-start so avatar top aligns with headline, not vertically centered */}
+        <div className="flex items-start justify-center gap-10 xl:gap-14">
 
-        {/* ── Avatar — desktop ── */}
-        <div className="hidden lg:block">
+        {/* ── Avatar — desktop: offset down to align top with "Создаю" ── */}
+        <div className="hidden lg:block" style={{ paddingTop: "3.5rem" }}>
           <AvatarPanel />
         </div>
 
         <div className="max-w-[480px]">
 
-          {/* ── Avatar — mobile: small portrait above badge ── */}
-          <div className="lg:hidden flex justify-center mb-6">
-            <div
-              className="w-[110px] rounded-2xl overflow-hidden"
+          {/* ── Avatar — mobile: left-aligned, slightly bigger ── */}
+          <div className="lg:hidden flex justify-start mb-5">
+            <m.div
+              className="w-[130px] rounded-2xl overflow-hidden"
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={PULSE}
               style={{
                 border: "1px solid rgba(203,255,0,0.32)",
                 boxShadow: "0 0 18px rgba(203,255,0,0.22)",
@@ -598,7 +596,7 @@ function Hero() {
                 className="w-full h-full object-cover object-top select-none"
                 draggable={false}
               />
-            </div>
+            </m.div>
           </div>
 
           {/* Badge */}
@@ -622,12 +620,11 @@ function Hero() {
             className="text-[clamp(2.1rem,4.5vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
           >
             Создаю{" "}
-            <span style={{
-              textDecoration: "underline",
-              textDecorationColor: "#CBFF00",
-              textDecorationThickness: "3px",
-              textUnderlineOffset: "6px",
-            }}>продающие</span>{" "}
+            <m.span
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={PULSE}
+              style={{ display: "inline" }}
+            >продающие</m.span>{" "}
             карточки и HERO-визуалы для{" "}
             <span className="text-accent">WB и Ozon</span>
           </m.h1>
@@ -1129,7 +1126,7 @@ function Footer() {
     <footer className="border-t border-white/[0.05] py-8">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
         <span className="text-xs font-mono text-zinc-700 uppercase tracking-widest">
-          MAX<span className="text-accent/50">.</span>DESIGN
+          ALEXDSGN
         </span>
         <div className="flex items-center gap-6">
           <a href={TG_LINK} target="_blank" rel="noopener noreferrer" className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors">Telegram</a>
