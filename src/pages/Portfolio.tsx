@@ -377,41 +377,222 @@ function FloatingCard({ card }: { card: HeroCard }) {
   );
 }
 
+/** Glowing wisp / energy streaks behind the cards (4 corners) */
+function HeroStreaks() {
+  return (
+    <svg
+      aria-hidden
+      className="pointer-events-none absolute inset-0 w-full h-full"
+      viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMid slice"
+      style={{ zIndex: 5 }}
+    >
+      <defs>
+        <filter id="streakBlur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" />
+        </filter>
+        <filter id="streakHalo" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="24" />
+        </filter>
+      </defs>
+
+      {/* TOP-LEFT — behind headphones card */}
+      <g style={{ mixBlendMode: "screen" }}>
+        <path
+          d="M -150 200 Q 100 80 320 220 Q 540 360 380 500 Q 220 640 20 540 Q -180 440 -150 200 Z"
+          fill="#CBFF00"
+          filter="url(#streakHalo)"
+          opacity="0.22"
+        />
+        <path
+          d="M -60 240 C 80 180, 240 200, 420 320"
+          stroke="#CBFF00"
+          strokeWidth="2.2"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.95"
+          strokeLinecap="round"
+        />
+        <path
+          d="M -60 290 C 100 230, 280 270, 460 380"
+          stroke="#CBFF00"
+          strokeWidth="1.6"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.75"
+          strokeLinecap="round"
+        />
+        <path
+          d="M -40 340 C 130 290, 320 360, 480 460"
+          stroke="#CBFF00"
+          strokeWidth="1.1"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.55"
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* TOP-RIGHT — behind drill card */}
+      <g style={{ mixBlendMode: "screen" }}>
+        <path
+          d="M 2070 200 Q 1820 80 1600 220 Q 1380 360 1540 500 Q 1700 640 1900 540 Q 2100 440 2070 200 Z"
+          fill="#CBFF00"
+          filter="url(#streakHalo)"
+          opacity="0.22"
+        />
+        <path
+          d="M 1980 240 C 1840 180, 1680 200, 1500 320"
+          stroke="#CBFF00"
+          strokeWidth="2.2"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.95"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 1980 290 C 1820 230, 1640 270, 1460 380"
+          stroke="#CBFF00"
+          strokeWidth="1.6"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.75"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 1960 340 C 1790 290, 1600 360, 1440 460"
+          stroke="#CBFF00"
+          strokeWidth="1.1"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.55"
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* BOTTOM-LEFT — behind thermos card */}
+      <g style={{ mixBlendMode: "screen" }}>
+        <path
+          d="M -150 700 Q 80 580 320 720 Q 560 860 380 980 Q 200 1100 0 1020 Q -200 940 -150 700 Z"
+          fill="#CBFF00"
+          filter="url(#streakHalo)"
+          opacity="0.20"
+        />
+        <path
+          d="M -60 760 C 110 720, 280 780, 440 900"
+          stroke="#CBFF00"
+          strokeWidth="2.2"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.85"
+          strokeLinecap="round"
+        />
+        <path
+          d="M -40 820 C 140 780, 320 840, 460 960"
+          stroke="#CBFF00"
+          strokeWidth="1.6"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.65"
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* BOTTOM-RIGHT — behind serum card */}
+      <g style={{ mixBlendMode: "screen" }}>
+        <path
+          d="M 2070 700 Q 1840 580 1600 720 Q 1360 860 1540 980 Q 1720 1100 1920 1020 Q 2120 940 2070 700 Z"
+          fill="#CBFF00"
+          filter="url(#streakHalo)"
+          opacity="0.20"
+        />
+        <path
+          d="M 1980 760 C 1810 720, 1640 780, 1480 900"
+          stroke="#CBFF00"
+          strokeWidth="2.2"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.85"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 1960 820 C 1780 780, 1600 840, 1460 960"
+          stroke="#CBFF00"
+          strokeWidth="1.6"
+          fill="none"
+          filter="url(#streakBlur)"
+          opacity="0.65"
+          strokeLinecap="round"
+        />
+      </g>
+
+      {/* Particle splatter — small dots scattered near each wisp */}
+      <g fill="#CBFF00" filter="url(#streakBlur)">
+        {/* top-left */}
+        <circle cx="180" cy="280" r="2.2" opacity="0.8" />
+        <circle cx="280" cy="220" r="1.4" opacity="0.55" />
+        <circle cx="360" cy="380" r="2.6" opacity="0.85" />
+        <circle cx="100" cy="320" r="1" opacity="0.45" />
+        <circle cx="420" cy="300" r="1.6" opacity="0.6" />
+        {/* top-right */}
+        <circle cx="1740" cy="280" r="2.2" opacity="0.8" />
+        <circle cx="1640" cy="220" r="1.4" opacity="0.55" />
+        <circle cx="1560" cy="380" r="2.6" opacity="0.85" />
+        <circle cx="1820" cy="320" r="1" opacity="0.45" />
+        <circle cx="1500" cy="300" r="1.6" opacity="0.6" />
+        {/* bottom-left */}
+        <circle cx="220" cy="820" r="2.2" opacity="0.75" />
+        <circle cx="340" cy="900" r="1.4" opacity="0.55" />
+        <circle cx="100" cy="860" r="2.6" opacity="0.8" />
+        <circle cx="420" cy="940" r="1.2" opacity="0.5" />
+        {/* bottom-right */}
+        <circle cx="1700" cy="820" r="2.2" opacity="0.75" />
+        <circle cx="1580" cy="900" r="1.4" opacity="0.55" />
+        <circle cx="1820" cy="860" r="2.6" opacity="0.8" />
+        <circle cx="1500" cy="940" r="1.2" opacity="0.5" />
+      </g>
+    </svg>
+  );
+}
+
 function Hero() {
   return (
     <section className="relative min-h-[100dvh] flex items-center overflow-hidden pt-16">
 
-      {/* ── Corner ambient glows ── */}
+      {/* ── Corner ambient glows (subtle, since wisps add their own light) ── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
         <div
-          className="absolute -left-40 -top-20 w-[700px] h-[700px] rounded-full"
+          className="absolute -left-40 -top-20 w-[600px] h-[600px] rounded-full"
           style={{
-            background: "radial-gradient(circle, rgba(203,255,0,0.11) 0%, transparent 60%)",
+            background: "radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 60%)",
             filter: "blur(70px)",
           }}
         />
         <div
-          className="absolute -right-40 -top-20 w-[700px] h-[700px] rounded-full"
+          className="absolute -right-40 -top-20 w-[600px] h-[600px] rounded-full"
           style={{
-            background: "radial-gradient(circle, rgba(203,255,0,0.11) 0%, transparent 60%)",
+            background: "radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 60%)",
             filter: "blur(70px)",
           }}
         />
         <div
-          className="absolute -left-40 bottom-0 w-[700px] h-[700px] rounded-full"
+          className="absolute -left-40 bottom-0 w-[600px] h-[600px] rounded-full"
           style={{
-            background: "radial-gradient(circle, rgba(203,255,0,0.08) 0%, transparent 60%)",
+            background: "radial-gradient(circle, rgba(203,255,0,0.05) 0%, transparent 60%)",
             filter: "blur(70px)",
           }}
         />
         <div
-          className="absolute -right-40 bottom-0 w-[700px] h-[700px] rounded-full"
+          className="absolute -right-40 bottom-0 w-[600px] h-[600px] rounded-full"
           style={{
-            background: "radial-gradient(circle, rgba(203,255,0,0.08) 0%, transparent 60%)",
+            background: "radial-gradient(circle, rgba(203,255,0,0.05) 0%, transparent 60%)",
             filter: "blur(70px)",
           }}
         />
       </div>
+
+      {/* ── Wisp / streak energy lines (z-5, behind cards) ── */}
+      <HeroStreaks />
 
       {/* ── Floating product cards (visible md+) ── */}
       <div className="absolute inset-0 z-10 pointer-events-none hidden md:block">
