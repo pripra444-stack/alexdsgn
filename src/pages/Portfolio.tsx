@@ -135,8 +135,8 @@ function Nav() {
 
 type HeroCard = {
   id: string;
-  title: string; // alt text only — never rendered as visible text
-  img: string;   // path under /public — single <img> tag, no CSS card chrome
+  title: string;
+  img: string;
   metric?: {
     label: string;
     num: number;
@@ -148,8 +148,10 @@ type HeroCard = {
   floatY: number;
   dur: number;
   delay: number;
-  side: "left" | "right";
-  vSide: "top" | "bottom";
+  pos: React.CSSProperties;    // absolute CSS position within the card layer
+  rotX: number;                // 3-D tilt: negative = top card, positive = bottom
+  rotY: number;                // 3-D tilt: positive = left card, negative = right
+  metricDir: "left" | "right"; // which side the metric badge extends toward
 };
 
 const HERO_CARDS: HeroCard[] = [
@@ -162,8 +164,10 @@ const HERO_CARDS: HeroCard[] = [
     floatY: 14,
     dur: 5,
     delay: 0,
-    side: "left",
-    vSide: "top",
+    pos: { top: "5%", left: "7%" },
+    rotX: -10,
+    rotY: 22,
+    metricDir: "right",
   },
   {
     id: "drill",
@@ -174,8 +178,10 @@ const HERO_CARDS: HeroCard[] = [
     floatY: 10,
     dur: 4.5,
     delay: 1.3,
-    side: "right",
-    vSide: "top",
+    pos: { top: "5%", right: "13%" },
+    rotX: -10,
+    rotY: -22,
+    metricDir: "left",
   },
   {
     id: "thermos",
@@ -185,8 +191,10 @@ const HERO_CARDS: HeroCard[] = [
     floatY: 16,
     dur: 5.5,
     delay: 0.7,
-    side: "left",
-    vSide: "bottom",
+    pos: { bottom: "5%", left: "27%" },
+    rotX: 10,
+    rotY: 22,
+    metricDir: "right",
   },
   {
     id: "serum",
@@ -197,8 +205,10 @@ const HERO_CARDS: HeroCard[] = [
     floatY: 12,
     dur: 4.8,
     delay: 2,
-    side: "right",
-    vSide: "bottom",
+    pos: { bottom: "5%", right: "20%" },
+    rotX: 10,
+    rotY: -22,
+    metricDir: "left",
   },
 ];
 
@@ -263,19 +273,10 @@ function RingChart() {
 }
 
 function FloatingCard({ card }: { card: HeroCard }) {
-  const isLeft = card.side === "left";
-  const isBottom = card.vSide === "bottom";
+  const isLeft   = card.metricDir === "right"; // badge extends right → card is on left side
+  const isBottom = card.rotX > 0;
 
-  const posClass = [
-    isLeft ? "left-[17%]" : "right-[17%]",
-    isBottom ? "bottom-0" : "top-14",
-  ].join(" ");
-
-  // 3D tilt: steep angle — outer corner faces viewer
-  const rotX = isBottom ? 10 : -10;
-  const rotY = isLeft ? 22 : -22;
-
-  // Metric badge: flat, outside the 3D wrapper so it stays upright
+  // Metric badge: flat, stays upright outside the 3D wrapper
   const metricStyle: React.CSSProperties = card.metric
     ? {
         position: "absolute",
@@ -294,7 +295,8 @@ function FloatingCard({ card }: { card: HeroCard }) {
 
   return (
     <m.div
-      className={`absolute ${posClass} w-[300px] lg:w-[320px]`}
+      className="absolute w-[300px] lg:w-[320px]"
+      style={card.pos}
       animate={{ y: [0, -card.floatY, 0] }}
       transition={{
         duration: card.dur,
@@ -302,6 +304,7 @@ function FloatingCard({ card }: { card: HeroCard }) {
         repeat: Infinity,
         delay: card.delay,
       }}
+      whileHover={{ scale: 1.04 }}
     >
       {/* ── Metric badge — flat, NOT inside the 3D wrapper ── */}
       {card.metric && (
@@ -337,30 +340,26 @@ function FloatingCard({ card }: { card: HeroCard }) {
         </div>
       )}
 
-      {/* ── 3D glass card: steep perspective tilt toward corner ── */}
+      {/* ── 3D glass card ── */}
       <div
         style={{
-          transform: `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg) rotate(${card.rotate}deg)`,
+          transform: `perspective(700px) rotateX(${card.rotX}deg) rotateY(${card.rotY}deg) rotate(${card.rotate}deg)`,
           position: "relative",
           opacity: 0.92,
         }}
       >
-        {/* Neon glass shell:
-            - overflow:hidden clips the PNG's rectangular white frame
-            - scale(1.09) pushes the frame outside the rounded clip
-            - border = lime neon edge
-            - multi-layer box-shadow = inner glow + outer atmospheric halo */}
+        {/* Neon glass shell */}
         <div
           style={{
             borderRadius: 20,
             overflow: "hidden",
             border: "1px solid rgba(203,255,0,0.38)",
             boxShadow: [
-              "0 0 0 1px rgba(203,255,0,0.10)",          /* tight rim */
-              "0 0 18px 2px rgba(203,255,0,0.30)",       /* close neon glow */
-              "0 0 55px 8px rgba(203,255,0,0.12)",       /* wide halo */
-              "inset 0 0 22px rgba(203,255,0,0.06)",     /* inner glass light */
-              "0 28px 55px rgba(0,0,0,0.80)",            /* depth shadow */
+              "0 0 0 1px rgba(203,255,0,0.10)",
+              "0 0 18px 2px rgba(203,255,0,0.30)",
+              "0 0 55px 8px rgba(203,255,0,0.12)",
+              "inset 0 0 22px rgba(203,255,0,0.06)",
+              "0 28px 55px rgba(0,0,0,0.80)",
             ].join(", "),
           }}
         >
@@ -371,10 +370,7 @@ function FloatingCard({ card }: { card: HeroCard }) {
             decoding="async"
             draggable={false}
             className="block w-full h-auto select-none"
-            style={{
-              transform: "scale(1.09)",
-              transformOrigin: "center center",
-            }}
+            style={{ transform: "scale(1.09)", transformOrigin: "center center" }}
           />
         </div>
 
@@ -383,8 +379,7 @@ function FloatingCard({ card }: { card: HeroCard }) {
           aria-hidden
           className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-52 h-10 pointer-events-none"
           style={{
-            background:
-              "radial-gradient(ellipse, rgba(203,255,0,0.32) 0%, transparent 70%)",
+            background: "radial-gradient(ellipse, rgba(203,255,0,0.32) 0%, transparent 70%)",
             filter: "blur(12px)",
           }}
         />
@@ -483,37 +478,258 @@ function HeroStreaks() {
 // Shared pulse timing — avatar photo and "продающие" use identical values to stay in sync
 const PULSE = { duration: 4, ease: "easeInOut" as const, repeat: Infinity };
 
+// ─── CYBER TUNNEL ─────────────────────────────────────────────────────────────
+/** Animated concentric dashed rings — glowing orbital halo around the avatar */
+function CyberTunnel() {
+  const SIZE = 620;
+  const CX   = SIZE / 2; // 310
+  const rings = [
+    { r: 118, dash: "8 14",  dur: 28, dir:  1, op: 0.55 },
+    { r: 150, dash: "4 18",  dur: 38, dir: -1, op: 0.40 },
+    { r: 184, dash: "14 8",  dur: 22, dir:  1, op: 0.30 },
+    { r: 216, dash: "6 16",  dur: 48, dir: -1, op: 0.20 },
+    { r: 248, dash: "3 22",  dur: 62, dir:  1, op: 0.13 },
+    { r: 278, dash: "18 6",  dur: 34, dir: -1, op: 0.08 },
+  ];
+  return (
+    <svg
+      aria-hidden
+      className="pointer-events-none"
+      width={SIZE}
+      height={SIZE}
+      viewBox={`0 0 ${SIZE} ${SIZE}`}
+      style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 1 }}
+    >
+      <defs>
+        <filter id="cyberGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      {rings.map((ring, i) => (
+        <m.g
+          key={i}
+          style={{ originX: `${CX}px`, originY: `${CX}px` }}
+          animate={{ rotate: ring.dir * 360 }}
+          transition={{ duration: ring.dur, ease: "linear", repeat: Infinity }}
+        >
+          <circle
+            cx={CX}
+            cy={CX}
+            r={ring.r}
+            fill="none"
+            stroke="#CBFF00"
+            strokeWidth={1}
+            strokeDasharray={ring.dash}
+            opacity={ring.op}
+            filter="url(#cyberGlow)"
+          />
+        </m.g>
+      ))}
+    </svg>
+  );
+}
+
+// ─── AUDIO WAVEFORM ───────────────────────────────────────────────────────────
+/** Deterministic bar heights — computed once so they're stable across renders */
+const WAVE_BARS = Array.from({ length: 32 }, (_, i) => {
+  const s = i * 7.3 + 1.2;
+  return {
+    h:     8 + (Math.sin(s) * 0.5 + 0.5) * 56,
+    dur:   1.4 + (Math.cos(s * 2.1) * 0.5 + 0.5) * 1.4,
+    delay: (Math.sin(s * 1.7) * 0.5 + 0.5) * 1.2,
+  };
+});
+
+/** Horizontal frequency bars — decorative band behind avatar */
+function AudioWaveform() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none"
+      style={{
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
+        width: 420,
+        opacity: 0.55,
+        zIndex: 0,
+      }}
+    >
+      {WAVE_BARS.map((bar, i) => (
+        <m.div
+          key={i}
+          style={{
+            flex: "none",
+            width: 3,
+            background: "linear-gradient(to top, rgba(203,255,0,0.9), rgba(203,255,0,0.05))",
+            borderRadius: 2,
+          }}
+          animate={{ height: [bar.h, bar.h * 0.22, bar.h * 0.72, bar.h * 0.18, bar.h] }}
+          transition={{
+            duration: bar.dur,
+            ease: "easeInOut",
+            repeat: Infinity,
+            delay: bar.delay,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ─── CONVERSION CARD ──────────────────────────────────────────────────────────
+/** Analytics glassmorphism card with animated donut and stat rows */
+function ConversionCard() {
+  const r    = 44;
+  const circ = 2 * Math.PI * r;
+
+  return (
+    <m.div
+      initial={{ opacity: 0, x: 30 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      style={{
+        width: 200,
+        background: "rgba(255,255,255,0.03)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        border: "1px solid rgba(203,255,0,0.22)",
+        borderRadius: 20,
+        padding: "22px 18px",
+        boxShadow: [
+          "0 0 40px rgba(203,255,0,0.07)",
+          "0 20px 50px rgba(0,0,0,0.55)",
+          "inset 0 0 20px rgba(203,255,0,0.03)",
+        ].join(", "),
+      }}
+    >
+      {/* Header */}
+      <p style={{
+        fontSize: 9,
+        fontFamily: "monospace",
+        color: "#555",
+        letterSpacing: "0.22em",
+        textTransform: "uppercase",
+        marginBottom: 18,
+      }}>
+        Аналитика · 30 дней
+      </p>
+
+      {/* Donut chart */}
+      <div style={{ position: "relative", display: "flex", justifyContent: "center", marginBottom: 18 }}>
+        <svg width="110" height="110" viewBox="0 0 110 110" aria-hidden>
+          {/* track */}
+          <circle cx="55" cy="55" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
+          {/* animated fill: offset ping-pongs from 28% shown → 15% → 28% */}
+          <m.circle
+            cx="55"
+            cy="55"
+            r={r}
+            fill="none"
+            stroke="#CBFF00"
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeDasharray={circ}
+            transform="rotate(-90 55 55)"
+            opacity={0.88}
+            animate={{ strokeDashoffset: [circ * 0.28, circ * 0.82, circ * 0.28] }}
+            transition={{ duration: 3.2, ease: "easeInOut", repeat: Infinity, repeatDelay: 0.5 }}
+          />
+        </svg>
+        {/* Center label */}
+        <div style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          textAlign: "center",
+        }}>
+          <p style={{ fontSize: 22, fontWeight: 900, color: "#CBFF00", lineHeight: 1 }}>
+            <CountUp to={28} prefix="+" suffix="%" duration={2.5} />
+          </p>
+          <p style={{
+            fontSize: 9,
+            color: "#555",
+            fontFamily: "monospace",
+            textTransform: "uppercase",
+            letterSpacing: "0.15em",
+            marginTop: 3,
+          }}>
+            CTR
+          </p>
+        </div>
+      </div>
+
+      {/* Stat rows */}
+      {[
+        { label: "Конверсия", val: "+28%" },
+        { label: "Просмотры", val: "+47%" },
+        { label: "В корзину",  val: "×2.1"  },
+      ].map(({ label, val }) => (
+        <div
+          key={label}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 9,
+          }}
+        >
+          <span style={{ fontSize: 10, color: "#555", fontFamily: "monospace" }}>{label}</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#CBFF00", fontFamily: "monospace" }}>{val}</span>
+        </div>
+      ))}
+
+      {/* Bottom neon rule */}
+      <div style={{
+        height: 1,
+        background: "linear-gradient(to right, transparent, rgba(203,255,0,0.35), transparent)",
+        marginTop: 12,
+      }} />
+    </m.div>
+  );
+}
+
 // ─── AVATAR PANEL ────────────────────────────────────────────────────────────
 function AvatarPanel() {
   return (
     // opacity pulse: 100% → 50% → 100%, slow breathe
     <m.div
-      className="relative flex-shrink-0 w-[270px] xl:w-[310px]"
-      animate={{ opacity: [1, 0.5, 1] }}
+      className="relative flex-shrink-0 w-[460px] xl:w-[540px]"
+      animate={{ opacity: [1, 0.75, 1] }}
       transition={PULSE}
-      style={{ aspectRatio: "3/4" }}
     >
+      {/* overflow-hidden clips the image frame; rounded corners for glass feel */}
       <div
-        className="w-full h-full rounded-3xl overflow-hidden"
+        className="relative rounded-3xl overflow-hidden"
         style={{
-          border:    "1px solid rgba(203,255,0,0.34)",
+          border:    "1px solid rgba(203,255,0,0.28)",
           boxShadow: [
-            "0 0 22px rgba(203,255,0,0.26)",
-            "0 0 60px rgba(203,255,0,0.10)",
-            "0 28px 52px rgba(0,0,0,0.68)",
+            "0 0 40px rgba(203,255,0,0.22)",
+            "0 0 100px rgba(203,255,0,0.08)",
+            "0 40px 80px rgba(0,0,0,0.72)",
           ].join(", "),
         }}
       >
         <img
           src="/hero/avatar.png"
-          alt="Max"
-          className="w-full h-full object-cover object-top select-none"
+          alt="Alex"
+          className="w-full h-auto block select-none"
           draggable={false}
         />
+        {/* bottom gradient fade into dark canvas */}
         <div
           aria-hidden
-          className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
-          style={{ background: "linear-gradient(to top, rgba(203,255,0,0.10), transparent)" }}
+          className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+          style={{ background: "linear-gradient(to top, rgba(8,8,8,0.7), transparent)" }}
         />
       </div>
     </m.div>
@@ -522,187 +738,170 @@ function AvatarPanel() {
 
 function Hero() {
   return (
-    <section className="relative min-h-[100dvh] flex items-center overflow-hidden pt-16">
+    <section className="relative min-h-[100dvh] flex items-end overflow-hidden pt-16 pb-16 xl:pb-24">
 
-      {/* ── Corner ambient glows (subtle, since wisps add their own light) ── */}
+      {/* ── Corner ambient glows — z-0 ── */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        <div
-          className="absolute -left-40 -top-20 w-[600px] h-[600px] rounded-full"
-          style={{
-            background: "radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 60%)",
-            filter: "blur(70px)",
-          }}
-        />
-        <div
-          className="absolute -right-40 -top-20 w-[600px] h-[600px] rounded-full"
-          style={{
-            background: "radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 60%)",
-            filter: "blur(70px)",
-          }}
-        />
-        <div
-          className="absolute -left-40 bottom-0 w-[600px] h-[600px] rounded-full"
-          style={{
-            background: "radial-gradient(circle, rgba(203,255,0,0.05) 0%, transparent 60%)",
-            filter: "blur(70px)",
-          }}
-        />
-        <div
-          className="absolute -right-40 bottom-0 w-[600px] h-[600px] rounded-full"
-          style={{
-            background: "radial-gradient(circle, rgba(203,255,0,0.05) 0%, transparent 60%)",
-            filter: "blur(70px)",
-          }}
-        />
+        <div className="absolute -left-40 -top-20 w-[600px] h-[600px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 60%)", filter: "blur(70px)" }} />
+        <div className="absolute -right-40 -top-20 w-[600px] h-[600px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 60%)", filter: "blur(70px)" }} />
+        <div className="absolute -left-40 bottom-0 w-[600px] h-[600px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(203,255,0,0.05) 0%, transparent 60%)", filter: "blur(70px)" }} />
+        <div className="absolute -right-40 bottom-0 w-[600px] h-[600px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(203,255,0,0.05) 0%, transparent 60%)", filter: "blur(70px)" }} />
       </div>
 
-      {/* ── Wisp / streak energy lines (z-5, behind cards) ── */}
+      {/* ── Neon wave streaks — z-5 ── */}
       <HeroStreaks />
 
-      {/* ── Floating product cards (visible md+) ── */}
+      {/* ── Floating product cards — z-10, scattered across full viewport ── */}
       <div className="absolute inset-0 z-10 pointer-events-none hidden md:block">
         {HERO_CARDS.map((card) => (
           <FloatingCard key={card.id} card={card} />
         ))}
       </div>
 
-      {/* ── Center text content ── */}
-      <div className="relative z-20 w-full max-w-[1280px] mx-auto px-5 md:px-10">
-        {/* items-start so avatar top aligns with headline, not vertically centered */}
-        <div className="flex items-start justify-center gap-10 xl:gap-14">
+      {/* ── Avatar — large centered visual, z-15 ── */}
+      <div
+        aria-hidden
+        className="hidden lg:block absolute z-[15] pointer-events-none"
+        style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
+      >
+        <AvatarPanel />
+      </div>
 
-        {/* ── Avatar — desktop: offset down to align top with "Создаю" ── */}
-        <div className="hidden lg:block" style={{ paddingTop: "3.5rem" }}>
-          <AvatarPanel />
-        </div>
+      {/* ── Main content — z-30, text lower-left ── */}
+      <div className="relative z-30 w-full max-w-[1280px] mx-auto px-5 md:px-10">
+        <div className="flex">
 
-        <div className="max-w-[480px]">
+          {/* ── Text column ── */}
+          <div className="max-w-[440px]">
 
-          {/* ── Avatar — mobile: left-aligned, slightly bigger ── */}
-          <div className="lg:hidden flex justify-start mb-5">
+            {/* Mobile avatar */}
+            <div className="lg:hidden flex justify-start mb-5">
+              <m.div
+                className="w-[130px] rounded-2xl overflow-hidden"
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={PULSE}
+                style={{
+                  border: "1px solid rgba(203,255,0,0.32)",
+                  boxShadow: "0 0 18px rgba(203,255,0,0.22)",
+                  aspectRatio: "3/4",
+                }}
+              >
+                <img
+                  src="/hero/avatar.png"
+                  alt="Alex"
+                  className="w-full h-full object-cover object-top select-none"
+                  draggable={false}
+                />
+              </m.div>
+            </div>
+
+            {/* Badge */}
             <m.div
-              className="w-[130px] rounded-2xl overflow-hidden"
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={PULSE}
-              style={{
-                border: "1px solid rgba(203,255,0,0.32)",
-                boxShadow: "0 0 18px rgba(203,255,0,0.22)",
-                aspectRatio: "3/4",
-              }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-flex items-center gap-2 mb-8"
             >
-              <img
-                src="/hero/avatar.png"
-                alt="Max"
-                className="w-full h-full object-cover object-top select-none"
-                draggable={false}
-              />
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+              <span className="text-xs font-mono tracking-[0.2em] uppercase text-zinc-400">
+                Дизайн маркетплейсов · AI Creator
+              </span>
+            </m.div>
+
+            {/* Headline */}
+            <m.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="text-[clamp(2.1rem,4.5vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
+            >
+              Создаю{" "}
+              <m.span animate={{ opacity: [1, 0.5, 1] }} transition={PULSE} style={{ display: "inline" }}>
+                продающие
+              </m.span>{" "}
+              карточки и HERO-визуалы для{" "}
+              <span className="text-accent">WB и Ozon</span>
+            </m.h1>
+
+            {/* Subtext */}
+            <m.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-5 text-base md:text-lg text-zinc-400 leading-relaxed"
+            >
+              Помогаю выделиться в выдаче и увеличить CTR через коммерческий
+              дизайн и AI-визуалы
+            </m.p>
+
+            {/* Platform pills */}
+            <m.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-wrap gap-2 mt-6"
+            >
+              {["WB", "Ozon", "e-commerce", "упаковка"].map((p) => (
+                <span
+                  key={p}
+                  className="px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] text-xs font-mono text-zinc-400"
+                >
+                  {p}
+                </span>
+              ))}
+            </m.div>
+
+            {/* CTAs */}
+            <m.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-wrap items-center gap-4 mt-8"
+            >
+              <a
+                href={TG_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 h-12 px-7 rounded-full bg-accent text-black text-sm font-semibold hover:bg-accent-dim transition-colors duration-200 shadow-[0_0_40px_-8px_rgba(203,255,0,0.5)]"
+              >
+                <TelegramIcon />
+                Написать в Telegram
+              </a>
+              <a
+                href="#cases"
+                className="inline-flex items-center gap-2 h-12 px-7 rounded-full border border-white/15 text-white text-sm font-medium hover:border-white/30 hover:bg-white/[0.04] transition-all duration-200"
+              >
+                Смотреть кейсы
+                <ArrowDownIcon />
+              </a>
+            </m.div>
+
+            {/* Stats bar */}
+            <m.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-wrap gap-8 mt-12 pt-12 border-t border-white/[0.06]"
+            >
+              {[
+                { value: "40+",  label: "проектов" },
+                { value: "+30%", label: "средний рост CTR" },
+                { value: "24 ч", label: "первая версия" },
+                { value: "AI+",  label: "инструментарий" },
+              ].map(({ value, label }) => (
+                <div key={label}>
+                  <p className="text-2xl font-bold text-white">{value}</p>
+                  <p className="text-xs text-zinc-500 mt-1">{label}</p>
+                </div>
+              ))}
             </m.div>
           </div>
 
-          {/* Badge */}
-          <m.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="inline-flex items-center gap-2 mb-8"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            <span className="text-xs font-mono tracking-[0.2em] uppercase text-zinc-400">
-              Дизайн маркетплейсов · AI Creator
-            </span>
-          </m.div>
-
-          {/* Headline */}
-          <m.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[clamp(2.1rem,4.5vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
-          >
-            Создаю{" "}
-            <m.span
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={PULSE}
-              style={{ display: "inline" }}
-            >продающие</m.span>{" "}
-            карточки и HERO-визуалы для{" "}
-            <span className="text-accent">WB и Ozon</span>
-          </m.h1>
-
-          {/* Sub */}
-          <m.p
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-5 text-base md:text-lg text-zinc-400 leading-relaxed"
-          >
-            Помогаю выделиться в выдаче и увеличить CTR через коммерческий
-            дизайн и AI-визуалы
-          </m.p>
-
-          {/* Platform pills */}
-          <m.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-wrap gap-2 mt-6"
-          >
-            {["WB", "Ozon", "e-commerce", "упаковка"].map((p) => (
-              <span
-                key={p}
-                className="px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] text-xs font-mono text-zinc-400"
-              >
-                {p}
-              </span>
-            ))}
-          </m.div>
-
-          {/* CTAs */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-wrap items-center gap-4 mt-8"
-          >
-            <a
-              href={TG_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 h-12 px-7 rounded-full bg-accent text-black text-sm font-semibold hover:bg-accent-dim transition-colors duration-200 shadow-[0_0_40px_-8px_rgba(203,255,0,0.5)]"
-            >
-              <TelegramIcon />
-              Написать в Telegram
-            </a>
-            <a
-              href="#cases"
-              className="inline-flex items-center gap-2 h-12 px-7 rounded-full border border-white/15 text-white text-sm font-medium hover:border-white/30 hover:bg-white/[0.04] transition-all duration-200"
-            >
-              Смотреть кейсы
-              <ArrowDownIcon />
-            </a>
-          </m.div>
-
-          {/* Stats */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-wrap gap-8 mt-12 pt-12 border-t border-white/[0.06]"
-          >
-            {[
-              { value: "40+", label: "проектов" },
-              { value: "+30%", label: "средний рост CTR" },
-              { value: "24 ч", label: "первая версия" },
-              { value: "AI+", label: "инструментарий" },
-            ].map(({ value, label }) => (
-              <div key={label}>
-                <p className="text-2xl font-bold text-white">{value}</p>
-                <p className="text-xs text-zinc-500 mt-1">{label}</p>
-              </div>
-            ))}
-          </m.div>
         </div>
-        </div>{/* end photo+text flex */}
       </div>
     </section>
   );
