@@ -106,7 +106,7 @@ type HeroCard = {
   rating: string;
   reviews: string;
   platform: "WB" | "Ozon";
-  metric?: { label: string; value: string };
+  metric?: { label: string; value: string; chart?: "line" | "ring" };
   rotate: number;
   floatY: number;
   dur: number;
@@ -131,7 +131,7 @@ const HERO_CARDS: HeroCard[] = [
     rating: "4.8",
     reviews: "12 500",
     platform: "WB",
-    metric: { label: "CTR", value: "+32%" },
+    metric: { label: "CTR", value: "+32%", chart: "line" },
     rotate: -9,
     floatY: 14,
     dur: 5,
@@ -153,7 +153,7 @@ const HERO_CARDS: HeroCard[] = [
     rating: "4.8",
     reviews: "9 210",
     platform: "WB",
-    metric: { label: "Просмотры", value: "+47%" },
+    metric: { label: "Просмотры", value: "+47%", chart: "line" },
     rotate: 7,
     floatY: 10,
     dur: 4.5,
@@ -196,7 +196,7 @@ const HERO_CARDS: HeroCard[] = [
     rating: "4.9",
     reviews: "15 892",
     platform: "Ozon",
-    metric: { label: "Конверсия", value: "+28%" },
+    metric: { label: "Конверсия", value: "+28%", chart: "ring" },
     rotate: 8,
     floatY: 12,
     dur: 4.8,
@@ -222,7 +222,45 @@ function TrendLine({ flip = false }: { flip?: boolean }) {
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity="0.5"
+        opacity="0.55"
+      />
+    </svg>
+  );
+}
+
+/** Donut/ring progress chart — used for the conversion metric */
+function RingChart() {
+  const r = 16;
+  const c = 2 * Math.PI * r;
+  const dash = c * 0.72;
+  return (
+    <svg
+      width="40"
+      height="40"
+      viewBox="0 0 40 40"
+      style={{ marginTop: 6 }}
+      aria-hidden
+    >
+      <circle
+        cx="20"
+        cy="20"
+        r={r}
+        fill="none"
+        stroke="rgba(255,255,255,0.08)"
+        strokeWidth="3"
+      />
+      <circle
+        cx="20"
+        cy="20"
+        r={r}
+        fill="none"
+        stroke="#CBFF00"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${c - dash}`}
+        strokeDashoffset={c * 0.25}
+        opacity="0.75"
+        transform="rotate(-90 20 20)"
       />
     </svg>
   );
@@ -296,7 +334,11 @@ function FloatingCard({ card }: { card: HeroCard }) {
             >
               {card.metric.value}
             </span>
-            <TrendLine flip={!isLeft} />
+            {card.metric.chart === "ring" ? (
+              <RingChart />
+            ) : (
+              <TrendLine flip={!isLeft} />
+            )}
           </div>
         )}
 
