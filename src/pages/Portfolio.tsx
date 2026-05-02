@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { m, useInView } from "framer-motion";
+import { useRef, useEffect } from "react";
+import { m, useInView, useMotionValue, useTransform, animate } from "framer-motion";
 
 // ─── Links ───────────────────────────────────────────────────────────────────
 const TG_LINK = "https://t.me/AlexanderPanurin";
@@ -49,6 +49,41 @@ function Label({ children }: { children: React.ReactNode }) {
     >
       {children}
     </m.p>
+  );
+}
+
+// ─── Count-up animation ───────────────────────────────────────────────────────
+function CountUp({
+  to,
+  prefix = "+",
+  suffix = "%",
+  duration = 1.8,
+}: {
+  to: number;
+  prefix?: string;
+  suffix?: string;
+  duration?: number;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v));
+
+  useEffect(() => {
+    if (!inView) return;
+    const ctrl = animate(count, to, {
+      duration,
+      ease: [0.22, 1, 0.36, 1],
+    });
+    return ctrl.stop;
+  }, [inView]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <span ref={ref}>
+      {prefix}
+      <m.span>{rounded}</m.span>
+      {suffix}
+    </span>
   );
 }
 
@@ -106,7 +141,7 @@ type HeroCard = {
   rating: string;
   reviews: string;
   platform: "WB" | "Ozon";
-  metric?: { label: string; value: string; chart?: "line" | "ring" };
+  metric?: { label: string; value: string; num: number; chart?: "line" | "ring" };
   rotate: number;
   floatY: number;
   dur: number;
@@ -131,7 +166,7 @@ const HERO_CARDS: HeroCard[] = [
     rating: "4.8",
     reviews: "12 500",
     platform: "WB",
-    metric: { label: "CTR", value: "+32%", chart: "line" },
+    metric: { label: "CTR", value: "+32%", num: 32, chart: "line" },
     rotate: -9,
     floatY: 14,
     dur: 5,
@@ -143,7 +178,7 @@ const HERO_CARDS: HeroCard[] = [
     id: "drill",
     title: "ДРЕЛЬ",
     sub: "АККУМУЛЯТОРНАЯ",
-    img: "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=280&h=178&fit=crop&q=80&auto=format",
+    img: "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=280&h=178&fit=crop&q=80&auto=format",
     imgH: 178,
     specs: [
       { text: "21V мощность", em: true },
@@ -153,7 +188,7 @@ const HERO_CARDS: HeroCard[] = [
     rating: "4.8",
     reviews: "9 210",
     platform: "WB",
-    metric: { label: "Просмотры", value: "+47%", chart: "line" },
+    metric: { label: "Просмотры", value: "+47%", num: 47, chart: "line" },
     rotate: 7,
     floatY: 10,
     dur: 4.5,
@@ -196,7 +231,7 @@ const HERO_CARDS: HeroCard[] = [
     rating: "4.9",
     reviews: "15 892",
     platform: "Ozon",
-    metric: { label: "Конверсия", value: "+28%", chart: "ring" },
+    metric: { label: "Конверсия", value: "+28%", num: 28, chart: "ring" },
     rotate: 8,
     floatY: 12,
     dur: 4.8,
@@ -271,9 +306,10 @@ function FloatingCard({ card }: { card: HeroCard }) {
   const isBottom = card.vSide === "bottom";
 
   // Absolute position classes for the animated wrapper
+  // left/right offset pulls cards inward (closer to center text)
   const posClass = [
-    isLeft ? "left-0" : "right-0",
-    isBottom ? "bottom-0" : "top-16",
+    isLeft ? "left-[3%]" : "right-[3%]",
+    isBottom ? "bottom-0" : "top-14",
   ].join(" ");
 
   // Metric badge: placed OUTSIDE the card (to the inner side = toward center)
@@ -296,7 +332,7 @@ function FloatingCard({ card }: { card: HeroCard }) {
 
   return (
     <m.div
-      className={`absolute ${posClass} w-[272px]`}
+      className={`absolute ${posClass} w-[300px] lg:w-[320px]`}
       animate={{ y: [0, -card.floatY, 0] }}
       transition={{
         duration: card.dur,
@@ -315,7 +351,7 @@ function FloatingCard({ card }: { card: HeroCard }) {
               style={{
                 fontSize: 9,
                 fontFamily: "monospace",
-                color: "#555",
+                color: "#666",
                 letterSpacing: "0.13em",
                 textTransform: "uppercase",
                 lineHeight: 1.6,
@@ -325,14 +361,14 @@ function FloatingCard({ card }: { card: HeroCard }) {
             </span>
             <span
               style={{
-                fontSize: 30,
+                fontSize: 34,
                 fontWeight: 900,
                 color: "#CBFF00",
                 lineHeight: 1,
                 letterSpacing: "-0.02em",
               }}
             >
-              {card.metric.value}
+              <CountUp to={card.metric.num} duration={2} />
             </span>
             {card.metric.chart === "ring" ? (
               <RingChart />
