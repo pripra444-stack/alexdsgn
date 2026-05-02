@@ -399,8 +399,23 @@ function FloatingCard({ card }: { card: HeroCard }) {
   );
 }
 
-/** Thin diagonal light rays from each corner — glowing lime-green energy streaks */
+/** Neon light waves sweeping across the hero background */
 function HeroStreaks() {
+  // Wave paths: smooth sinusoidal curves sweeping full width
+  // Each wave is rendered 3×: wide halo → mid glow → bright core
+  const waves = [
+    // upper band — sweeps from left edge through top-left card area, arcs toward center-top
+    "M -100 180  C 200 60,  480 320, 760 200  S 1200 40,  1500 180  S 1800 320, 2020 220",
+    // second wave — offset lower, opposite phase
+    "M -100 340  C 240 480, 520 220, 820 360  S 1280 480, 1560 320  S 1840 180, 2020 340",
+    // mid wave — cuts through card zone at center height
+    "M -100 520  C 280 380, 600 620, 900 480  S 1360 340, 1640 500  S 1880 640, 2020 500",
+    // lower band — mirrors upper, feeds bottom-left/right cards
+    "M -100 700  C 220 840, 540 580, 840 720  S 1320 860, 1600 700  S 1860 560, 2020 700",
+    // bottom edge sweep
+    "M -100 860  C 300 740, 640 920, 960 820  S 1440 700, 1740 860  S 1940 960, 2020 860",
+  ];
+
   return (
     <svg
       aria-hidden
@@ -410,80 +425,50 @@ function HeroStreaks() {
       style={{ zIndex: 5 }}
     >
       <defs>
-        {/* wide ambient halo — very soft diffuse light */}
-        <filter id="rH" x="-200%" y="-200%" width="500%" height="500%">
-          <feGaussianBlur stdDeviation="28" />
+        <filter id="wH" x="-60%" y="-300%" width="220%" height="700%">
+          <feGaussianBlur stdDeviation="32" />
         </filter>
-        {/* mid glow — visible beam shape */}
-        <filter id="rG" x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur stdDeviation="7" />
+        <filter id="wG" x="-20%" y="-150%" width="140%" height="400%">
+          <feGaussianBlur stdDeviation="8" />
         </filter>
-        {/* tight core — bright crisp line */}
-        <filter id="rC" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="1.2" />
+        <filter id="wC" x="-5%" y="-60%" width="110%" height="220%">
+          <feGaussianBlur stdDeviation="1.4" />
         </filter>
       </defs>
 
-      {/* ── TOP-LEFT — behind headphones card ── */}
       <g style={{ mixBlendMode: "screen" }}>
-        <line x1="-80" y1="10"  x2="500" y2="370" stroke="#CBFF00" strokeWidth="80"  filter="url(#rH)" opacity="0.15" strokeLinecap="round" />
-        <line x1="10"  y1="-80" x2="520" y2="310" stroke="#CBFF00" strokeWidth="55"  filter="url(#rH)" opacity="0.10" strokeLinecap="round" />
-        <line x1="-80" y1="10"  x2="500" y2="370" stroke="#CBFF00" strokeWidth="12"  filter="url(#rG)" opacity="0.58" strokeLinecap="round" />
-        <line x1="10"  y1="-80" x2="520" y2="310" stroke="#CBFF00" strokeWidth="8"   filter="url(#rG)" opacity="0.42" strokeLinecap="round" />
-        <line x1="-80" y1="120" x2="440" y2="420" stroke="#CBFF00" strokeWidth="5"   filter="url(#rG)" opacity="0.22" strokeLinecap="round" />
-        <line x1="-80" y1="10"  x2="500" y2="370" stroke="#CBFF00" strokeWidth="1.8" filter="url(#rC)" opacity="1"    strokeLinecap="round" />
-        <line x1="10"  y1="-80" x2="520" y2="310" stroke="#CBFF00" strokeWidth="1.2" filter="url(#rC)" opacity="0.85" strokeLinecap="round" />
-      </g>
+        {waves.map((d, i) => {
+          // alternate opacity so waves feel layered, not uniform
+          const baseOp = [0.18, 0.13, 0.16, 0.13, 0.10][i];
+          const glowOp = [0.55, 0.42, 0.50, 0.40, 0.32][i];
+          const coreOp = [1.00, 0.80, 0.90, 0.75, 0.60][i];
+          return (
+            <g key={i}>
+              {/* halo */}
+              <path d={d} stroke="#CBFF00" strokeWidth="90" fill="none"
+                filter="url(#wH)" opacity={baseOp} strokeLinecap="round" />
+              {/* glow */}
+              <path d={d} stroke="#CBFF00" strokeWidth="10" fill="none"
+                filter="url(#wG)" opacity={glowOp} strokeLinecap="round" />
+              {/* core */}
+              <path d={d} stroke="#CBFF00" strokeWidth="1.6" fill="none"
+                filter="url(#wC)" opacity={coreOp} strokeLinecap="round" />
+            </g>
+          );
+        })}
 
-      {/* ── TOP-RIGHT — behind drill card ── */}
-      <g style={{ mixBlendMode: "screen" }}>
-        <line x1="2000" y1="10"  x2="1420" y2="370" stroke="#CBFF00" strokeWidth="80"  filter="url(#rH)" opacity="0.15" strokeLinecap="round" />
-        <line x1="1910" y1="-80" x2="1400" y2="310" stroke="#CBFF00" strokeWidth="55"  filter="url(#rH)" opacity="0.10" strokeLinecap="round" />
-        <line x1="2000" y1="10"  x2="1420" y2="370" stroke="#CBFF00" strokeWidth="12"  filter="url(#rG)" opacity="0.58" strokeLinecap="round" />
-        <line x1="1910" y1="-80" x2="1400" y2="310" stroke="#CBFF00" strokeWidth="8"   filter="url(#rG)" opacity="0.42" strokeLinecap="round" />
-        <line x1="2000" y1="120" x2="1480" y2="420" stroke="#CBFF00" strokeWidth="5"   filter="url(#rG)" opacity="0.22" strokeLinecap="round" />
-        <line x1="2000" y1="10"  x2="1420" y2="370" stroke="#CBFF00" strokeWidth="1.8" filter="url(#rC)" opacity="1"    strokeLinecap="round" />
-        <line x1="1910" y1="-80" x2="1400" y2="310" stroke="#CBFF00" strokeWidth="1.2" filter="url(#rC)" opacity="0.85" strokeLinecap="round" />
-      </g>
-
-      {/* ── BOTTOM-LEFT — behind thermos card ── */}
-      <g style={{ mixBlendMode: "screen" }}>
-        <line x1="-80" y1="890" x2="460" y2="530" stroke="#CBFF00" strokeWidth="80"  filter="url(#rH)" opacity="0.13" strokeLinecap="round" />
-        <line x1="10"  y1="980" x2="500" y2="590" stroke="#CBFF00" strokeWidth="55"  filter="url(#rH)" opacity="0.08" strokeLinecap="round" />
-        <line x1="-80" y1="890" x2="460" y2="530" stroke="#CBFF00" strokeWidth="12"  filter="url(#rG)" opacity="0.52" strokeLinecap="round" />
-        <line x1="10"  y1="980" x2="500" y2="590" stroke="#CBFF00" strokeWidth="8"   filter="url(#rG)" opacity="0.36" strokeLinecap="round" />
-        <line x1="-80" y1="780" x2="420" y2="490" stroke="#CBFF00" strokeWidth="5"   filter="url(#rG)" opacity="0.20" strokeLinecap="round" />
-        <line x1="-80" y1="890" x2="460" y2="530" stroke="#CBFF00" strokeWidth="1.8" filter="url(#rC)" opacity="0.95" strokeLinecap="round" />
-        <line x1="10"  y1="980" x2="500" y2="590" stroke="#CBFF00" strokeWidth="1.2" filter="url(#rC)" opacity="0.75" strokeLinecap="round" />
-      </g>
-
-      {/* ── BOTTOM-RIGHT — behind serum card ── */}
-      <g style={{ mixBlendMode: "screen" }}>
-        <line x1="2000" y1="890" x2="1460" y2="530" stroke="#CBFF00" strokeWidth="80"  filter="url(#rH)" opacity="0.13" strokeLinecap="round" />
-        <line x1="1910" y1="980" x2="1420" y2="590" stroke="#CBFF00" strokeWidth="55"  filter="url(#rH)" opacity="0.08" strokeLinecap="round" />
-        <line x1="2000" y1="890" x2="1460" y2="530" stroke="#CBFF00" strokeWidth="12"  filter="url(#rG)" opacity="0.52" strokeLinecap="round" />
-        <line x1="1910" y1="980" x2="1420" y2="590" stroke="#CBFF00" strokeWidth="8"   filter="url(#rG)" opacity="0.36" strokeLinecap="round" />
-        <line x1="2000" y1="780" x2="1500" y2="490" stroke="#CBFF00" strokeWidth="5"   filter="url(#rG)" opacity="0.20" strokeLinecap="round" />
-        <line x1="2000" y1="890" x2="1460" y2="530" stroke="#CBFF00" strokeWidth="1.8" filter="url(#rC)" opacity="0.95" strokeLinecap="round" />
-        <line x1="1910" y1="980" x2="1420" y2="590" stroke="#CBFF00" strokeWidth="1.2" filter="url(#rC)" opacity="0.75" strokeLinecap="round" />
-      </g>
-
-      {/* Sparkle particles along rays */}
-      <g fill="#CBFF00" style={{ mixBlendMode: "screen" }} filter="url(#rC)">
-        <circle cx="210" cy="175" r="2.2" opacity="0.9" />
-        <circle cx="310" cy="120" r="1.4" opacity="0.7" />
-        <circle cx="165" cy="285" r="1.8" opacity="0.6" />
-        <circle cx="400" cy="255" r="1.2" opacity="0.5" />
-        <circle cx="1710" cy="175" r="2.2" opacity="0.9" />
-        <circle cx="1610" cy="120" r="1.4" opacity="0.7" />
-        <circle cx="1755" cy="285" r="1.8" opacity="0.6" />
-        <circle cx="1520" cy="255" r="1.2" opacity="0.5" />
-        <circle cx="215" cy="725" r="2.2" opacity="0.8" />
-        <circle cx="160" cy="620" r="1.6" opacity="0.6" />
-        <circle cx="375" cy="675" r="1.4" opacity="0.5" />
-        <circle cx="1705" cy="725" r="2.2" opacity="0.8" />
-        <circle cx="1760" cy="620" r="1.6" opacity="0.6" />
-        <circle cx="1545" cy="675" r="1.4" opacity="0.5" />
+        {/* floating glint particles */}
+        {[
+          [160,  150, 2.2, 0.85], [310,  90,  1.4, 0.65], [420,  270, 1.8, 0.60],
+          [680,  200, 1.2, 0.50], [890,  420, 2.0, 0.70], [1060, 340, 1.4, 0.55],
+          [1240, 180, 1.8, 0.60], [1440, 310, 2.2, 0.80], [1620, 120, 1.4, 0.65],
+          [1780, 250, 1.6, 0.55], [240,  680, 1.8, 0.70], [520,  760, 1.4, 0.55],
+          [780,  640, 2.0, 0.75], [1100, 720, 1.4, 0.55], [1380, 660, 1.8, 0.65],
+          [1680, 740, 2.2, 0.80], [1840, 620, 1.4, 0.55],
+        ].map(([cx, cy, r, op], i) => (
+          <circle key={i} cx={cx} cy={cy} r={r} fill="#CBFF00"
+            opacity={op} filter="url(#wC)" />
+        ))}
       </g>
     </svg>
   );
