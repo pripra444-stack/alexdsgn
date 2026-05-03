@@ -1038,7 +1038,8 @@ function Services() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.06 }}
-              className="flex items-center justify-center gap-5 md:gap-8"
+              className="flex items-center justify-center gap-6 md:gap-10"
+              style={{ overflowX: "auto", paddingBottom: 8 }}
             >
               {SHOWCASE_SLIDES.map((slide, i) => (
                 <div
@@ -1054,7 +1055,7 @@ function Services() {
                     overflow: "hidden",
                     cursor: "pointer",
                     flexShrink: 0,
-                    width: "clamp(160px, 22vw, 280px)",
+                    width: "clamp(220px, 27vw, 480px)",
                     border: i === active
                       ? "1.5px solid rgba(203,255,0,0.65)"
                       : "1.5px solid rgba(255,255,255,0.06)",
