@@ -13,6 +13,7 @@ export default {
           "sans-serif",
         ],
         mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "monospace"],
+        luna: ["LunaObscura", "Geist", "sans-serif"],
       },
       colors: {
         canvas: "#080808",

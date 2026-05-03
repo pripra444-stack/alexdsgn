@@ -730,7 +730,7 @@ function Hero() {
         <img
           src="/hero/BG HS 2.png"
           alt=""
-          className="w-full h-full object-cover object-center select-none"
+          className="w-full h-full object-cover object-center select-none brightness-75 md:brightness-100"
           draggable={false}
         />
         {/* gradient overlays: darken bottom-left for text legibility, dim top slightly */}
@@ -782,7 +782,7 @@ function Hero() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[clamp(2.2rem,4.8vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
+            className="font-luna text-[clamp(2.2rem,4.8vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
           >
             Создаю{" "}
             <span>продающие</span>{" "}
@@ -925,7 +925,7 @@ function Services() {
           <Label>Услуги</Label>
           <m.h2
             variants={fadeUp}
-            className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-14"
+            className="font-luna text-4xl md:text-5xl font-bold tracking-tight text-white mb-14"
           >
             Что делаю
           </m.h2>
@@ -1108,7 +1108,7 @@ function Cases() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Кейсы</Label>
-          <m.h2 variants={fadeUp} className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-3">
+          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-tight text-white mb-3">
             Проекты
           </m.h2>
           <m.p variants={fadeUp} className="text-zinc-500 text-base mb-14">
@@ -1140,7 +1140,7 @@ function WhyMe() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Почему я</Label>
-          <m.h2 variants={fadeUp} className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-14">
+          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-tight text-white mb-14">
             Как я работаю
           </m.h2>
         </Reveal>
@@ -1180,7 +1180,7 @@ function Process() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Процесс</Label>
-          <m.h2 variants={fadeUp} className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-14">
+          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-tight text-white mb-14">
             Как работаем
           </m.h2>
         </Reveal>
@@ -1230,7 +1230,7 @@ function Contacts() {
               <m.p variants={fadeUp} className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-5">
                 Контакты
               </m.p>
-              <m.h2 variants={fadeUp} className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">
+              <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">
                 Готов к работе?
               </m.h2>
               <m.p variants={fadeUp} className="text-lg text-zinc-400 mb-10 max-w-[480px]">
