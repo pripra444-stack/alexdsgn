@@ -1033,13 +1033,66 @@ function Services() {
               Примеры карточек товаров
             </m.p>
 
-            {/* Cards row */}
+            {/* ── MOBILE: single card + prev/next arrows ── */}
             <m.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.06 }}
-              className="flex items-center justify-center gap-6 md:gap-10"
-              style={{ overflowX: "auto", paddingBottom: 8 }}
+              className="flex md:hidden items-center gap-4 w-full justify-center"
+            >
+              {/* Prev */}
+              <button
+                onClick={() => setActive((active + 2) % 3)}
+                className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/25 transition-all duration-200"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+
+              {/* Active card */}
+              <AnimatePresence mode="wait">
+                <m.div
+                  key={active}
+                  initial={{ opacity: 0, scale: 0.94 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.94 }}
+                  transition={{ duration: 0.22 }}
+                  style={{
+                    width: "min(72vw, 300px)",
+                    flexShrink: 0,
+                    borderRadius: 20,
+                    overflow: "hidden",
+                    border: "1.5px solid rgba(203,255,0,0.65)",
+                    boxShadow: [
+                      "0 0 0 1px rgba(203,255,0,0.12)",
+                      "0 0 36px rgba(203,255,0,0.20)",
+                      "0 20px 50px rgba(0,0,0,0.75)",
+                    ].join(", "),
+                  }}
+                >
+                  <img
+                    src={SHOWCASE_SLIDES[active].img}
+                    alt={SHOWCASE_SLIDES[active].label}
+                    draggable={false}
+                    className="block w-full h-auto select-none"
+                  />
+                </m.div>
+              </AnimatePresence>
+
+              {/* Next */}
+              <button
+                onClick={() => setActive((active + 1) % 3)}
+                className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/25 transition-all duration-200"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </m.div>
+
+            {/* ── DESKTOP: all 3 cards side-by-side, hover to activate ── */}
+            <m.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.06 }}
+              className="hidden md:flex items-center justify-center gap-6 lg:gap-8"
             >
               {SHOWCASE_SLIDES.map((slide, i) => (
                 <div
@@ -1055,7 +1108,7 @@ function Services() {
                     overflow: "hidden",
                     cursor: "pointer",
                     flexShrink: 0,
-                    width: "clamp(220px, 27vw, 480px)",
+                    width: "min(24vw, 420px)",
                     border: i === active
                       ? "1.5px solid rgba(203,255,0,0.65)"
                       : "1.5px solid rgba(255,255,255,0.06)",
@@ -1079,7 +1132,7 @@ function Services() {
               ))}
             </m.div>
 
-            {/* Active label — animates on change */}
+            {/* Active label */}
             <AnimatePresence mode="wait">
               <m.p
                 key={active}
@@ -1087,14 +1140,14 @@ function Services() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.18 }}
-                className="mt-10 text-sm font-mono text-zinc-400 uppercase tracking-[0.18em]"
+                className="mt-8 text-sm font-mono text-zinc-400 uppercase tracking-[0.18em]"
               >
                 {SHOWCASE_SLIDES[active].label}
               </m.p>
             </AnimatePresence>
 
             {/* Dot indicators */}
-            <div className="flex items-center gap-2 mt-4">
+            <div className="flex items-center gap-2 mt-3">
               {SHOWCASE_SLIDES.map((_, i) => (
                 <button
                   key={i}
