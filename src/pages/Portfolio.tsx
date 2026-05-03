@@ -725,29 +725,34 @@ function Hero() {
   return (
     <section className="relative min-h-[100dvh] flex items-end overflow-hidden pt-16 pb-16 xl:pb-24">
 
-      {/* ── Corner ambient glows — z-0 ── */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute -left-40 -top-20 w-[600px] h-[600px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 60%)", filter: "blur(70px)" }} />
-        <div className="absolute -right-40 -top-20 w-[600px] h-[600px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 60%)", filter: "blur(70px)" }} />
-        <div className="absolute -left-40 bottom-0 w-[600px] h-[600px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(203,255,0,0.05) 0%, transparent 60%)", filter: "blur(70px)" }} />
-        <div className="absolute -right-40 bottom-0 w-[600px] h-[600px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(203,255,0,0.05) 0%, transparent 60%)", filter: "blur(70px)" }} />
+      {/* ── Background photo — BG HS 1.png as full-cover hero image ── */}
+      <div aria-hidden className="absolute inset-0 z-0">
+        <img
+          src="/hero/BG HS 1.png"
+          alt=""
+          className="w-full h-full object-cover object-center select-none"
+          draggable={false}
+        />
+        {/* gradient overlays: darken bottom-left for text legibility, dim top slightly */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: [
+              "linear-gradient(to top, rgba(8,8,8,0.82) 0%, rgba(8,8,8,0.30) 45%, transparent 70%)",
+              "linear-gradient(to right, rgba(8,8,8,0.55) 0%, transparent 45%)",
+            ].join(", "),
+          }}
+        />
       </div>
 
-      {/* ── Neon wave streaks — z-5 ── */}
-      <HeroStreaks />
-
-      {/* ── Floating product cards — z-10, scattered across full viewport ── */}
+      {/* ── Floating product cards — z-10 ── */}
       <div className="absolute inset-0 z-10 pointer-events-none hidden md:block">
         {HERO_CARDS.map((card) => (
           <FloatingCard key={card.id} card={card} />
         ))}
       </div>
 
-      {/* ── Animated donut analytics card — z-20, bottom-right ── */}
+      {/* ── Animated donut analytics card — z-20, bottom-right corner ── */}
       <div
         className="hidden xl:block absolute z-20 pointer-events-none"
         style={{ right: "2%", bottom: "7%" }}
@@ -755,144 +760,93 @@ function Hero() {
         <ConversionCard />
       </div>
 
-      {/* ── Avatar — large centered visual, z-15 ── */}
-      <div
-        aria-hidden
-        className="hidden lg:block absolute z-[15] pointer-events-none"
-        style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
-      >
-        <AvatarPanel />
-      </div>
-
-      {/* ── Main content — z-30, text lower-left ── */}
+      {/* ── Text content — z-30, lower-left ── */}
       <div className="relative z-30 w-full max-w-[1280px] mx-auto px-5 md:px-10">
-        <div className="flex">
+        <div className="max-w-[480px]">
 
-          {/* ── Text column ── */}
-          <div className="max-w-[440px]">
+          {/* Badge */}
+          <m.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2 mb-8"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+            <span className="text-xs font-mono tracking-[0.2em] uppercase text-zinc-400">
+              Дизайн маркетплейсов · AI Creator
+            </span>
+          </m.div>
 
-            {/* Mobile avatar */}
-            <div className="lg:hidden flex justify-start mb-5">
-              <m.div
-                className="w-[130px] rounded-2xl overflow-hidden"
-                animate={{ opacity: [1, 0.5, 1] }}
-                transition={PULSE}
-                style={{
-                  border: "1px solid rgba(203,255,0,0.32)",
-                  boxShadow: "0 0 18px rgba(203,255,0,0.22)",
-                  aspectRatio: "3/4",
-                }}
-              >
-                <img
-                  src="/hero/avatar.png"
-                  alt="Alex"
-                  className="w-full h-full object-cover object-top select-none"
-                  draggable={false}
-                />
-              </m.div>
-            </div>
+          {/* Headline */}
+          <m.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[clamp(2.2rem,4.8vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
+          >
+            Создаю{" "}
+            <m.span animate={{ opacity: [1, 0.5, 1] }} transition={PULSE} style={{ display: "inline" }}>
+              продающие
+            </m.span>{" "}
+            карточки<br />и HERO-визуалы для{" "}
+            <span className="text-accent">WB и Ozon</span>
+          </m.h1>
 
-            {/* Badge */}
-            <m.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="inline-flex items-center gap-2 mb-8"
+          {/* Subtext */}
+          <m.p
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-5 text-base md:text-lg text-zinc-400 leading-relaxed"
+          >
+            Помогаю выделиться в выдаче и увеличить CTR через коммерческий
+            дизайн и AI-визуалы
+          </m.p>
+
+          {/* CTAs */}
+          <m.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-wrap items-center gap-4 mt-8"
+          >
+            <a
+              href={TG_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 h-12 px-7 rounded-full bg-accent text-black text-sm font-semibold hover:bg-accent-dim transition-colors duration-200 shadow-[0_0_40px_-8px_rgba(203,255,0,0.5)]"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-              <span className="text-xs font-mono tracking-[0.2em] uppercase text-zinc-400">
-                Дизайн маркетплейсов · AI Creator
-              </span>
-            </m.div>
-
-            {/* Headline */}
-            <m.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="text-[clamp(2.1rem,4.5vw,3.6rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
+              <TelegramIcon />
+              Написать в Telegram
+            </a>
+            <a
+              href="#cases"
+              className="inline-flex items-center gap-2 h-12 px-7 rounded-full border border-white/15 text-white text-sm font-medium hover:border-white/30 hover:bg-white/[0.04] transition-all duration-200"
             >
-              Создаю{" "}
-              <m.span animate={{ opacity: [1, 0.5, 1] }} transition={PULSE} style={{ display: "inline" }}>
-                продающие
-              </m.span>{" "}
-              карточки и HERO-визуалы для{" "}
-              <span className="text-accent">WB и Ozon</span>
-            </m.h1>
+              Смотреть кейсы
+              <ArrowDownIcon />
+            </a>
+          </m.div>
 
-            {/* Subtext */}
-            <m.p
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-5 text-base md:text-lg text-zinc-400 leading-relaxed"
-            >
-              Помогаю выделиться в выдаче и увеличить CTR через коммерческий
-              дизайн и AI-визуалы
-            </m.p>
-
-            {/* Platform pills */}
-            <m.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-wrap gap-2 mt-6"
-            >
-              {["WB", "Ozon", "e-commerce", "упаковка"].map((p) => (
-                <span
-                  key={p}
-                  className="px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] text-xs font-mono text-zinc-400"
-                >
-                  {p}
-                </span>
-              ))}
-            </m.div>
-
-            {/* CTAs */}
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-wrap items-center gap-4 mt-8"
-            >
-              <a
-                href={TG_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 h-12 px-7 rounded-full bg-accent text-black text-sm font-semibold hover:bg-accent-dim transition-colors duration-200 shadow-[0_0_40px_-8px_rgba(203,255,0,0.5)]"
-              >
-                <TelegramIcon />
-                Написать в Telegram
-              </a>
-              <a
-                href="#cases"
-                className="inline-flex items-center gap-2 h-12 px-7 rounded-full border border-white/15 text-white text-sm font-medium hover:border-white/30 hover:bg-white/[0.04] transition-all duration-200"
-              >
-                Смотреть кейсы
-                <ArrowDownIcon />
-              </a>
-            </m.div>
-
-            {/* Stats bar */}
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-wrap gap-8 mt-12 pt-12 border-t border-white/[0.06]"
-            >
-              {[
-                { value: "40+",  label: "проектов" },
-                { value: "+30%", label: "средний рост CTR" },
-                { value: "24 ч", label: "первая версия" },
-                { value: "AI+",  label: "инструментарий" },
-              ].map(({ value, label }) => (
-                <div key={label}>
-                  <p className="text-2xl font-bold text-white">{value}</p>
-                  <p className="text-xs text-zinc-500 mt-1">{label}</p>
-                </div>
-              ))}
-            </m.div>
-          </div>
+          {/* Stats */}
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.55 }}
+            className="flex flex-wrap gap-8 mt-10 pt-10 border-t border-white/[0.08]"
+          >
+            {[
+              { value: "40+",  label: "проектов" },
+              { value: "+30%", label: "средний рост CTR" },
+              { value: "24 ч", label: "первая версия" },
+              { value: "AI+",  label: "инструментарий" },
+            ].map(({ value, label }) => (
+              <div key={label}>
+                <p className="text-2xl font-bold text-white">{value}</p>
+                <p className="text-xs text-zinc-500 mt-1">{label}</p>
+              </div>
+            ))}
+          </m.div>
 
         </div>
       </div>
