@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { m, useInView, useMotionValue, useTransform, animate } from "framer-motion";
 
 // ─── Links ───────────────────────────────────────────────────────────────────
@@ -782,7 +782,7 @@ function Hero() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-luna text-[clamp(2.2rem,4.8vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
+            className="font-luna text-[clamp(2.2rem,4.8vw,3.8rem)] font-bold leading-[1.05] tracking-[0.06em] text-white"
           >
             Создаю{" "}
             <span>продающие</span>{" "}
@@ -917,6 +917,91 @@ const SERVICES = [
   },
 ];
 
+function ServiceCard({ s, idx }: { s: (typeof SERVICES)[0]; idx: number }) {
+  const [slide, setSlide] = useState(-1);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isShowcase = idx === 0;
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!isShowcase || !cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const w = rect.width / 3;
+    setSlide(x < w ? 0 : x < w * 2 ? 1 : 2);
+  }
+
+  return (
+    <Reveal>
+      <m.div
+        ref={cardRef}
+        variants={fadeUp}
+        className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:border-accent/30 hover:bg-surface-2 transition-all duration-300 cursor-default"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setSlide(-1)}
+      >
+        <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700">{s.num}</span>
+        <span className="text-2xl mb-4 block">{s.icon}</span>
+        <h3 className="text-lg font-semibold text-white">{s.title}</h3>
+        <p className="text-sm text-accent/70 font-mono mb-3">{s.subtitle}</p>
+        <p className="text-sm text-zinc-400 leading-relaxed">{s.desc}</p>
+        <div className="flex flex-wrap gap-1.5 mt-5">
+          {s.tags.map((t) => (
+            <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500">
+              {t}
+            </span>
+          ))}
+        </div>
+
+        {/* Product cards slideshow — only on first service card */}
+        {isShowcase && slide >= 0 && (
+          <div
+            className="absolute inset-0 z-10 flex items-center justify-center"
+            style={{
+              background: "rgba(8,8,8,0.90)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+            }}
+          >
+            <div
+              style={{
+                width: "75%",
+                overflow: "hidden",
+                borderRadius: 12,
+                boxShadow: "0 8px 40px rgba(0,0,0,0.65)",
+              }}
+            >
+              <img
+                src="/hero/services-cards.png"
+                alt="Примеры карточек товаров"
+                draggable={false}
+                style={{
+                  display: "block",
+                  width: "300%",
+                  transform: `translateX(${-slide * 33.333}%)`,
+                  transition: "transform 0.22s ease",
+                }}
+              />
+            </div>
+            <p style={{
+              position: "absolute",
+              bottom: 16,
+              fontSize: 10,
+              color: "#666",
+              fontFamily: "monospace",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+            }}>
+              {["Powerbank", "Бейсболка", "Лосьон"][slide]}
+            </p>
+          </div>
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+      </m.div>
+    </Reveal>
+  );
+}
+
 function Services() {
   return (
     <section id="services" className="py-28 md:py-36">
@@ -925,39 +1010,15 @@ function Services() {
           <Label>Услуги</Label>
           <m.h2
             variants={fadeUp}
-            className="font-luna text-4xl md:text-5xl font-bold tracking-tight text-white mb-14"
+            className="font-luna text-4xl md:text-5xl font-bold tracking-[0.06em] text-white mb-14"
           >
             Что делаю
           </m.h2>
         </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {SERVICES.map((s) => (
-            <Reveal key={s.num}>
-              <m.div
-                variants={fadeUp}
-                className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:border-accent/30 hover:bg-surface-2 transition-all duration-300 cursor-default"
-              >
-                <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700">
-                  {s.num}
-                </span>
-                <span className="text-2xl mb-4 block">{s.icon}</span>
-                <h3 className="text-lg font-semibold text-white">{s.title}</h3>
-                <p className="text-sm text-accent/70 font-mono mb-3">{s.subtitle}</p>
-                <p className="text-sm text-zinc-400 leading-relaxed">{s.desc}</p>
-                <div className="flex flex-wrap gap-1.5 mt-5">
-                  {s.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-              </m.div>
-            </Reveal>
+          {SERVICES.map((s, idx) => (
+            <ServiceCard key={s.num} s={s} idx={idx} />
           ))}
         </div>
       </div>
@@ -1108,7 +1169,7 @@ function Cases() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Кейсы</Label>
-          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-tight text-white mb-3">
+          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-[0.06em] text-white mb-3">
             Проекты
           </m.h2>
           <m.p variants={fadeUp} className="text-zinc-500 text-base mb-14">
@@ -1140,7 +1201,7 @@ function WhyMe() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Почему я</Label>
-          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-tight text-white mb-14">
+          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-[0.06em] text-white mb-14">
             Как я работаю
           </m.h2>
         </Reveal>
@@ -1180,7 +1241,7 @@ function Process() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Процесс</Label>
-          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-tight text-white mb-14">
+          <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-[0.06em] text-white mb-14">
             Как работаем
           </m.h2>
         </Reveal>
@@ -1230,7 +1291,7 @@ function Contacts() {
               <m.p variants={fadeUp} className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-5">
                 Контакты
               </m.p>
-              <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">
+              <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-6xl font-bold tracking-[0.06em] text-white mb-4">
                 Готов к работе?
               </m.h2>
               <m.p variants={fadeUp} className="text-lg text-zinc-400 mb-10 max-w-[480px]">
