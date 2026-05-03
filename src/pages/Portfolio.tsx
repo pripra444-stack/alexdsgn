@@ -1050,7 +1050,7 @@ function Services() {
               transition={{ duration: 0.35, delay: 0.08 }}
               className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-10"
             >
-              Примеры карточек товаров
+              {activeSlides === HERO_SLIDES ? "Примеры HERO-экранов" : "Примеры карточек товаров"}
             </m.p>
 
             {/* ── MOBILE: single card + prev/next arrows ── */}
