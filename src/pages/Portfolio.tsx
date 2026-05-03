@@ -930,6 +930,12 @@ const HERO_SLIDES = [
   { img: "/hero/hero%20003.png", label: "Спортсумка" },
 ];
 
+const AI_SLIDES = [
+  { img: "/hero/ai%20visual%20001.png", label: "Маска для волос" },
+  { img: "/hero/ai%20visual%20002.png", label: "Фонарик" },
+  { img: "/hero/ai%20visual%20003.png", label: "Ваза" },
+];
+
 function ServiceCard({
   s,
   idx,
@@ -939,7 +945,7 @@ function ServiceCard({
   idx: number;
   onOpen?: () => void;
 }) {
-  const hasSlideshow = idx === 0 || idx === 1;
+  const hasSlideshow = idx === 0 || idx === 1 || idx === 2;
   return (
     <Reveal>
       <m.div
@@ -1008,6 +1014,7 @@ function Services() {
               onOpen={
                 idx === 0 ? () => openSlideshow(SHOWCASE_SLIDES) :
                 idx === 1 ? () => openSlideshow(HERO_SLIDES) :
+                idx === 2 ? () => openSlideshow(AI_SLIDES) :
                 undefined
               }
             />
@@ -1050,7 +1057,9 @@ function Services() {
               transition={{ duration: 0.35, delay: 0.08 }}
               className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-10"
             >
-              {activeSlides === HERO_SLIDES ? "Примеры HERO-экранов" : "Примеры карточек товаров"}
+              {activeSlides === HERO_SLIDES ? "Примеры HERO-экранов" :
+               activeSlides === AI_SLIDES   ? "Примеры AI-визуалов"  :
+                                              "Примеры карточек товаров"}
             </m.p>
 
             {/* ── MOBILE: single card + prev/next arrows ── */}
