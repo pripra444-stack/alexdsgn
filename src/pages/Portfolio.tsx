@@ -191,7 +191,7 @@ const HERO_CARDS: HeroCard[] = [
     floatY: 16,
     dur: 5.5,
     delay: 0.7,
-    pos: { bottom: "5%", left: "2%" },
+    pos: { bottom: "5%", left: "7%" },
     rotX: 10,
     rotY: 22,
     metricDir: "right",
@@ -728,7 +728,7 @@ function Hero() {
       {/* ── Background photo — BG HS 1.png as full-cover hero image ── */}
       <div aria-hidden className="absolute inset-0 z-0">
         <img
-          src="/hero/BG HS 1.png"
+          src="/hero/BG HS 2.png"
           alt=""
           className="w-full h-full object-cover object-center select-none"
           draggable={false}
@@ -785,9 +785,7 @@ function Hero() {
             className="text-[clamp(2.2rem,4.8vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white"
           >
             Создаю{" "}
-            <m.span animate={{ opacity: [1, 0.5, 1] }} transition={PULSE} style={{ display: "inline" }}>
-              продающие
-            </m.span>{" "}
+            <span>продающие</span>{" "}
             карточки<br />и HERO-визуалы для{" "}
             <span className="text-accent">WB и Ozon</span>
           </m.h1>
