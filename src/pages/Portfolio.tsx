@@ -191,7 +191,7 @@ const HERO_CARDS: HeroCard[] = [
     floatY: 16,
     dur: 5.5,
     delay: 0.7,
-    pos: { bottom: "5%", left: "38%" },
+    pos: { bottom: "5%", left: "2%" },
     rotX: 10,
     rotY: 22,
     metricDir: "right",
