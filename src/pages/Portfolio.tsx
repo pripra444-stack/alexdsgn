@@ -917,11 +917,17 @@ const SERVICES = [
   },
 ];
 
-// ─── Slideshow cards (3 separate PNGs dropped by user) ───────────────────────
+// ─── Slideshow slide sets ─────────────────────────────────────────────────────
 const SHOWCASE_SLIDES = [
   { img: "/hero/card%2001.png", label: "Powerbank" },
   { img: "/hero/card%2002.png", label: "Бейсболка" },
   { img: "/hero/card%2003.png", label: "Лосьон" },
+];
+
+const HERO_SLIDES = [
+  { img: "/hero/hero%20001.png", label: "Электрочайник" },
+  { img: "/hero/hero%20002.png", label: "Самокат" },
+  { img: "/hero/hero%20003.png", label: "Спортсумка" },
 ];
 
 function ServiceCard({
@@ -933,14 +939,14 @@ function ServiceCard({
   idx: number;
   onOpen?: () => void;
 }) {
-  const isShowcase = idx === 0;
+  const hasSlideshow = idx === 0 || idx === 1;
   return (
     <Reveal>
       <m.div
         variants={fadeUp}
         className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:border-accent/30 hover:bg-surface-2 transition-all duration-300"
-        style={{ cursor: isShowcase ? "pointer" : "default" }}
-        onClick={isShowcase ? onOpen : undefined}
+        style={{ cursor: hasSlideshow ? "pointer" : "default" }}
+        onClick={hasSlideshow ? onOpen : undefined}
       >
         <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700">{s.num}</span>
         <span className="text-2xl mb-4 block">{s.icon}</span>
@@ -954,8 +960,7 @@ function ServiceCard({
             </span>
           ))}
         </div>
-        {/* subtle hint for first card */}
-        {isShowcase && (
+        {hasSlideshow && (
           <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-accent/60 transition-colors duration-200">
             смотреть примеры →
           </span>
@@ -966,13 +971,19 @@ function ServiceCard({
   );
 }
 
+type Slide = { img: string; label: string };
+
 function Services() {
-  const [slideshowOpen, setSlideshowOpen] = useState(false);
+  const [activeSlides, setActiveSlides] = useState<Slide[] | null>(null);
   const [active, setActive] = useState(0);
 
-  function openSlideshow() {
+  function openSlideshow(slides: Slide[]) {
     setActive(0);
-    setSlideshowOpen(true);
+    setActiveSlides(slides);
+  }
+
+  function closeSlideshow() {
+    setActiveSlides(null);
   }
 
   return (
@@ -990,14 +1001,23 @@ function Services() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {SERVICES.map((s, idx) => (
-            <ServiceCard key={s.num} s={s} idx={idx} onOpen={openSlideshow} />
+            <ServiceCard
+              key={s.num}
+              s={s}
+              idx={idx}
+              onOpen={
+                idx === 0 ? () => openSlideshow(SHOWCASE_SLIDES) :
+                idx === 1 ? () => openSlideshow(HERO_SLIDES) :
+                undefined
+              }
+            />
           ))}
         </div>
       </div>
 
       {/* ── Full-screen product slideshow modal ── */}
       <AnimatePresence>
-        {slideshowOpen && (
+        {activeSlides && (
           <m.div
             key="slideshow-backdrop"
             initial={{ opacity: 0 }}
@@ -1010,11 +1030,11 @@ function Services() {
               backdropFilter: "blur(18px)",
               WebkitBackdropFilter: "blur(18px)",
             }}
-            onClick={(e) => { if (e.target === e.currentTarget) setSlideshowOpen(false); }}
+            onClick={(e) => { if (e.target === e.currentTarget) closeSlideshow(); }}
           >
             {/* Close button */}
             <button
-              onClick={() => setSlideshowOpen(false)}
+              onClick={closeSlideshow}
               className="absolute top-6 right-7 w-10 h-10 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-500 hover:text-white hover:border-white/25 transition-all duration-200"
               aria-label="Закрыть"
             >
@@ -1070,8 +1090,8 @@ function Services() {
                   }}
                 >
                   <img
-                    src={SHOWCASE_SLIDES[active].img}
-                    alt={SHOWCASE_SLIDES[active].label}
+                    src={activeSlides[active].img}
+                    alt={activeSlides[active].label}
                     draggable={false}
                     className="block w-full h-auto select-none"
                   />
@@ -1095,7 +1115,7 @@ function Services() {
               className="hidden md:flex items-center justify-center gap-6 lg:gap-8"
               style={{ maxWidth: "100%" }}
             >
-              {SHOWCASE_SLIDES.map((slide, i) => (
+              {activeSlides.map((slide, i) => (
                 <div
                   key={i}
                   onMouseEnter={() => setActive(i)}
@@ -1143,17 +1163,17 @@ function Services() {
                 transition={{ duration: 0.18 }}
                 className="mt-8 text-sm font-mono text-zinc-400 uppercase tracking-[0.18em]"
               >
-                {SHOWCASE_SLIDES[active].label}
+                {activeSlides[active].label}
               </m.p>
             </AnimatePresence>
 
             {/* Dot indicators */}
             <div className="flex items-center gap-2 mt-3">
-              {SHOWCASE_SLIDES.map((_, i) => (
+              {activeSlides.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setActive(i)}
-                  aria-label={SHOWCASE_SLIDES[i].label}
+                  aria-label={activeSlides[i].label}
                   style={{
                     padding: 0,
                     border: "none",
