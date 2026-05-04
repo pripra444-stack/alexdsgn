@@ -1477,23 +1477,44 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
         onClick={onOpen}
         className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${c.gradient} border border-white/[0.07] h-[320px] md:h-[360px] ${onOpen ? "cursor-pointer" : "cursor-default"}`}
       >
-        {(c.shapes as Shape[]).map((s, i) => (
-          <div
-            key={i}
+        {c.id === 1 ? (
+          /* Case 1 — show actual product card preview instead of shapes */
+          <img
             aria-hidden
-            className="absolute pointer-events-none transition-all duration-500 group-hover:scale-105"
+            src="/hero/project%20card%2003.png"
+            alt=""
+            draggable={false}
+            className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
             style={{
-              width: s.w,
-              height: s.h,
-              left: s.x,
-              top: s.y,
-              borderRadius: s.r,
-              background: `linear-gradient(145deg, ${c.accent}22, ${c.accent}08)`,
-              border: `1px solid ${c.accent}${Math.round(s.op * 30).toString(16).padStart(2, "0")}`,
-              opacity: s.op,
+              right: "-8%",
+              top: "50%",
+              transform: "translateY(-50%) rotate(10deg)",
+              width: "58%",
+              height: "auto",
+              borderRadius: 14,
+              opacity: 0.88,
+              boxShadow: "0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(192,132,252,0.25)",
             }}
           />
-        ))}
+        ) : (
+          (c.shapes as Shape[]).map((s, i) => (
+            <div
+              key={i}
+              aria-hidden
+              className="absolute pointer-events-none transition-all duration-500 group-hover:scale-105"
+              style={{
+                width: s.w,
+                height: s.h,
+                left: s.x,
+                top: s.y,
+                borderRadius: s.r,
+                background: `linear-gradient(145deg, ${c.accent}22, ${c.accent}08)`,
+                border: `1px solid ${c.accent}${Math.round(s.op * 30).toString(16).padStart(2, "0")}`,
+                opacity: s.op,
+              }}
+            />
+          ))
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
         <div className="absolute inset-0 flex flex-col justify-end p-7">
           <div className="flex gap-2 mb-3">
