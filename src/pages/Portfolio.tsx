@@ -860,7 +860,7 @@ function Marquee() {
     "Карточки товаров",
     "HERO-экраны",
     "AI-визуалы",
-    "Упаковка",
+    "Воронка продаж",
     "CTR +30%",
     "e-commerce",
   ];
@@ -909,11 +909,11 @@ const SERVICES = [
   },
   {
     num: "04",
-    icon: "◈",
-    title: "Дизайн упаковки",
-    subtitle: "Print-ready",
-    desc: "От идеи до макета, готового к производству. Этикетка, коробка, стикер — коммерческий уровень с первой итерации.",
-    tags: ["Упаковка", "Print", "Этикетка"],
+    icon: "◎",
+    title: "Анализ воронки продаж",
+    subtitle: "WB · Ozon · Unit-экономика",
+    desc: "Разбираю, где теряются покупатели: CTR, конверсия, корзина. Нахожу точки роста и даю конкретные рекомендации по дизайну.",
+    tags: ["CTR", "Конверсия", "Аналитика", "Рост"],
   },
 ];
 
@@ -928,12 +928,19 @@ const HERO_SLIDES = [
   { img: "/hero/hero%20001.png", label: "Электрочайник" },
   { img: "/hero/hero%20002.png", label: "Самокат" },
   { img: "/hero/hero%20003.png", label: "Спортсумка" },
+  { img: "/hero/hero%20004.png", label: "HERO-экран" },
 ];
 
 const AI_SLIDES = [
   { img: "/hero/ai%20visual%20001.png", label: "Маска для волос" },
   { img: "/hero/ai%20visual%20002.png", label: "Фонарик" },
   { img: "/hero/ai%20visual%20003.png", label: "Ваза" },
+];
+
+const VORONKA_SLIDES = [
+  { img: "/hero/voronka%2001.png", label: "Воронка 1" },
+  { img: "/hero/voronka%2002.png", label: "Воронка 2" },
+  { img: "/hero/voronka%2003.png", label: "Воронка 3" },
 ];
 
 function ServiceCard({
@@ -945,7 +952,7 @@ function ServiceCard({
   idx: number;
   onOpen?: () => void;
 }) {
-  const hasSlideshow = idx === 0 || idx === 1 || idx === 2;
+  const hasSlideshow = idx === 0 || idx === 1 || idx === 2 || idx === 3;
   return (
     <Reveal>
       <m.div
@@ -1015,6 +1022,7 @@ function Services() {
                 idx === 0 ? () => openSlideshow(SHOWCASE_SLIDES) :
                 idx === 1 ? () => openSlideshow(HERO_SLIDES) :
                 idx === 2 ? () => openSlideshow(AI_SLIDES) :
+                idx === 3 ? () => openSlideshow(VORONKA_SLIDES) :
                 undefined
               }
             />
@@ -1057,9 +1065,10 @@ function Services() {
               transition={{ duration: 0.35, delay: 0.08 }}
               className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-10"
             >
-              {activeSlides === HERO_SLIDES ? "Примеры HERO-экранов" :
-               activeSlides === AI_SLIDES   ? "Примеры AI-визуалов"  :
-                                              "Примеры карточек товаров"}
+              {activeSlides === HERO_SLIDES    ? "Примеры HERO-экранов"        :
+               activeSlides === AI_SLIDES     ? "Примеры AI-визуалов"          :
+               activeSlides === VORONKA_SLIDES ? "Анализ воронки продаж"       :
+                                                 "Примеры карточек товаров"}
             </m.p>
 
             {/* ── MOBILE: single card + prev/next arrows ── */}
