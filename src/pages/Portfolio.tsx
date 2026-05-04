@@ -919,16 +919,16 @@ const SERVICES = [
 
 // ─── Slideshow slide sets ─────────────────────────────────────────────────────
 const SHOWCASE_SLIDES = [
-  { img: "/hero/card%2001.png", label: "Powerbank" },
-  { img: "/hero/card%2002.png", label: "Бейсболка" },
-  { img: "/hero/card%2003.png", label: "Лосьон" },
+  { img: "/hero/card%2001.png", label: "Первый слайд" },
+  { img: "/hero/card%2002.png", label: "Второй слайд" },
+  { img: "/hero/card%2003.png", label: "Третий слайд" },
 ];
 
 const HERO_SLIDES = [
-  { img: "/hero/hero%20001.png", label: "Электрочайник" },
-  { img: "/hero/hero%20002.png", label: "Самокат" },
-  { img: "/hero/hero%20003.png", label: "Спортсумка" },
-  { img: "/hero/hero%20004.png", label: "HERO-экран" },
+  { img: "/hero/hero%20001.png", label: "Робот-мойщик окон" },
+  { img: "/hero/hero%20002.png", label: "Аппликатор Кузнецова" },
+  { img: "/hero/hero%20003.png", label: "Машинка для стрижки волос" },
+  { img: "/hero/hero%20004.png", label: "Наушники" },
 ];
 
 const AI_SLIDES = [
