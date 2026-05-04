@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#06060f"/><stop offset="100%" stop-color="#0a0818"/></linearGradient>
+    <linearGradient id="deviceG1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c1c2e"/><stop offset="100%" stop-color="#12121e"/></linearGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#bg1)"/>
+
+  <!-- Counter -->
+  <circle cx="52" cy="52" r="9" fill="#7c3aed"/>
+  <text x="72" y="58" font-family="Arial, sans-serif" font-size="24" fill="#7c3aed" font-weight="700" letter-spacing="1">01 / 04</text>
+
+  <!-- Title -->
+  <text x="52" y="168" font-family="Arial Black, Arial, sans-serif" font-size="88" fill="white" font-weight="900">Исходный</text>
+  <text x="52" y="264" font-family="Arial Black, Arial, sans-serif" font-size="88" fill="white" font-weight="900">Hero-экран</text>
+  <text x="52" y="316" font-family="Arial, sans-serif" font-size="30" fill="#555">низкая кликабельность</text>
+
+  <!-- Product card mockup (right) -->
+  <rect x="548" y="52" width="484" height="660" rx="20" fill="url(#deviceG1)" stroke="#222" stroke-width="1.5"/>
+  <!-- Grey boring product image area -->
+  <rect x="568" y="72" width="444" height="340" rx="10" fill="#141420"/>
+  <!-- Boring product: a grey box -->
+  <rect x="660" y="110" width="260" height="260" rx="12" fill="#1e1e2e" stroke="#2a2a3a" stroke-width="1"/>
+  <rect x="690" y="140" width="200" height="180" rx="6" fill="#252535"/>
+  <!-- Screen dots representing a generic device -->
+  <rect x="720" y="160" width="140" height="100" rx="4" fill="#1a1a28"/>
+  <text x="790" y="220" font-family="Arial, sans-serif" font-size="14" fill="#3a3a5a" text-anchor="middle">GADGET PRO</text>
+  <text x="790" y="240" font-family="Arial, sans-serif" font-size="12" fill="#2a2a3a" text-anchor="middle">модель 2024</text>
+  <!-- Bottom info area -->
+  <text x="620" y="450" font-family="Arial, sans-serif" font-size="24" fill="#555" font-weight="600">3 490 ₽</text>
+  <text x="620" y="484" font-family="Arial, sans-serif" font-size="16" fill="#3a3a4a">★ 3.7  ·  89 отзывов</text>
+  <!-- Cart button (dull) -->
+  <rect x="618" y="504" width="394" height="52" rx="8" fill="#1a1a2a" stroke="#2a2a3a" stroke-width="1"/>
+  <text x="815" y="536" font-family="Arial, sans-serif" font-size="18" fill="#444" text-anchor="middle">В корзину</text>
+  <!-- Thumbnails row -->
+  <rect x="618" y="572" width="90" height="90" rx="6" fill="#161622" stroke="#222" stroke-width="1"/>
+  <rect x="718" y="572" width="90" height="90" rx="6" fill="#161622" stroke="#222" stroke-width="1"/>
+  <rect x="818" y="572" width="90" height="90" rx="6" fill="#161622" stroke="#222" stroke-width="1"/>
+  <rect x="918" y="572" width="90" height="90" rx="6" fill="#161622" stroke="#222" stroke-width="1"/>
+
+  <!-- Problem boxes (left) -->
+  <!-- Box 1 -->
+  <rect x="52" y="356" width="456" height="96" rx="14" fill="#0f0f18"/>
+  <rect x="74" y="378" width="52" height="52" rx="10" fill="#151520"/>
+  <polygon points="100,384 112,406 88,406" fill="#7c3aed" opacity="0.55"/>
+  <text x="142" y="397" font-family="Arial, sans-serif" font-size="22" fill="white" font-weight="700">низкий CTR</text>
+  <text x="142" y="424" font-family="Arial, sans-serif" font-size="17" fill="#555">показатели ниже среднего</text>
+
+  <!-- Box 2 -->
+  <rect x="52" y="466" width="456" height="96" rx="14" fill="#0f0f18"/>
+  <rect x="74" y="488" width="52" height="52" rx="10" fill="#151520"/>
+  <ellipse cx="100" cy="514" rx="16" ry="11" fill="none" stroke="#7c3aed" stroke-width="2" opacity="0.55"/>
+  <circle cx="100" cy="514" r="4" fill="#7c3aed" opacity="0.55"/>
+  <text x="142" y="507" font-family="Arial, sans-serif" font-size="22" fill="white" font-weight="700">серый фон</text>
+  <text x="142" y="534" font-family="Arial, sans-serif" font-size="17" fill="#555">нет акцентов и эмоции</text>
+
+  <!-- Box 3 -->
+  <rect x="52" y="576" width="456" height="96" rx="14" fill="#0f0f18"/>
+  <rect x="74" y="598" width="52" height="52" rx="10" fill="#151520"/>
+  <rect x="84" y="610" width="32" height="8" rx="4" fill="#7c3aed" opacity="0.55"/>
+  <text x="142" y="617" font-family="Arial, sans-serif" font-size="22" fill="white" font-weight="700">нет УТП</text>
+  <text x="142" y="644" font-family="Arial, sans-serif" font-size="17" fill="#555">отсутствует уникальность</text>
+
+  <!-- Bottom problem statement -->
+  <rect x="52" y="706" width="976" height="84" rx="14" fill="#0f0f18"/>
+  <text x="80" y="753" font-family="Arial, sans-serif" font-size="20" fill="white" font-weight="700">Проблема: </text>
+  <text x="222" y="753" font-family="Arial, sans-serif" font-size="20" fill="#555">Hero-экран не останавливает прокрутку и не цепляет</text>
+
+  <!-- Subtle noise overlay lines -->
+  <line x1="0" y1="840" x2="1080" y2="840" stroke="#ffffff" stroke-width="0.5" opacity="0.03"/>
+  <line x1="0" y1="880" x2="1080" y2="880" stroke="#ffffff" stroke-width="0.5" opacity="0.03"/>
+  <line x1="0" y1="920" x2="1080" y2="920" stroke="#ffffff" stroke-width="0.5" opacity="0.03"/>
+  <line x1="0" y1="960" x2="1080" y2="960" stroke="#ffffff" stroke-width="0.5" opacity="0.03"/>
+</svg>

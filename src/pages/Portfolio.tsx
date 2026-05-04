@@ -951,10 +951,10 @@ const PROJECT_SLIDES = [
 ];
 
 const HERO_PROJECT_SLIDES = [
-  { img: "/hero/hero%20project%2001.png", label: "Исходный Hero-экран" },
-  { img: "/hero/hero%20project%2002.png", label: "Разработка" },
-  { img: "/hero/hero%20project%2003.png", label: "Готовый Hero-экран" },
-  { img: "/hero/hero%20project%2004.png", label: "Результат" },
+  { img: "/hero/hero%20project%2001.svg", label: "Исходный Hero-экран" },
+  { img: "/hero/hero%20project%2002.svg", label: "Разработка" },
+  { img: "/hero/hero%20project%2003.svg", label: "Готовый Hero-экран" },
+  { img: "/hero/hero%20project%2004.svg", label: "Результат" },
 ];
 
 function ServiceCard({
@@ -1507,7 +1507,7 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
           /* Case 2 — hero screen preview */
           <img
             aria-hidden
-            src="/hero/hero%20project%2003.png"
+            src="/hero/hero%20project%2003.svg"
             alt=""
             draggable={false}
             className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
