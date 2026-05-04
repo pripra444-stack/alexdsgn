@@ -943,6 +943,13 @@ const VORONKA_SLIDES = [
   { img: "/hero/voronka%2003.png", label: "Воронка 3" },
 ];
 
+const PROJECT_SLIDES = [
+  { img: "/hero/project%20card%2001.png", label: "Исходная карточка" },
+  { img: "/hero/project%20card%2002.png", label: "Разработка воронки" },
+  { img: "/hero/project%20card%2003.png", label: "Готовая карточка" },
+  { img: "/hero/project%20card%2004.png", label: "Результат" },
+];
+
 function ServiceCard({
   s,
   idx,
@@ -1295,12 +1302,180 @@ const CASES = [
 
 type Shape = { w: number; h: number; x: string; y: string; r: number; op: number };
 
-function CaseCard({ c }: { c: (typeof CASES)[0] }) {
+// ─── Card-deck modal for case studies ────────────────────────────────────────
+function CaseDeckModal({ slides, title, onClose }: {
+  slides: { img: string; label: string }[];
+  title: string;
+  onClose: () => void;
+}) {
+  const [active, setActive] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const n = slides.length;
+
+  // Fan layout: spread cards around center
+  const fanOffsets   = [-150, -50, 50, 150];
+  const fanRotations = [-18,  -6,   6,  18];
+
+  function getCardStyle(i: number): React.CSSProperties {
+    if (i === active) return {
+      transform: "translateX(-50%) rotate(0deg) scale(1.06)",
+      opacity: 1,
+      zIndex: 10,
+      border: "1.5px solid rgba(203,255,0,0.70)",
+      boxShadow: [
+        "0 0 0 1px rgba(203,255,0,0.14)",
+        "0 0 40px rgba(203,255,0,0.25)",
+        "0 24px 60px rgba(0,0,0,0.80)",
+      ].join(", "),
+    };
+    const off = fanOffsets[i]   ?? (i - 1.5) * 100;
+    const rot = fanRotations[i] ?? (i - 1.5) * 12;
+    return {
+      transform: `translateX(calc(-50% + ${off}px)) rotate(${rot}deg) scale(0.82)`,
+      opacity: 0.5,
+      zIndex: n - i,
+      border: "1.5px solid rgba(255,255,255,0.07)",
+      boxShadow: "0 8px 28px rgba(0,0,0,0.65)",
+    };
+  }
+
+  return (
+    <m.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
+      style={{ background: "rgba(8,8,8,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
+      onClick={onClose}
+    >
+      <m.div
+        initial={{ scale: 0.94, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.94, opacity: 0, y: 20 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        className="relative flex flex-col items-center w-full px-5"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-0 right-4 md:right-8 w-9 h-9 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/25 transition-all duration-200"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+
+        {/* Title */}
+        <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-8">{title}</p>
+
+        {/* ── MOBILE: single card + arrows ── */}
+        <div className="flex md:hidden items-center gap-4 w-full justify-center mb-6">
+          <button
+            onClick={() => setActive((active + n - 1) % n)}
+            className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-200"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <AnimatePresence mode="wait">
+            <m.div
+              key={active}
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              transition={{ duration: 0.22 }}
+              style={{
+                width: "min(72vw, 300px)",
+                flexShrink: 0,
+                borderRadius: 16,
+                overflow: "hidden",
+                border: "1.5px solid rgba(203,255,0,0.65)",
+                boxShadow: "0 0 36px rgba(203,255,0,0.20), 0 20px 50px rgba(0,0,0,0.75)",
+              }}
+            >
+              <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
+            </m.div>
+          </AnimatePresence>
+          <button
+            onClick={() => setActive((active + 1) % n)}
+            className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-200"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        {/* ── DESKTOP: playing-card fan ── */}
+        <div
+          ref={containerRef}
+          className="hidden md:block relative"
+          style={{ width: 640, height: 400 }}
+          onMouseMove={e => {
+            if (!containerRef.current) return;
+            const rect = containerRef.current.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            setActive(Math.max(0, Math.min(n - 1, Math.floor(x / (rect.width / n)))));
+          }}
+        >
+          {slides.map((slide, i) => (
+            <div
+              key={i}
+              onClick={() => setActive(i)}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: "50%",
+                width: 260,
+                borderRadius: 16,
+                overflow: "hidden",
+                cursor: "pointer",
+                transition: "all 0.42s cubic-bezier(0.22, 1, 0.36, 1)",
+                ...getCardStyle(i),
+              }}
+            >
+              <img src={slide.img} alt={slide.label} draggable={false} className="block w-full h-auto select-none" />
+            </div>
+          ))}
+        </div>
+
+        {/* Label + dots */}
+        <AnimatePresence mode="wait">
+          <m.p
+            key={active}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18 }}
+            className="mt-6 md:mt-2 text-sm font-mono text-zinc-400 uppercase tracking-[0.18em]"
+          >
+            {slides[active].label}
+          </m.p>
+        </AnimatePresence>
+        <div className="flex items-center gap-2 mt-3">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              style={{
+                padding: 0, border: "none", borderRadius: 3, cursor: "pointer",
+                background: i === active ? "#CBFF00" : "rgba(255,255,255,0.18)",
+                width: i === active ? 22 : 6,
+                height: 6,
+                transition: "all 0.3s ease",
+              }}
+            />
+          ))}
+        </div>
+      </m.div>
+    </m.div>
+  );
+}
+
+function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) {
   return (
     <Reveal>
       <m.article
         variants={fadeUp}
-        className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${c.gradient} border border-white/[0.07] h-[320px] md:h-[360px] cursor-default`}
+        onClick={onOpen}
+        className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${c.gradient} border border-white/[0.07] h-[320px] md:h-[360px] ${onOpen ? "cursor-pointer" : "cursor-default"}`}
       >
         {(c.shapes as Shape[]).map((s, i) => (
           <div
@@ -1339,9 +1514,16 @@ function CaseCard({ c }: { c: (typeof CASES)[0] }) {
           <h3 className="text-base md:text-lg font-semibold text-white leading-snug mb-2.5">
             {c.title}
           </h3>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono" style={{ color: c.accent }}>↑</span>
-            <span className="text-sm font-mono text-zinc-300">{c.result}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono" style={{ color: c.accent }}>↑</span>
+              <span className="text-sm font-mono text-zinc-300">{c.result}</span>
+            </div>
+            {onOpen && (
+              <span className="text-[10px] font-mono uppercase tracking-[0.15em] opacity-0 group-hover:opacity-60 transition-opacity duration-200" style={{ color: c.accent }}>
+                смотреть →
+              </span>
+            )}
           </div>
         </div>
       </m.article>
@@ -1350,8 +1532,19 @@ function CaseCard({ c }: { c: (typeof CASES)[0] }) {
 }
 
 function Cases() {
+  const [caseModal, setCaseModal] = useState<{ slides: typeof PROJECT_SLIDES; title: string } | null>(null);
+
   return (
     <section id="cases" className="py-28 md:py-36 bg-surface/30">
+      <AnimatePresence>
+        {caseModal && (
+          <CaseDeckModal
+            slides={caseModal.slides}
+            title={caseModal.title}
+            onClose={() => setCaseModal(null)}
+          />
+        )}
+      </AnimatePresence>
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Кейсы</Label>
@@ -1364,7 +1557,11 @@ function Cases() {
         </Reveal>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {CASES.map((c) => (
-            <CaseCard key={c.id} c={c} />
+            <CaseCard
+              key={c.id}
+              c={c}
+              onOpen={c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES, title: "Карточки для бренда натуральной косметики" }) : undefined}
+            />
           ))}
         </div>
       </div>
