@@ -1313,7 +1313,7 @@ function CaseDeckModal({ slides, title, onClose }: {
   const n = slides.length;
 
   // Fan layout: spread cards around center
-  const fanOffsets   = [-150, -50, 50, 150];
+  const fanOffsets   = [-300, -100, 100, 300];
   const fanRotations = [-18,  -6,   6,  18];
 
   function getCardStyle(i: number): React.CSSProperties {
@@ -1407,7 +1407,7 @@ function CaseDeckModal({ slides, title, onClose }: {
         <div
           ref={containerRef}
           className="hidden md:block relative"
-          style={{ width: 640, height: 400 }}
+          style={{ width: "min(90vw, 1200px)", height: "min(65vh, 660px)" }}
           onMouseMove={e => {
             if (!containerRef.current) return;
             const rect = containerRef.current.getBoundingClientRect();
@@ -1423,8 +1423,8 @@ function CaseDeckModal({ slides, title, onClose }: {
                 position: "absolute",
                 top: 0,
                 left: "50%",
-                width: 260,
-                borderRadius: 16,
+                width: "min(27vw, 500px)",
+                borderRadius: 20,
                 overflow: "hidden",
                 cursor: "pointer",
                 transition: "all 0.42s cubic-bezier(0.22, 1, 0.36, 1)",
