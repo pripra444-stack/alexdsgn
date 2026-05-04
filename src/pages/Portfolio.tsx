@@ -950,6 +950,13 @@ const PROJECT_SLIDES = [
   { img: "/hero/project%20card%2004.png", label: "Результат" },
 ];
 
+const HERO_PROJECT_SLIDES = [
+  { img: "/hero/hero%20project%2001.png", label: "Исходный Hero-экран" },
+  { img: "/hero/hero%20project%2002.png", label: "Разработка" },
+  { img: "/hero/hero%20project%2003.png", label: "Готовый Hero-экран" },
+  { img: "/hero/hero%20project%2004.png", label: "Результат" },
+];
+
 function ServiceCard({
   s,
   idx,
@@ -1478,7 +1485,7 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
         className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${c.gradient} border border-white/[0.07] h-[320px] md:h-[360px] ${onOpen ? "cursor-pointer" : "cursor-default"}`}
       >
         {c.id === 1 ? (
-          /* Case 1 — show actual product card preview instead of shapes */
+          /* Case 1 — product card preview */
           <img
             aria-hidden
             src="/hero/project%20card%2003.png"
@@ -1494,6 +1501,25 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
               borderRadius: 14,
               opacity: 0.88,
               boxShadow: "0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(192,132,252,0.25)",
+            }}
+          />
+        ) : c.id === 2 ? (
+          /* Case 2 — hero screen preview */
+          <img
+            aria-hidden
+            src="/hero/hero%20project%2003.png"
+            alt=""
+            draggable={false}
+            className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
+            style={{
+              right: "-6%",
+              top: "50%",
+              transform: "translateY(-50%) rotate(-8deg)",
+              width: "62%",
+              height: "auto",
+              borderRadius: 14,
+              opacity: 0.88,
+              boxShadow: "0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(56,189,248,0.25)",
             }}
           />
         ) : (
@@ -1581,7 +1607,11 @@ function Cases() {
             <CaseCard
               key={c.id}
               c={c}
-              onOpen={c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES, title: "Карточки для бренда натуральной косметики" }) : undefined}
+              onOpen={
+                c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
+                c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
+                undefined
+              }
             />
           ))}
         </div>
