@@ -932,9 +932,9 @@ const HERO_SLIDES = [
 ];
 
 const AI_SLIDES = [
-  { img: "/hero/ai%20visual%20001.png", label: "Маска для волос" },
-  { img: "/hero/ai%20visual%20002.png", label: "Фонарик" },
-  { img: "/hero/ai%20visual%20003.png", label: "Ваза" },
+  { img: "/hero/ai%20visual%20001.png", label: "Прохладительные напитки" },
+  { img: "/hero/ai%20visual%20002.png", label: "Собачий корм" },
+  { img: "/hero/ai%20visual%20003.png", label: "Зубная паста" },
 ];
 
 const VORONKA_SLIDES = [
