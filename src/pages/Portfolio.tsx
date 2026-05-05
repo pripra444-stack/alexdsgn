@@ -957,6 +957,13 @@ const HERO_PROJECT_SLIDES = [
   { img: "/hero/hero%20project%2004.svg", label: "Результат" },
 ];
 
+const SWIM_SLIDES = [
+  { img: "/hero/swim%2001.png", label: "Плохая читаемость" },
+  { img: "/hero/swim%2002.png", label: "Переработка структуры" },
+  { img: "/hero/swim%2003.png", label: "Новый Hero-визуал" },
+  { img: "/hero/swim%2004.png", label: "Дополнительные слайды" },
+];
+
 function ServiceCard({
   s,
   idx,
@@ -1294,11 +1301,11 @@ const CASES = [
   },
   {
     id: 6,
-    title: "HERO + карточки для премиум-бренда на Ozon",
-    result: "+41% CTR · рост в Топ-10 категории",
-    tags: ["Ozon", "Premium"],
-    gradient: "from-zinc-900/90 via-neutral-800/70 to-stone-900/80",
-    accent: "#CBFF00",
+    title: "Hero + карточки для спорт-бренда на Ozon",
+    result: "+28–35% CTR · очки FitSmile в Топ выдачи",
+    tags: ["Ozon", "Sport"],
+    gradient: "from-sky-950/90 via-cyan-900/70 to-blue-950/80",
+    accent: "#22D3EE",
     shapes: [
       { w: 180, h: 120, x: "52%", y: "22%", r: 14, op: 0.85 },
       { w: 140, h: 36, x: "54%", y: "58%", r: 8, op: 0.5 },
@@ -1522,6 +1529,25 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
               boxShadow: "0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(56,189,248,0.25)",
             }}
           />
+        ) : c.id === 6 ? (
+          /* Case 6 — swim goggles sport brand preview */
+          <img
+            aria-hidden
+            src="/hero/swim%2003.png"
+            alt=""
+            draggable={false}
+            className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
+            style={{
+              right: "-5%",
+              top: "50%",
+              transform: "translateY(-50%) rotate(6deg)",
+              width: "65%",
+              height: "auto",
+              borderRadius: 14,
+              opacity: 0.9,
+              boxShadow: "0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(34,211,238,0.25)",
+            }}
+          />
         ) : (
           (c.shapes as Shape[]).map((s, i) => (
             <div
@@ -1610,6 +1636,7 @@ function Cases() {
               onOpen={
                 c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
                 c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
+                c.id === 6 ? () => setCaseModal({ slides: SWIM_SLIDES,         title: "Hero + карточки для спорт-бренда на Ozon" }) :
                 undefined
               }
             />
