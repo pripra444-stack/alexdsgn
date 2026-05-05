@@ -958,10 +958,10 @@ const HERO_PROJECT_SLIDES = [
 ];
 
 const SWIM_SLIDES = [
-  { img: "/hero/swim%2001.png", label: "Плохая читаемость" },
-  { img: "/hero/swim%2002.png", label: "Переработка структуры" },
-  { img: "/hero/swim%2003.png", label: "Новый Hero-визуал" },
-  { img: "/hero/swim%2004.png", label: "Дополнительные слайды" },
+  { img: "/hero/Project%20Card%20001.png", label: "Плохая читаемость" },
+  { img: "/hero/Project%20Card%20002.png", label: "Переработка структуры" },
+  { img: "/hero/Project%20Card%20003.png", label: "Новый Hero-визуал" },
+  { img: "/hero/Project%20Card%20004.png", label: "Дополнительные слайды" },
 ];
 
 function ServiceCard({
@@ -1533,7 +1533,7 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
           /* Case 6 — swim goggles sport brand preview */
           <img
             aria-hidden
-            src="/hero/swim%2003.png"
+            src="/hero/Project%20Card%20003.png"
             alt=""
             draggable={false}
             className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
