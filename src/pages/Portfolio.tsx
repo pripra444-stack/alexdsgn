@@ -1101,7 +1101,7 @@ function Services() {
             >
               {/* Prev */}
               <button
-                onClick={() => setActive((active + 2) % 3)}
+                onClick={() => setActive((active + activeSlides.length - 1) % activeSlides.length)}
                 className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/25 transition-all duration-200"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -1139,7 +1139,7 @@ function Services() {
 
               {/* Next */}
               <button
-                onClick={() => setActive((active + 1) % 3)}
+                onClick={() => setActive((active + 1) % activeSlides.length)}
                 className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/25 transition-all duration-200"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
