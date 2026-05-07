@@ -985,28 +985,26 @@ function ServiceCard({
     <Reveal>
       <m.div
         variants={fadeUp}
-        className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:border-accent/30 hover:bg-surface-2 transition-all duration-300"
+        className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:bg-accent hover:border-accent transition-colors duration-300"
         style={{ cursor: hasSlideshow ? "pointer" : "default" }}
         onClick={hasSlideshow ? onOpen : undefined}
       >
-        <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700">{s.num}</span>
-        <span className="text-2xl mb-4 block">{s.icon}</span>
-        <h3 className="text-lg font-semibold text-white">{s.title}</h3>
-        <p className="text-sm text-accent/70 font-mono mb-3">{s.subtitle}</p>
-        <p className="text-sm text-zinc-400 leading-relaxed">{s.desc}</p>
+        <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700 group-hover:text-black/40 transition-colors duration-300">{s.num}</span>
+        <h3 className="text-lg font-semibold text-white group-hover:text-black transition-colors duration-300 mt-2 mb-2">{s.title}</h3>
+        <p className="text-sm text-accent/70 font-mono mb-3 group-hover:text-black/55 transition-colors duration-300">{s.subtitle}</p>
+        <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-black/65 transition-colors duration-300">{s.desc}</p>
         <div className="flex flex-wrap gap-1.5 mt-5">
           {s.tags.map((t) => (
-            <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500">
+            <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500 group-hover:bg-black/10 group-hover:text-black/55 transition-colors duration-300">
               {t}
             </span>
           ))}
         </div>
         {hasSlideshow && (
-          <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-accent/60 transition-colors duration-200">
+          <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/45 transition-colors duration-200">
             смотреть примеры →
           </span>
         )}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-accent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
       </m.div>
     </Reveal>
   );
