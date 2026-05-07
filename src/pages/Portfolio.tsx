@@ -1153,50 +1153,49 @@ function Services() {
               </button>
             </m.div>
 
-            {/* ── DESKTOP: all 3 cards side-by-side, hover to activate ── */}
+            {/* ── DESKTOP: 3D coverflow ── */}
             <m.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
-              className="hidden md:flex items-center justify-center gap-6 lg:gap-8"
-              style={{ maxWidth: "100%" }}
+              className="hidden md:block relative w-full"
+              style={{ height: "min(62vh, 620px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
             >
-              {activeSlides.map((slide, i) => (
-                <div
-                  key={i}
-                  onMouseEnter={() => setActive(i)}
-                  onClick={() => setActive(i)}
-                  style={{
-                    transition: "all 0.38s cubic-bezier(0.22, 1, 0.36, 1)",
-                    opacity: i === active ? 1 : 0.55,
-                    transform: i === active ? "scale(1.10)" : "scale(0.84)",
-                    transformOrigin: "center bottom",
-                    borderRadius: 20,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    flexShrink: 0,
-                    width: "min(24vw, 420px)",
-                    border: i === active
-                      ? "1.5px solid rgba(203,255,0,0.65)"
-                      : "1.5px solid rgba(255,255,255,0.06)",
-                    boxShadow: i === active
-                      ? [
-                          "0 0 0 1px rgba(203,255,0,0.12)",
-                          "0 0 40px rgba(203,255,0,0.22)",
-                          "0 0 80px rgba(203,255,0,0.10)",
-                          "0 28px 60px rgba(0,0,0,0.75)",
-                        ].join(", ")
-                      : "0 12px 40px rgba(0,0,0,0.55)",
-                  }}
-                >
-                  <img
-                    src={slide.img}
-                    alt={slide.label}
-                    draggable={false}
-                    className="block w-full h-auto select-none"
-                  />
-                </div>
-              ))}
+              {activeSlides.map((slide, i) => {
+                const off = i - active;
+                const abs = Math.abs(off);
+                if (abs > 2) return null;
+                const spreadX = off === 0 ? 0 : Math.sign(off) * (abs === 1 ? 255 : 460);
+                const rotY    = off * -44;
+                const depth   = -abs * 210;
+                const scl     = [1, 0.87, 0.70][abs];
+                const bright  = [1, 0.52, 0.28][abs];
+                return (
+                  <div
+                    key={i}
+                    onMouseEnter={() => setActive(i)}
+                    onClick={() => setActive(i)}
+                    style={{
+                      position: "absolute",
+                      left: "50%", top: "50%",
+                      width: "min(24vw, 400px)",
+                      borderRadius: 18,
+                      overflow: "hidden",
+                      cursor: abs > 0 ? "pointer" : "default",
+                      zIndex: 10 - abs,
+                      transform: `translateX(calc(-50% + ${spreadX}px)) translateY(-50%) rotateY(${rotY}deg) translateZ(${depth}px) scale(${scl})`,
+                      filter: `brightness(${bright})`,
+                      transition: "transform 0.58s cubic-bezier(0.22,1,0.36,1), filter 0.48s ease, border-color 0.3s ease, box-shadow 0.48s ease",
+                      border: abs === 0 ? "2px solid rgba(203,255,0,0.65)" : "1.5px solid rgba(255,255,255,0.07)",
+                      boxShadow: abs === 0
+                        ? "0 0 0 1px rgba(203,255,0,0.10), 0 0 48px rgba(203,255,0,0.22), 0 32px 80px rgba(0,0,0,0.85)"
+                        : "0 10px 40px rgba(0,0,0,0.65)",
+                    }}
+                  >
+                    <img src={slide.img} alt={slide.label} draggable={false} className="block w-full h-auto select-none" />
+                  </div>
+                );
+              })}
             </m.div>
 
             {/* Active label */}
@@ -1330,35 +1329,7 @@ function CaseDeckModal({ slides, title, onClose }: {
   onClose: () => void;
 }) {
   const [active, setActive] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
   const n = slides.length;
-
-  // Fan layout: spread cards around center
-  const fanOffsets   = [-300, -100, 100, 300];
-  const fanRotations = [-18,  -6,   6,  18];
-
-  function getCardStyle(i: number): React.CSSProperties {
-    if (i === active) return {
-      transform: "translateX(-50%) rotate(0deg) scale(1.06)",
-      opacity: 1,
-      zIndex: 10,
-      border: "1.5px solid rgba(203,255,0,0.70)",
-      boxShadow: [
-        "0 0 0 1px rgba(203,255,0,0.14)",
-        "0 0 40px rgba(203,255,0,0.25)",
-        "0 24px 60px rgba(0,0,0,0.80)",
-      ].join(", "),
-    };
-    const off = fanOffsets[i]   ?? (i - 1.5) * 100;
-    const rot = fanRotations[i] ?? (i - 1.5) * 12;
-    return {
-      transform: `translateX(calc(-50% + ${off}px)) rotate(${rot}deg) scale(0.82)`,
-      opacity: 0.5,
-      zIndex: n - i,
-      border: "1.5px solid rgba(255,255,255,0.07)",
-      boxShadow: "0 8px 28px rgba(0,0,0,0.65)",
-    };
-  }
 
   return (
     <m.div
@@ -1426,37 +1397,61 @@ function CaseDeckModal({ slides, title, onClose }: {
           </div>
         </div>
 
-        {/* ── DESKTOP: playing-card fan ── */}
+        {/* ── DESKTOP: 3D coverflow ── */}
         <div
-          ref={containerRef}
-          className="hidden md:block relative"
-          style={{ width: "min(90vw, 1200px)", height: "min(65vh, 660px)" }}
-          onMouseMove={e => {
-            if (!containerRef.current) return;
-            const rect = containerRef.current.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            setActive(Math.max(0, Math.min(n - 1, Math.floor(x / (rect.width / n)))));
-          }}
+          className="hidden md:block relative w-full"
+          style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
         >
-          {slides.map((slide, i) => (
-            <div
-              key={i}
-              onClick={() => setActive(i)}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: "50%",
-                width: "min(27vw, 500px)",
-                borderRadius: 20,
-                overflow: "hidden",
-                cursor: "pointer",
-                transition: "all 0.42s cubic-bezier(0.22, 1, 0.36, 1)",
-                ...getCardStyle(i),
-              }}
-            >
-              <img src={slide.img} alt={slide.label} draggable={false} className="block w-full h-auto select-none" />
-            </div>
-          ))}
+          {slides.map((slide, i) => {
+            const off  = i - active;
+            const abs  = Math.abs(off);
+            if (abs > 2) return null;
+            const spreadX = off === 0 ? 0 : Math.sign(off) * (abs === 1 ? 275 : 490);
+            const rotY    = off * -46;
+            const depth   = -abs * 230;
+            const scl     = [1, 0.86, 0.68][abs];
+            const bright  = [1, 0.50, 0.25][abs];
+            return (
+              <div
+                key={i}
+                onClick={() => abs > 0 && setActive(i)}
+                style={{
+                  position: "absolute",
+                  left: "50%", top: "50%",
+                  width: "min(28vw, 480px)",
+                  borderRadius: 20,
+                  overflow: "hidden",
+                  cursor: abs > 0 ? "pointer" : "default",
+                  zIndex: 10 - abs,
+                  transform: `translateX(calc(-50% + ${spreadX}px)) translateY(-50%) rotateY(${rotY}deg) translateZ(${depth}px) scale(${scl})`,
+                  filter: `brightness(${bright})`,
+                  transition: "transform 0.60s cubic-bezier(0.22,1,0.36,1), filter 0.50s ease, border-color 0.32s ease, box-shadow 0.50s ease",
+                  border: abs === 0 ? "2px solid rgba(203,255,0,0.68)" : "1.5px solid rgba(255,255,255,0.07)",
+                  boxShadow: abs === 0
+                    ? "0 0 0 1px rgba(203,255,0,0.10), 0 0 52px rgba(203,255,0,0.24), 0 36px 90px rgba(0,0,0,0.90)"
+                    : "0 10px 44px rgba(0,0,0,0.72)",
+                }}
+              >
+                <img src={slide.img} alt={slide.label} draggable={false} className="block w-full h-auto select-none" />
+              </div>
+            );
+          })}
+        </div>
+        {/* Desktop nav arrows */}
+        <div className="hidden md:flex items-center gap-6 mt-6">
+          <button
+            onClick={() => setActive((active + n - 1) % n)}
+            className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center text-zinc-300 hover:border-white/25 hover:text-white active:scale-95 transition-all duration-150"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span className="text-xs font-mono text-zinc-500 tabular-nums">{active + 1} / {n}</span>
+          <button
+            onClick={() => setActive((active + 1) % n)}
+            className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center text-zinc-300 hover:border-white/25 hover:text-white active:scale-95 transition-all duration-150"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
         </div>
 
         {/* Label + dots */}
