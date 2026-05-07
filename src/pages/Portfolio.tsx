@@ -1516,14 +1516,29 @@ function CaseDeckModal({ slides, title, onClose }: {
   );
 }
 
-function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) {
+function CaseCard({ c, onOpen, isHovered }: { c: (typeof CASES)[0]; onOpen?: () => void; isHovered?: boolean }) {
+  const T = "0.38s ease";
   return (
     <Reveal>
       <m.article
         variants={fadeUp}
         onClick={onOpen}
-        className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${c.gradient} border border-white/[0.07] h-[320px] md:h-[360px] ${onOpen ? "cursor-pointer" : "cursor-default"}`}
+        className={`group relative overflow-hidden rounded-2xl h-[320px] md:h-[360px] ${onOpen ? "cursor-pointer" : "cursor-default"}`}
+        style={{
+          border: isHovered ? `1.5px solid ${c.accent}` : "1px solid rgba(255,255,255,0.07)",
+          transition: `border-color ${T}`,
+        }}
       >
+        {/* Gradient bg — fades out on hover */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-br ${c.gradient}`}
+          style={{ opacity: isHovered ? 0 : 1, transition: `opacity ${T}` }}
+        />
+        {/* Solid accent bg — fades in on hover */}
+        <div
+          className="absolute inset-0"
+          style={{ background: c.accent, opacity: isHovered ? 1 : 0, transition: `opacity ${T}` }}
+        />
         {c.id === 1 ? (
           /* Case 1 — product card preview */
           <img
@@ -1619,7 +1634,11 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
             />
           ))
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+        {/* Dark overlay — fades out on hover */}
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"
+          style={{ opacity: isHovered ? 0 : 1, transition: `opacity ${T}` }}
+        />
         <div className="absolute inset-0 flex flex-col justify-end p-7">
           <div className="flex gap-2 mb-3">
             {c.tags.map((t) => (
@@ -1627,25 +1646,36 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
                 key={t}
                 className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium"
                 style={{
-                  background: `${c.accent}22`,
-                  color: c.accent,
-                  border: `1px solid ${c.accent}44`,
+                  background: isHovered ? "rgba(0,0,0,0.15)" : `${c.accent}22`,
+                  color: isHovered ? "rgba(0,0,0,0.7)" : c.accent,
+                  border: isHovered ? "1px solid rgba(0,0,0,0.12)" : `1px solid ${c.accent}44`,
+                  transition: `all ${T}`,
                 }}
               >
                 {t}
               </span>
             ))}
           </div>
-          <h3 className="text-base md:text-lg font-semibold text-white leading-snug mb-2.5">
+          <h3
+            className="text-base md:text-lg font-semibold leading-snug mb-2.5"
+            style={{ color: isHovered ? "rgba(0,0,0,0.85)" : "white", transition: `color ${T}` }}
+          >
             {c.title}
           </h3>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono" style={{ color: c.accent }}>↑</span>
-              <span className="text-sm font-mono text-zinc-300">{c.result}</span>
+              <span className="text-xs font-mono" style={{ color: isHovered ? "rgba(0,0,0,0.6)" : c.accent, transition: `color ${T}` }}>↑</span>
+              <span className="text-sm font-mono" style={{ color: isHovered ? "rgba(0,0,0,0.65)" : "#d4d4d8", transition: `color ${T}` }}>{c.result}</span>
             </div>
             {onOpen && (
-              <span className="text-[10px] font-mono uppercase tracking-[0.15em] opacity-0 group-hover:opacity-60 transition-opacity duration-200" style={{ color: c.accent }}>
+              <span
+                className="text-[10px] font-mono uppercase tracking-[0.15em] transition-opacity duration-200"
+                style={{
+                  color: isHovered ? "rgba(0,0,0,0.5)" : c.accent,
+                  opacity: isHovered ? 1 : 0,
+                  transition: `color ${T}, opacity 0.2s ease`,
+                }}
+              >
                 смотреть →
               </span>
             )}
@@ -1714,6 +1744,7 @@ function Cases() {
               >
                 <CaseCard
                   c={c}
+                  isHovered={hovCase === idx}
                   onOpen={
                     c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
                     c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
