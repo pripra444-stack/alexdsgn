@@ -957,6 +957,13 @@ const HERO_PROJECT_SLIDES = [
   { img: "/hero/hero%20project%2004.svg", label: "Результат" },
 ];
 
+const FASHION_SLIDES = [
+  { img: "/hero/Project%20jacket%20Card%20001.png", label: "Задача" },
+  { img: "/hero/Project%20jacket%20Card%20002.png", label: "Визуальная система" },
+  { img: "/hero/Project%20jacket%20Card%20003.png", label: "Серия из 9 слайдов" },
+  { img: "/hero/Project%20jacket%20Card%20004.png", label: "Результат" },
+];
+
 const SWIM_SLIDES = [
   { img: "/hero/Project%20Card%20001.png", label: "Плохая читаемость" },
   { img: "/hero/Project%20Card%20002.png", label: "Переработка структуры" },
@@ -1531,6 +1538,25 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
               boxShadow: "0 12px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(56,189,248,0.25)",
             }}
           />
+        ) : c.id === 4 ? (
+          /* Case 4 — fashion jacket brand preview */
+          <img
+            aria-hidden
+            src="/hero/Project%20jacket%20Card%20004.png"
+            alt=""
+            draggable={false}
+            className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
+            style={{
+              right: "-8%",
+              top: "50%",
+              transform: "translateY(-50%) rotate(-7deg)",
+              width: "64%",
+              height: "auto",
+              borderRadius: 14,
+              opacity: 0.88,
+              boxShadow: "0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.25)",
+            }}
+          />
         ) : c.id === 6 ? (
           /* Case 6 — swim goggles sport brand preview */
           <img
@@ -1638,6 +1664,7 @@ function Cases() {
               onOpen={
                 c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
                 c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
+                c.id === 4 ? () => setCaseModal({ slides: FASHION_SLIDES,      title: "Карточки для бренда уличной одежды" }) :
                 c.id === 6 ? () => setCaseModal({ slides: SWIM_SLIDES,         title: "Hero + карточки для спорт-бренда на Ozon" }) :
                 undefined
               }
