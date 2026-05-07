@@ -1017,6 +1017,7 @@ type Slide = { img: string; label: string };
 function Services() {
   const [activeSlides, setActiveSlides] = useState<Slide[] | null>(null);
   const [active, setActive] = useState(0);
+  const [hovSvc, setHovSvc] = useState<number | null>(null);
 
   function openSlideshow(slides: Slide[]) {
     setActive(0);
@@ -1025,6 +1026,28 @@ function Services() {
 
   function closeSlideshow() {
     setActiveSlides(null);
+  }
+
+  const SVC_COLS = 2;
+  function svcStyle(idx: number): React.CSSProperties {
+    const T = "transform 0.52s cubic-bezier(0.22,1,0.36,1), filter 0.42s ease";
+    if (hovSvc === null) return { transition: T, willChange: "transform" };
+    if (idx === hovSvc) return {
+      transition: T, willChange: "transform",
+      transform: "scale(1.035) translateZ(28px)",
+      zIndex: 10,
+    };
+    const dC = (idx % SVC_COLS) - (hovSvc % SVC_COLS);
+    const dR = Math.floor(idx / SVC_COLS) - Math.floor(hovSvc / SVC_COLS);
+    const rotY = dC * 22;
+    const rotX = dR * -8;
+    const bright = Math.max(0.48, 1 - (Math.abs(dC) + Math.abs(dR)) * 0.22);
+    return {
+      transition: T, willChange: "transform",
+      transform: `rotateY(${rotY}deg) rotateX(${rotX}deg) scale(0.965) translateZ(-45px)`,
+      filter: `brightness(${bright})`,
+      zIndex: 4,
+    };
   }
 
   return (
@@ -1040,21 +1063,29 @@ function Services() {
           </m.h2>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {SERVICES.map((s, idx) => (
-            <ServiceCard
-              key={s.num}
-              s={s}
-              idx={idx}
-              onOpen={
-                idx === 0 ? () => openSlideshow(SHOWCASE_SLIDES) :
-                idx === 1 ? () => openSlideshow(HERO_SLIDES) :
-                idx === 2 ? () => openSlideshow(AI_SLIDES) :
-                idx === 3 ? () => openSlideshow(VORONKA_SLIDES) :
-                undefined
-              }
-            />
-          ))}
+        <div style={{ perspective: "1000px", perspectiveOrigin: "50% 40%" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {SERVICES.map((s, idx) => (
+              <div
+                key={s.num}
+                onMouseEnter={() => setHovSvc(idx)}
+                onMouseLeave={() => setHovSvc(null)}
+                style={{ position: "relative", ...svcStyle(idx) }}
+              >
+                <ServiceCard
+                  s={s}
+                  idx={idx}
+                  onOpen={
+                    idx === 0 ? () => openSlideshow(SHOWCASE_SLIDES) :
+                    idx === 1 ? () => openSlideshow(HERO_SLIDES) :
+                    idx === 2 ? () => openSlideshow(AI_SLIDES) :
+                    idx === 3 ? () => openSlideshow(VORONKA_SLIDES) :
+                    undefined
+                  }
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -1629,6 +1660,29 @@ function CaseCard({ c, onOpen }: { c: (typeof CASES)[0]; onOpen?: () => void }) 
 
 function Cases() {
   const [caseModal, setCaseModal] = useState<{ slides: typeof PROJECT_SLIDES; title: string } | null>(null);
+  const [hovCase, setHovCase] = useState<number | null>(null);
+
+  const CASE_COLS = 3;
+  function caseStyle(idx: number): React.CSSProperties {
+    const T = "transform 0.52s cubic-bezier(0.22,1,0.36,1), filter 0.42s ease";
+    if (hovCase === null) return { transition: T, willChange: "transform" };
+    if (idx === hovCase) return {
+      transition: T, willChange: "transform",
+      transform: "scale(1.04) translateZ(32px)",
+      zIndex: 10,
+    };
+    const dC = (idx % CASE_COLS) - (hovCase % CASE_COLS);
+    const dR = Math.floor(idx / CASE_COLS) - Math.floor(hovCase / CASE_COLS);
+    const rotY = dC * 18;
+    const rotX = dR * -7;
+    const bright = Math.max(0.45, 1 - (Math.abs(dC) + Math.abs(dR)) * 0.20);
+    return {
+      transition: T, willChange: "transform",
+      transform: `rotateY(${rotY}deg) rotateX(${rotX}deg) scale(0.962) translateZ(-50px)`,
+      filter: `brightness(${bright})`,
+      zIndex: 4,
+    };
+  }
 
   return (
     <section id="cases" className="py-28 md:py-36 bg-surface/30">
@@ -1651,20 +1705,28 @@ function Cases() {
             Реальные результаты — CTR, позиции в выдаче, конверсия
           </m.p>
         </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {CASES.map((c) => (
-            <CaseCard
-              key={c.id}
-              c={c}
-              onOpen={
-                c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
-                c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
-                c.id === 4 ? () => setCaseModal({ slides: FASHION_SLIDES,      title: "Карточки для бренда уличной одежды" }) :
-                c.id === 6 ? () => setCaseModal({ slides: SWIM_SLIDES,         title: "Hero + карточки для спорт-бренда на Ozon" }) :
-                undefined
-              }
-            />
-          ))}
+        <div style={{ perspective: "1100px", perspectiveOrigin: "50% 40%" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {CASES.map((c, idx) => (
+              <div
+                key={c.id}
+                onMouseEnter={() => setHovCase(idx)}
+                onMouseLeave={() => setHovCase(null)}
+                style={{ position: "relative", ...caseStyle(idx) }}
+              >
+                <CaseCard
+                  c={c}
+                  onOpen={
+                    c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
+                    c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
+                    c.id === 4 ? () => setCaseModal({ slides: FASHION_SLIDES,      title: "Карточки для бренда уличной одежды" }) :
+                    c.id === 6 ? () => setCaseModal({ slides: SWIM_SLIDES,         title: "Hero + карточки для спорт-бренда на Ozon" }) :
+                    undefined
+                  }
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
