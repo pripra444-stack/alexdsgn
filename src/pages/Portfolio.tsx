@@ -2148,31 +2148,43 @@ function GogglesSlide2() {
             filter: "blur(28px)", pointerEvents: "none",
           }}
         />
-        {/* Collage: pool bg + goggles foreground */}
-        <div style={{ position: "relative", width: "100%", height: 280 }}>
-          {/* Pool water background — slides in from right */}
+        {/* Collage: pool bg → swimmer → goggles front */}
+        <div style={{ position: "relative", width: "100%", height: 290 }}>
+          {/* Layer 1 — Pool background, slides in from right */}
           <m.div
-            initial={{ opacity: 0, x: 60, scale: 0.88 }}
+            initial={{ opacity: 0, x: 55, scale: 0.88 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ duration: 0.68, ease: E, delay: 0.44 }}
+            transition={{ duration: 0.68, ease: E, delay: 0.42 }}
             style={{
-              position: "absolute", right: "4%", top: "6%", width: "76%", zIndex: 1,
+              position: "absolute", right: "0%", top: "8%", width: "70%", zIndex: 1,
               borderRadius: 22, overflow: "hidden",
               boxShadow: "0 18px 52px rgba(0,0,0,0.70)",
-              border: "1px solid rgba(203,255,0,0.12)",
             }}
           >
             <img src="/hero/goggles-slide2-b.png" alt="Фон бассейн" draggable={false}
               style={{ width: "100%", height: "auto", display: "block" }}/>
           </m.div>
-          {/* Goggles — large, foreground, overlapping pool */}
+          {/* Layer 2 — Swimmer, transparent bg, right side overlapping pool */}
           <m.div
-            initial={{ opacity: 0, x: -50, y: 30, rotate: -10 }}
-            animate={{ opacity: 1, x: 0, y: 0, rotate: -5 }}
-            transition={{ duration: 0.75, ease: E, delay: 0.68 }}
+            initial={{ opacity: 0, x: 45, y: 16 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ duration: 0.65, ease: E, delay: 0.62 }}
             style={{
-              position: "absolute", left: "0%", bottom: "-2%", width: "72%", zIndex: 3,
-              filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.80)) drop-shadow(0 0 28px rgba(203,255,0,0.25))",
+              position: "absolute", right: "-2%", top: "-6%", width: "50%", zIndex: 2,
+              filter: "drop-shadow(0 12px 32px rgba(0,0,0,0.65))",
+            }}
+          >
+            <img src="/hero/goggles-slide2-c.png" alt="Пловец" draggable={false}
+              style={{ width: "100%", height: "auto", display: "block" }}/>
+          </m.div>
+          {/* Layer 3 — Goggles, large foreground-left */}
+          <m.div
+            initial={{ opacity: 0, x: -44, y: 26, rotate: -10 }}
+            animate={{ opacity: 1, x: 0, y: 0, rotate: -5 }}
+            transition={{ duration: 0.75, ease: E, delay: 0.82 }}
+            style={{
+              position: "absolute", left: "-2%", bottom: "0%", width: "66%", zIndex: 3,
+              filter: "drop-shadow(0 20px 42px rgba(0,0,0,0.82)) drop-shadow(0 0 28px rgba(203,255,0,0.22))",
             }}
           >
             <img src="/hero/goggles-slide2-a.png" alt="Очки" draggable={false}
