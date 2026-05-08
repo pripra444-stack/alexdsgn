@@ -1414,6 +1414,7 @@ function BeautyScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
       {/* Back card */}
       <g transform="rotate(-16) translate(-88,4)">
         <rect x="-40" y="-65" width="80" height="130" rx="8" fill="url(#bsCard)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.32"/>
@@ -1447,6 +1448,7 @@ function BeautyScene({ hovered }: { hovered: boolean }) {
         <rect x="-32" y="32" width="44" height="3.5" rx="1.5" fill={ac} opacity="0.24"/>
         <rect x="-32" y="40" width="28" height="7" rx="3" fill={ac} opacity="0.48"/>
       </g>
+      </g>
     </svg>
   );
 }
@@ -1465,6 +1467,7 @@ function ElectronicsScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
       {/* Monitor outer frame */}
       <rect x="-165" y="-92" width="330" height="196" rx="14" fill="#0d0d0d"
         stroke={ac} strokeWidth="1.5" strokeOpacity={hovered ? 0.72 : 0.55}/>
@@ -1493,6 +1496,7 @@ function ElectronicsScene({ hovered }: { hovered: boolean }) {
       {/* Stand */}
       <rect x="-18" y="104" width="36" height="11" rx="4" fill="#0d0d0d" stroke={ac} strokeWidth="1" strokeOpacity="0.35"/>
       <rect x="-28" y="115" width="56" height="6" rx="3" fill="#0d0d0d" stroke={ac} strokeWidth="1" strokeOpacity="0.22"/>
+      </g>
     </svg>
   );
 }
@@ -1516,6 +1520,7 @@ function DrinksScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
       {/* Left bottle */}
       <g transform="translate(-82,10)" opacity="0.68">
         <rect x="-20" y="-90" width="40" height="140" rx="12" fill="url(#dsBot)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.38"/>
@@ -1547,6 +1552,7 @@ function DrinksScene({ hovered }: { hovered: boolean }) {
         <ellipse cx="0" cy="-90" rx="12" ry="6" fill={ac} opacity="0.33"/>
         <rect x="-6" y="-104" width="12" height="14" rx="4" fill={ac} opacity="0.43"/>
       </g>
+      </g>
     </svg>
   );
 }
@@ -1565,6 +1571,7 @@ function FashionScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
       {/* Jacket body */}
       <path d="M -80 -30 C -80 -90 -60 -112 0 -112 C 60 -112 80 -90 80 -30 L 80 72 C 80 80 73 87 65 87 L -65 87 C -73 87 -80 80 -80 72 Z"
         fill="url(#fsGrad)" stroke={ac} strokeWidth={hovered ? 2 : 1.2}
@@ -1589,6 +1596,7 @@ function FashionScene({ hovered }: { hovered: boolean }) {
       {/* Brand badge */}
       <rect x="-26" y="-62" width="52" height="19" rx="4" fill={ac} opacity="0.14"/>
       <text x="0" y="-49" textAnchor="middle" fontFamily="monospace" fontSize="9" fill={ac} opacity="0.72" letterSpacing="2">MARUZE</text>
+      </g>
     </svg>
   );
 }
@@ -1610,6 +1618,7 @@ function FoodScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
       {/* Left box */}
       <g transform="translate(-90,15)" opacity="0.72">
         <rect x="-42" y="-65" width="84" height="110" rx="8" fill="url(#pkB1)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.28"/>
@@ -1643,6 +1652,7 @@ function FoodScene({ hovered }: { hovered: boolean }) {
         <ellipse cx="0" cy="-14" rx="14" ry="17" fill={ac} opacity="0.2"/>
         <rect x="-20" y="22" width="40" height="5" rx="2.5" fill={ac} opacity="0.28"/>
         <rect x="-15" y="31" width="30" height="4" rx="2"   fill={ac} opacity="0.18"/>
+      </g>
       </g>
     </svg>
   );
@@ -1681,6 +1691,7 @@ function GogglesScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
 
       {/* Hover glow aura */}
       {hovered && (
@@ -1752,6 +1763,7 @@ function GogglesScene({ hovered }: { hovered: boolean }) {
       {/* Brand text */}
       <text x="0" y="-110" textAnchor="middle" fontFamily="monospace" fontSize="10"
         fill={ac} opacity="0.55" letterSpacing="4">FITSMILE</text>
+      </g>
     </svg>
   );
 }
@@ -2046,32 +2058,6 @@ function GogglesSlide1() {
         </m.div>
       </div>
 
-      {/* ── Connecting arrows (desktop only) ── */}
-      <svg
-        className="hidden md:block"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", overflow: "visible" }}
-        viewBox="0 0 100 100" preserveAspectRatio="none"
-      >
-        <defs>
-          <marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-            <path d="M0,0.5 L4,2.5 L0,4.5" fill="none" stroke="rgba(139,92,246,0.75)" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </marker>
-        </defs>
-        {[
-          { x1: 44, y1: 34, x2: 52, y2: 28, delay: 1.1 },
-          { x1: 44, y1: 50, x2: 52, y2: 50, delay: 1.22 },
-          { x1: 44, y1: 66, x2: 52, y2: 72, delay: 1.34 },
-        ].map((ln, i) => (
-          <m.line key={i}
-            x1={ln.x1} y1={ln.y1} x2={ln.x2} y2={ln.y2}
-            stroke="rgba(139,92,246,0.7)" strokeWidth="0.55" strokeLinecap="round"
-            markerEnd="url(#arr)"
-            initial={{ opacity: 0, pathLength: 0 }}
-            animate={{ opacity: 1, pathLength: 1 }}
-            transition={{ duration: 0.32, delay: ln.delay, ease: "easeOut" }}
-          />
-        ))}
-      </svg>
     </div>
   );
 }
@@ -2092,12 +2078,6 @@ function GogglesSlide2() {
     transition: { duration: 0.52, ease: E, delay },
   });
 
-  // Three images: fanned from behind → in front
-  const imgs = [
-    { src: "/hero/goggles-slide2-c.png", rotate: -14, x: -28, y: 12,  scale: 0.82, delay: 0.52, zIndex: 1 },
-    { src: "/hero/goggles-slide2-b.png", rotate:  -4, x:  10, y:  4,  scale: 0.91, delay: 0.68, zIndex: 2 },
-    { src: "/hero/goggles-slide2-a.png", rotate:   7, x:  38, y: -8,  scale: 1.00, delay: 0.84, zIndex: 3 },
-  ];
 
   return (
     <div className="relative flex flex-col md:flex-row gap-6 md:gap-8 w-full items-start md:items-center"
@@ -2168,27 +2148,32 @@ function GogglesSlide2() {
             filter: "blur(28px)", pointerEvents: "none",
           }}
         />
-        {/* Fan of images */}
-        <div style={{ position: "relative", width: "100%", height: 240, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {imgs.map((img, i) => (
-            <m.div
-              key={i}
-              initial={{ opacity: 0, x: 80, rotate: img.rotate + 20, scale: img.scale * 0.7 }}
-              animate={{ opacity: 1, x: img.x, rotate: img.rotate, scale: img.scale }}
-              transition={{ duration: 0.65, ease: E, delay: img.delay }}
-              style={{
-                position: "absolute",
-                zIndex: img.zIndex,
-                borderRadius: 14,
-                boxShadow: `0 16px 48px rgba(0,0,0,0.65), 0 0 28px rgba(139,92,246,${0.12 + i * 0.06})`,
-                transformOrigin: "bottom center",
-                maxWidth: "72%",
-              }}
-            >
-              <img src={img.src} alt={`Вариант ${i + 1}`} draggable={false}
-                style={{ width: "100%", height: "auto", display: "block", borderRadius: 14 }}/>
-            </m.div>
-          ))}
+        {/* Layered collage: pool bg → swimmer → goggles front */}
+        <div style={{ position: "relative", width: "100%", height: 280 }}>
+          {/* Pool water background */}
+          <m.div initial={{ opacity: 0, x: 60, scale: 0.85 }} animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ duration: 0.7, ease: E, delay: 0.48 }}
+            style={{ position: "absolute", right: "2%", top: "8%", width: "74%", zIndex: 1,
+              borderRadius: 20, overflow: "hidden",
+              boxShadow: "0 18px 52px rgba(0,0,0,0.65)" }}>
+            <img src="/hero/goggles-slide2-b.png" alt="Фон бассейн" draggable={false}
+              style={{ width: "100%", height: "auto", display: "block" }}/>
+          </m.div>
+          {/* Swimmer — transparent bg, on top of pool */}
+          <m.div initial={{ opacity: 0, x: 50, y: 20 }} animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ duration: 0.65, ease: E, delay: 0.66 }}
+            style={{ position: "absolute", right: "-4%", top: "-4%", width: "52%", zIndex: 2 }}>
+            <img src="/hero/goggles-slide2-c.png" alt="Пловец" draggable={false}
+              style={{ width: "100%", height: "auto", display: "block" }}/>
+          </m.div>
+          {/* Goggles — foreground, overlapping pool */}
+          <m.div initial={{ opacity: 0, x: -40, y: 30, rotate: -8 }} animate={{ opacity: 1, x: 0, y: 0, rotate: -4 }}
+            transition={{ duration: 0.72, ease: E, delay: 0.84 }}
+            style={{ position: "absolute", left: "0%", bottom: "0%", width: "65%", zIndex: 3,
+              filter: "drop-shadow(0 16px 36px rgba(0,0,0,0.75)) drop-shadow(0 0 24px rgba(139,92,246,0.3))" }}>
+            <img src="/hero/goggles-slide2-a.png" alt="Очки" draggable={false}
+              style={{ width: "100%", height: "auto", display: "block" }}/>
+          </m.div>
         </div>
       </div>
     </div>
@@ -2210,7 +2195,7 @@ function CaseDeckModal({ slides, title, onClose }: {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
       style={{ background: "rgba(8,8,8,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
       onClick={onClose}
     >
@@ -2253,6 +2238,8 @@ function CaseDeckModal({ slides, title, onClose }: {
                     boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
                     background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
                     padding: MSlide ? "14px 12px" : undefined,
+                    maxHeight: MSlide ? "58dvh" : undefined,
+                    overflowY: MSlide ? "auto" : undefined,
                   }}
                 >
                   {MSlide
