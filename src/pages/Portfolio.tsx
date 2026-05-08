@@ -2558,7 +2558,7 @@ function CaseDeckModal({ slides, title, onClose }: {
         {/* ── DESKTOP: fixed-height area — arrows always at same Y position ── */}
         <div
           className="hidden md:block relative w-full"
-          style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
+          style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%", overflow: "hidden" }}
         >
           {slides[active].component ? (
             /* Component slide — centered card inside fixed area */
@@ -2627,23 +2627,6 @@ function CaseDeckModal({ slides, title, onClose }: {
             })
           )}
         </div>
-        {/* Desktop nav arrows */}
-        <div className="hidden md:flex items-center gap-6 mt-6">
-          <button
-            onClick={() => setActive((active + n - 1) % n)}
-            className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center text-zinc-300 hover:border-white/25 hover:text-white active:scale-95 transition-all duration-150"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-          <span className="text-xs font-mono text-zinc-500 tabular-nums">{active + 1} / {n}</span>
-          <button
-            onClick={() => setActive((active + 1) % n)}
-            className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center text-zinc-300 hover:border-white/25 hover:text-white active:scale-95 transition-all duration-150"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
-        </div>
-
         {/* Label + dots */}
         <AnimatePresence mode="wait">
           <m.p
@@ -2674,35 +2657,66 @@ function CaseDeckModal({ slides, title, onClose }: {
         </div>
       </m.div>
 
-      {/* ── MOBILE arrows: direct children of backdrop, outside ALL stacking contexts ── */}
-      {/* position:fixed + z-index:9999 — nothing can ever render above these */}
+      {/* ══ ALL NAV ARROWS — fixed position, z-9999, outside every stacking context ══ */}
+
+      {/* MOBILE prev — left side, vertical center */}
       <button
         className="md:hidden"
         onClick={(e) => { e.stopPropagation(); setActive((active + n - 1) % n); }}
         style={{
-          position: "fixed", left: 8, top: "50%", transform: "translateY(-50%)",
-          zIndex: 9999,
-          width: 40, height: 40, borderRadius: "50%",
-          background: "rgba(0,0,0,0.85)", border: "1.5px solid rgba(255,255,255,0.18)",
+          position: "fixed", left: 10, top: "50%", transform: "translateY(-50%)",
+          zIndex: 9999, width: 40, height: 40, borderRadius: "50%",
+          background: "rgba(0,0,0,0.88)", border: "1.5px solid rgba(203,255,0,0.45)",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: "white", cursor: "pointer",
         }}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
+
+      {/* MOBILE next — right side, vertical center */}
       <button
         className="md:hidden"
         onClick={(e) => { e.stopPropagation(); setActive((active + 1) % n); }}
         style={{
-          position: "fixed", right: 8, top: "50%", transform: "translateY(-50%)",
-          zIndex: 9999,
-          width: 40, height: 40, borderRadius: "50%",
-          background: "rgba(0,0,0,0.85)", border: "1.5px solid rgba(255,255,255,0.18)",
+          position: "fixed", right: 10, top: "50%", transform: "translateY(-50%)",
+          zIndex: 9999, width: 40, height: 40, borderRadius: "50%",
+          background: "rgba(0,0,0,0.88)", border: "1.5px solid rgba(203,255,0,0.45)",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: "white", cursor: "pointer",
         }}
       >
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      {/* DESKTOP prev — left side, vertical center */}
+      <button
+        className="hidden md:flex"
+        onClick={(e) => { e.stopPropagation(); setActive((active + n - 1) % n); }}
+        style={{
+          position: "fixed", left: 16, top: "50%", transform: "translateY(-50%)",
+          zIndex: 9999, width: 44, height: 44, borderRadius: "50%",
+          background: "rgba(0,0,0,0.85)", border: "1.5px solid rgba(203,255,0,0.40)",
+          alignItems: "center", justifyContent: "center",
+          color: "white", cursor: "pointer",
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      {/* DESKTOP next — right side, vertical center */}
+      <button
+        className="hidden md:flex"
+        onClick={(e) => { e.stopPropagation(); setActive((active + 1) % n); }}
+        style={{
+          position: "fixed", right: 16, top: "50%", transform: "translateY(-50%)",
+          zIndex: 9999, width: 44, height: 44, borderRadius: "50%",
+          background: "rgba(0,0,0,0.85)", border: "1.5px solid rgba(203,255,0,0.40)",
+          alignItems: "center", justifyContent: "center",
+          color: "white", cursor: "pointer",
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
 
     </m.div>
