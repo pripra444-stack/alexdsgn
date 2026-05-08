@@ -2151,41 +2151,42 @@ function GogglesSlide2() {
 
         <div style={{ position: "relative", width: "100%", height: 290 }}>
 
-          {/* ▸ COMPOSITE CARD — pool image + swimmer inside (clipped) ▸ */}
-          {/*    Swimmer's transparent pixels ALWAYS sit on opaque pool image,    */}
-          {/*    so any browser/GPU compositing artifact is impossible.           */}
+          {/* ▸ COMPOSITE CARD — pool + swimmer baked inside (FULL swimmer visible) ▸ */}
+          {/*    Pool is opaque RGB, swimmer fits ENTIRELY inside card height,     */}
+          {/*    so head is visible AND transparency artifacts are physically      */}
+          {/*    impossible (every transparent swimmer pixel sits on pool image).  */}
           <m.div
             initial={{ opacity: 0, x: 55, scale: 0.88 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.68, ease: E, delay: 0.42 }}
             style={{
-              position: "absolute", right: "0%", top: "4%", width: "70%", zIndex: 1,
+              position: "absolute", right: "0%", top: "0%", width: "62%", zIndex: 1,
               borderRadius: 22,
-              overflow: "hidden",                       /* clips swimmer to pool bounds */
-              background: "#0a0a0a",                    /* solid fallback, never transparent */
+              overflow: "hidden",
+              background: "#0a0a0a",
               boxShadow: "0 18px 52px rgba(0,0,0,0.70)",
               border: "1px solid rgba(203,255,0,0.18)",
-              isolation: "isolate",                     /* own stacking context */
+              isolation: "isolate",
             }}
           >
-            {/* Pool — base, opaque RGB image (no alpha channel at all) */}
+            {/* Pool — base, opaque RGB image (no alpha at all) */}
             <img
               src="/hero/goggles-slide2-b.png"
               alt="Бассейн"
               draggable={false}
               style={{ width: "100%", height: "auto", display: "block", position: "relative", zIndex: 1 }}
             />
-            {/* Swimmer — overlaid INSIDE pool card; transparent areas reveal pool */}
+            {/* Swimmer — FULL HEIGHT of card, head at top, feet at bottom; right-aligned so pool stays visible on the left */}
             <m.img
               src="/hero/goggles-slide2-c.png"
               alt="Пловец"
               draggable={false}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, ease: E, delay: 0.65 }}
               style={{
-                position: "absolute", right: "-6%", bottom: "-3%",
-                height: "118%", width: "auto", display: "block", zIndex: 2,
+                position: "absolute", right: "2%", top: 0, bottom: 0,
+                height: "100%", width: "auto", display: "block", zIndex: 2,
                 filter: "drop-shadow(-6px 6px 12px rgba(0,0,0,0.55))",
                 pointerEvents: "none",
               }}
