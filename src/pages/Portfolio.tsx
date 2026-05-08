@@ -1414,7 +1414,7 @@ function BeautyScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: hovered ? "fill-opacity 0s" : "fill-opacity 0.22s ease" }}>
       {/* Back card */}
       <g transform="rotate(-16) translate(-88,4)">
         <rect x="-40" y="-65" width="80" height="130" rx="8" fill="url(#bsCard)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.32"/>
@@ -1467,7 +1467,7 @@ function ElectronicsScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: hovered ? "fill-opacity 0s" : "fill-opacity 0.22s ease" }}>
       {/* Monitor outer frame */}
       <rect x="-165" y="-92" width="330" height="196" rx="14" fill="#0d0d0d"
         stroke={ac} strokeWidth="1.5" strokeOpacity={hovered ? 0.72 : 0.55}/>
@@ -1520,7 +1520,7 @@ function DrinksScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: hovered ? "fill-opacity 0s" : "fill-opacity 0.22s ease" }}>
       {/* Left bottle */}
       <g transform="translate(-82,10)" opacity="0.68">
         <rect x="-20" y="-90" width="40" height="140" rx="12" fill="url(#dsBot)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.38"/>
@@ -1571,7 +1571,7 @@ function FashionScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: hovered ? "fill-opacity 0s" : "fill-opacity 0.22s ease" }}>
       {/* Jacket body */}
       <path d="M -80 -30 C -80 -90 -60 -112 0 -112 C 60 -112 80 -90 80 -30 L 80 72 C 80 80 73 87 65 87 L -65 87 C -73 87 -80 80 -80 72 Z"
         fill="url(#fsGrad)" stroke={ac} strokeWidth={hovered ? 2 : 1.2}
@@ -1618,7 +1618,7 @@ function FoodScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: hovered ? "fill-opacity 0s" : "fill-opacity 0.22s ease" }}>
       {/* Left box */}
       <g transform="translate(-90,15)" opacity="0.72">
         <rect x="-42" y="-65" width="84" height="110" rx="8" fill="url(#pkB1)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.28"/>
@@ -1691,7 +1691,7 @@ function GogglesScene({ hovered }: { hovered: boolean }) {
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g style={{ fillOpacity: hovered ? 0 : 1, transition: "fill-opacity 0.38s ease" }}>
+      <g style={{ fillOpacity: hovered ? 0 : 1, transition: hovered ? "fill-opacity 0s" : "fill-opacity 0.22s ease" }}>
 
       {/* Hover glow aura */}
       {hovered && (
@@ -2522,8 +2522,15 @@ function CaseDeckModal({ slides, title, onClose }: {
 
         {/* ── MOBILE: card first in DOM (lowest stack), arrows after (on top) ── */}
         <div className="md:hidden flex items-center w-full mb-4" style={{ gap: 0 }}>
-          {/* Card: DOM order 1 → display order 2 (center) via CSS order */}
-          <div style={{ flex: "1 1 0", minWidth: 0, order: 2, isolation: "isolate" }}>
+          {/* Card: DOM order 1 → display order 2 (center).
+              Outer div: overflow:hidden (no transform — clips correctly on iOS Safari).
+              Inner m.div: Framer Motion animation only, no overflow. */}
+          <div style={{
+            flex: "1 1 0", minWidth: 0, order: 2,
+            borderRadius: 16, overflow: "hidden",
+            border: "1.5px solid rgba(203,255,0,0.55)",
+            boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
+          }}>
             <AnimatePresence mode="wait">
               {(() => {
                 const MSlide = slides[active].component;
@@ -2536,10 +2543,6 @@ function CaseDeckModal({ slides, title, onClose }: {
                     transition={{ duration: 0.22 }}
                     style={{
                       width: "100%",
-                      borderRadius: 16,
-                      overflow: "hidden",
-                      border: "1.5px solid rgba(203,255,0,0.55)",
-                      boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
                       background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
                       padding: MSlide ? "12px 10px" : undefined,
                     }}
