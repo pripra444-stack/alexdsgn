@@ -2320,7 +2320,7 @@ function GogglesSlide3() {
           }}
         >
           <img
-            src="/hero/Project%20Card%20003.png"
+            src="/hero/goggles-card.png"
             alt="Новый Hero-визуал — FitSmile очки"
             draggable={false}
             style={{ width: "100%", height: "auto", display: "block", borderRadius: 16 }}
