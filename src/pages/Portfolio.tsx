@@ -2135,9 +2135,9 @@ function GogglesSlide2() {
         </m.div>
       </div>
 
-      {/* ── RIGHT: 3 photos fanned ── */}
+      {/* ── RIGHT: pool-card with swimmer baked inside + goggles in front ── */}
       <div style={{ flex: "1 1 auto", position: "relative", display: "flex", justifyContent: "center", alignItems: "center", minHeight: 260 }}>
-        {/* Purple glow */}
+        {/* Acid glow */}
         <m.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -2148,47 +2148,62 @@ function GogglesSlide2() {
             filter: "blur(28px)", pointerEvents: "none",
           }}
         />
-        {/* Collage: pool bg → swimmer → goggles front */}
+
         <div style={{ position: "relative", width: "100%", height: 290 }}>
-          {/* Layer 1 — Pool background, slides in from right */}
+
+          {/* ▸ COMPOSITE CARD — pool image + swimmer inside (clipped) ▸ */}
+          {/*    Swimmer's transparent pixels ALWAYS sit on opaque pool image,    */}
+          {/*    so any browser/GPU compositing artifact is impossible.           */}
           <m.div
             initial={{ opacity: 0, x: 55, scale: 0.88 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.68, ease: E, delay: 0.42 }}
             style={{
-              position: "absolute", right: "0%", top: "8%", width: "70%", zIndex: 1,
-              borderRadius: 22, overflow: "hidden",
+              position: "absolute", right: "0%", top: "4%", width: "70%", zIndex: 1,
+              borderRadius: 22,
+              overflow: "hidden",                       /* clips swimmer to pool bounds */
+              background: "#0a0a0a",                    /* solid fallback, never transparent */
               boxShadow: "0 18px 52px rgba(0,0,0,0.70)",
+              border: "1px solid rgba(203,255,0,0.18)",
+              isolation: "isolate",                     /* own stacking context */
             }}
           >
-            <img src="/hero/goggles-slide2-b.png" alt="Фон бассейн" draggable={false}
-              style={{ width: "100%", height: "auto", display: "block" }}/>
+            {/* Pool — base, opaque RGB image (no alpha channel at all) */}
+            <img
+              src="/hero/goggles-slide2-b.png"
+              alt="Бассейн"
+              draggable={false}
+              style={{ width: "100%", height: "auto", display: "block", position: "relative", zIndex: 1 }}
+            />
+            {/* Swimmer — overlaid INSIDE pool card; transparent areas reveal pool */}
+            <m.img
+              src="/hero/goggles-slide2-c.png"
+              alt="Пловец"
+              draggable={false}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: E, delay: 0.65 }}
+              style={{
+                position: "absolute", right: "-6%", bottom: "-3%",
+                height: "118%", width: "auto", display: "block", zIndex: 2,
+                filter: "drop-shadow(-6px 6px 12px rgba(0,0,0,0.55))",
+                pointerEvents: "none",
+              }}
+            />
           </m.div>
-          {/* Layer 2 — Swimmer, transparent bg, right side overlapping pool */}
-          <m.div
-            initial={{ opacity: 0, x: 45, y: 16 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            transition={{ duration: 0.65, ease: E, delay: 0.62 }}
-            style={{
-              position: "absolute", right: "-2%", top: "-6%", width: "50%", zIndex: 2,
-            }}
-          >
-            <img src="/hero/goggles-slide2-c.png" alt="Пловец" draggable={false}
-              style={{ width: "100%", height: "auto", display: "block",
-                filter: "drop-shadow(0 12px 32px rgba(0,0,0,0.65))" }}/>
-          </m.div>
-          {/* Layer 3 — Goggles, large foreground-left */}
+
+          {/* Goggles — large foreground-left, drop-shadow on img directly */}
           <m.div
             initial={{ opacity: 0, x: -44, y: 26, rotate: -10 }}
             animate={{ opacity: 1, x: 0, y: 0, rotate: -5 }}
             transition={{ duration: 0.75, ease: E, delay: 0.82 }}
             style={{
               position: "absolute", left: "-2%", bottom: "0%", width: "66%", zIndex: 3,
-              filter: "drop-shadow(0 20px 42px rgba(0,0,0,0.82)) drop-shadow(0 0 28px rgba(203,255,0,0.22))",
             }}
           >
             <img src="/hero/goggles-slide2-a.png" alt="Очки" draggable={false}
-              style={{ width: "100%", height: "auto", display: "block" }}/>
+              style={{ width: "100%", height: "auto", display: "block",
+                filter: "drop-shadow(0 20px 42px rgba(0,0,0,0.82)) drop-shadow(0 0 28px rgba(203,255,0,0.22))" }}/>
           </m.div>
         </div>
       </div>
@@ -2558,7 +2573,7 @@ function CaseDeckModal({ slides, title, onClose }: {
         {/* ── DESKTOP: fixed-height area — arrows always at same Y position ── */}
         <div
           className="hidden md:block relative w-full"
-          style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%", overflow: "hidden" }}
+          style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%", overflow: "visible" }}
         >
           {slides[active].component ? (
             /* Component slide — centered card inside fixed area */
