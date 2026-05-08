@@ -2171,11 +2171,11 @@ function GogglesSlide2() {
             transition={{ duration: 0.65, ease: E, delay: 0.62 }}
             style={{
               position: "absolute", right: "-2%", top: "-6%", width: "50%", zIndex: 2,
-              filter: "drop-shadow(0 12px 32px rgba(0,0,0,0.65))",
             }}
           >
             <img src="/hero/goggles-slide2-c.png" alt="Пловец" draggable={false}
-              style={{ width: "100%", height: "auto", display: "block" }}/>
+              style={{ width: "100%", height: "auto", display: "block",
+                filter: "drop-shadow(0 12px 32px rgba(0,0,0,0.65))" }}/>
           </m.div>
           {/* Layer 3 — Goggles, large foreground-left */}
           <m.div
@@ -2657,67 +2657,63 @@ function CaseDeckModal({ slides, title, onClose }: {
         </div>
       </m.div>
 
-      {/* ══ ALL NAV ARROWS — fixed position, z-9999, outside every stacking context ══ */}
-
-      {/* MOBILE prev — left side, vertical center */}
-      <button
-        className="md:hidden"
-        onClick={(e) => { e.stopPropagation(); setActive((active + n - 1) % n); }}
+      {/* ══ BOTTOM-CENTER NAV PILL — fixed, z-9999, outside every stacking context ══ */}
+      <div
+        onClick={e => e.stopPropagation()}
         style={{
-          position: "fixed", left: 10, top: "50%", transform: "translateY(-50%)",
-          zIndex: 9999, width: 40, height: 40, borderRadius: "50%",
-          background: "rgba(0,0,0,0.88)", border: "1.5px solid rgba(203,255,0,0.45)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "white", cursor: "pointer",
+          position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)",
+          zIndex: 9999,
+          display: "flex", alignItems: "center", gap: 4,
+          background: "rgba(10,10,10,0.90)",
+          border: "1px solid rgba(203,255,0,0.30)",
+          borderRadius: 50,
+          padding: "5px 6px",
+          backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+          boxShadow: "0 4px 28px rgba(0,0,0,0.60)",
         }}
       >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
+        {/* Prev */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setActive((active + n - 1) % n); }}
+          style={{
+            width: 38, height: 38, borderRadius: "50%",
+            background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "rgba(255,255,255,0.75)", cursor: "pointer",
+            transition: "background 0.18s ease, border-color 0.18s ease",
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(203,255,0,0.15)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(203,255,0,0.50)"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.12)"; }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
 
-      {/* MOBILE next — right side, vertical center */}
-      <button
-        className="md:hidden"
-        onClick={(e) => { e.stopPropagation(); setActive((active + 1) % n); }}
-        style={{
-          position: "fixed", right: 10, top: "50%", transform: "translateY(-50%)",
-          zIndex: 9999, width: 40, height: 40, borderRadius: "50%",
-          background: "rgba(0,0,0,0.88)", border: "1.5px solid rgba(203,255,0,0.45)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "white", cursor: "pointer",
-        }}
-      >
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
+        {/* Counter */}
+        <span style={{
+          minWidth: 46, textAlign: "center",
+          fontSize: 12, fontFamily: "ui-monospace, monospace",
+          color: "rgba(255,255,255,0.50)", letterSpacing: "0.10em",
+          userSelect: "none",
+        }}>
+          {active + 1} / {n}
+        </span>
 
-      {/* DESKTOP prev — left side, vertical center */}
-      <button
-        className="hidden md:flex"
-        onClick={(e) => { e.stopPropagation(); setActive((active + n - 1) % n); }}
-        style={{
-          position: "fixed", left: 16, top: "50%", transform: "translateY(-50%)",
-          zIndex: 9999, width: 44, height: 44, borderRadius: "50%",
-          background: "rgba(0,0,0,0.85)", border: "1.5px solid rgba(203,255,0,0.40)",
-          alignItems: "center", justifyContent: "center",
-          color: "white", cursor: "pointer",
-        }}
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-
-      {/* DESKTOP next — right side, vertical center */}
-      <button
-        className="hidden md:flex"
-        onClick={(e) => { e.stopPropagation(); setActive((active + 1) % n); }}
-        style={{
-          position: "fixed", right: 16, top: "50%", transform: "translateY(-50%)",
-          zIndex: 9999, width: 44, height: 44, borderRadius: "50%",
-          background: "rgba(0,0,0,0.85)", border: "1.5px solid rgba(203,255,0,0.40)",
-          alignItems: "center", justifyContent: "center",
-          color: "white", cursor: "pointer",
-        }}
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
+        {/* Next */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setActive((active + 1) % n); }}
+          style={{
+            width: 38, height: 38, borderRadius: "50%",
+            background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "rgba(255,255,255,0.75)", cursor: "pointer",
+            transition: "background 0.18s ease, border-color 0.18s ease",
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(203,255,0,0.15)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(203,255,0,0.50)"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.12)"; }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
 
     </m.div>
   );
