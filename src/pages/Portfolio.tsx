@@ -964,8 +964,8 @@ const FASHION_SLIDES = [
   { img: "/hero/Project%20jacket%20Card%20004.png", label: "Результат" },
 ];
 
-const SWIM_SLIDES = [
-  { img: "/hero/Project%20Card%20001.png", label: "Плохая читаемость" },
+const SWIM_SLIDES: SlideEntry[] = [
+  { component: GogglesSlide1, label: "Плохая читаемость" },
   { img: "/hero/Project%20Card%20002.png", label: "Переработка структуры" },
   { img: "/hero/Project%20Card%20003.png", label: "Новый Hero-визуал" },
   { img: "/hero/Project%20Card%20004.png", label: "Дополнительные слайды" },
@@ -1930,9 +1930,138 @@ function AnimatedCaseCard({ c, onOpen }: {
   );
 }
 
+// ─── Slide entry type (image or animated component) ─────────────────────────
+type SlideEntry = { label: string } & (
+  | { img: string;  component?: undefined }
+  | { component: () => JSX.Element; img?: undefined }
+);
+
+// ─── Swim goggles — Slide 1: «Плохая читаемость» ─────────────────────────────
+const GS1_PROBLEMS = [
+  { icon: "◎", title: "ПЕРЕГРУЖЕННЫЙ ВИЗУАЛ",  desc: "слишком много элементов и текста"            },
+  { icon: "▼", title: "СЛАБЫЙ КОНТРАСТ",       desc: "важные смыслы теряются"                      },
+  { icon: "◈", title: "НЕОЧЕВИДНЫЕ УТП",       desc: "польза товара не считывается с первого взгляда" },
+] as const;
+
+function GogglesSlide1() {
+  const E = [0.22, 1, 0.36, 1] as const;
+  const fly = (delay: number, x = 0, y = 0) => ({
+    initial: { opacity: 0, x, y },
+    animate: { opacity: 1, x: 0, y: 0 },
+    transition: { duration: 0.48, ease: E, delay },
+  });
+
+  return (
+    <div className="relative flex flex-col md:flex-row gap-5 md:gap-6 w-full items-start md:items-center"
+      style={{ padding: "6px 2px 10px" }}>
+
+      {/* ── LEFT: text analysis ── */}
+      <div style={{ flex: "0 0 42%", minWidth: 0 }}>
+
+        {/* Title block */}
+        <m.div {...fly(0.08, -28)}>
+          <p style={{ fontSize: "clamp(18px,2.8vw,28px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.1 }}>ПЛОХАЯ</p>
+          <p style={{ fontSize: "clamp(18px,2.8vw,28px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 5px 0", lineHeight: 1.1 }}>ЧИТАЕМОСТЬ</p>
+          <p style={{ fontSize: 10, color: "#71717a", margin: 0 }}>карточка не выделялась в выдаче</p>
+        </m.div>
+
+        {/* Divider */}
+        <m.div {...fly(0.26, -16)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "11px 0" }}/>
+
+        {/* Problem list */}
+        {GS1_PROBLEMS.map((p, i) => (
+          <m.div key={i} {...fly(0.36 + i * 0.14, 0, 18)}
+            style={{ display: "flex", gap: 9, marginBottom: 10, alignItems: "flex-start" }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: 6, flexShrink: 0,
+              background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#8B5CF6", fontSize: 12, fontWeight: 700,
+            }}>{p.icon}</div>
+            <div>
+              <p style={{ fontSize: 9.5, fontWeight: 700, color: "rgba(255,255,255,0.86)", margin: 0, letterSpacing: "0.06em" }}>{p.title}</p>
+              <p style={{ fontSize: 9,   color: "#52525b",             margin: "2px 0 0 0",  lineHeight: 1.4  }}>{p.desc}</p>
+            </div>
+          </m.div>
+        ))}
+
+        {/* ВЫВОД + ИТОГ */}
+        <div style={{ display: "flex", gap: 7, marginTop: 12 }}>
+          {([
+            { key: "v", label: "ВЫВОД", text: "карточка не привлекает внимание и не вызывает желания кликнуть", d: 0.84 },
+            { key: "i", label: "ИТОГ",  text: "карточка теряется среди конкурентов и не приносит ключевые выгоды", d: 0.93 },
+          ] as const).map(b => (
+            <m.div key={b.key} {...fly(b.d, 0, 14)} style={{
+              flex: 1, padding: "8px 10px", borderRadius: 8,
+              background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.17)",
+            }}>
+              <p style={{ fontSize: 8.5, fontWeight: 700, color: "#8B5CF6", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>◆ {b.label}</p>
+              <p style={{ fontSize: 8.5, color: "#52525b", margin: 0, lineHeight: 1.45 }}>{b.text}</p>
+            </m.div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── RIGHT: product card ── */}
+      <div style={{ flex: "1 1 auto", position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        {/* Glow halo */}
+        <m.div
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.9, delay: 0.68 }}
+          style={{
+            position: "absolute", inset: "-18%", borderRadius: "50%",
+            background: "radial-gradient(ellipse at center, rgba(139,92,246,0.28) 0%, transparent 65%)",
+            filter: "blur(24px)",
+          }}
+        />
+        {/* Card */}
+        <m.div
+          initial={{ opacity: 0, x: 60, rotate: 16 }}
+          animate={{ opacity: 1, x: 0, rotate: 6 }}
+          transition={{ duration: 0.6, ease: E, delay: 0.5 }}
+          style={{
+            position: "relative", borderRadius: 14, maxWidth: "100%",
+            boxShadow: "0 18px 55px rgba(0,0,0,0.65), 0 0 36px rgba(139,92,246,0.22)",
+          }}
+        >
+          <img src="/hero/Project%20Card%20001.png" alt="Карточка до редизайна" draggable={false}
+            style={{ width: "100%", height: "auto", display: "block", borderRadius: 14 }}/>
+        </m.div>
+      </div>
+
+      {/* ── Connecting lines (desktop only) ── */}
+      <m.svg
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+        transition={{ delay: 0.98, duration: 0.25 }}
+        className="hidden md:block"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", overflow: "visible" }}
+        viewBox="0 0 100 100" preserveAspectRatio="none"
+      >
+        {[
+          { d: "M 42 37 Q 45 37 46.5 39", delay: 1.0 },
+          { d: "M 42 51 Q 45 49 46.5 49", delay: 1.14 },
+          { d: "M 42 64 Q 45 59 46.5 57", delay: 1.28 },
+        ].map((line, i) => (
+          <m.path key={i} d={line.d}
+            stroke="rgba(139,92,246,0.45)" strokeWidth="0.65" fill="none" strokeDasharray="2.6 2.1"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ duration: 0.35, delay: line.delay }}/>
+        ))}
+        {[{ cx:46.5,cy:39 }, { cx:46.5,cy:49 }, { cx:46.5,cy:57 }].map((pt,i)=>(
+          <m.circle key={i} cx={pt.cx} cy={pt.cy} r="0.7"
+            fill="rgba(139,92,246,0.55)"
+            initial={{ opacity:0, scale:0 }} animate={{ opacity:1, scale:1 }}
+            transition={{ delay: 1.32+i*0.08 }}/>
+        ))}
+      </m.svg>
+    </div>
+  );
+}
+
 // ─── Card-deck modal for case studies ────────────────────────────────────────
 function CaseDeckModal({ slides, title, onClose }: {
-  slides: { img: string; label: string }[];
+  slides: SlideEntry[];
   title: string;
   onClose: () => void;
 }) {
@@ -1971,22 +2100,32 @@ function CaseDeckModal({ slides, title, onClose }: {
         {/* ── MOBILE: single card + arrows ── */}
         <div className="flex md:hidden flex-col items-center w-full mb-6">
           <AnimatePresence mode="wait">
-            <m.div
-              key={active}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.22 }}
-              style={{
-                width: "min(86vw, 400px)",
-                borderRadius: 16,
-                overflow: "hidden",
-                border: "1.5px solid rgba(203,255,0,0.55)",
-                boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
-              }}
-            >
-              <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
-            </m.div>
+            {(() => {
+              const MSlide = slides[active].component;
+              return (
+                <m.div
+                  key={active}
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -30 }}
+                  transition={{ duration: 0.22 }}
+                  style={{
+                    width: MSlide ? "min(92vw, 500px)" : "min(86vw, 400px)",
+                    borderRadius: 16,
+                    overflow: "hidden",
+                    border: "1.5px solid rgba(203,255,0,0.55)",
+                    boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
+                    background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
+                    padding: MSlide ? "14px 12px" : undefined,
+                  }}
+                >
+                  {MSlide
+                    ? <MSlide />
+                    : <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
+                  }
+                </m.div>
+              );
+            })()}
           </AnimatePresence>
           <div className="flex items-center gap-5 mt-5">
             <button
@@ -2005,46 +2144,74 @@ function CaseDeckModal({ slides, title, onClose }: {
           </div>
         </div>
 
-        {/* ── DESKTOP: 3D coverflow ── */}
-        <div
-          className="hidden md:block relative w-full"
-          style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
-        >
-          {slides.map((slide, i) => {
-            const off  = i - active;
-            const abs  = Math.abs(off);
-            if (abs > 2) return null;
-            const spreadX = off === 0 ? 0 : Math.sign(off) * (abs === 1 ? 275 : 490);
-            const rotY    = off * -46;
-            const depth   = -abs * 230;
-            const scl     = [1, 0.86, 0.68][abs];
-            const bright  = [1, 0.50, 0.25][abs];
-            return (
-              <div
-                key={i}
-                onClick={() => abs > 0 && setActive(i)}
-                style={{
-                  position: "absolute",
-                  left: "50%", top: "50%",
-                  width: "min(28vw, 480px)",
-                  borderRadius: 20,
-                  overflow: "hidden",
-                  cursor: abs > 0 ? "pointer" : "default",
-                  zIndex: 10 - abs,
-                  transform: `translateX(calc(-50% + ${spreadX}px)) translateY(-50%) rotateY(${rotY}deg) translateZ(${depth}px) scale(${scl})`,
-                  filter: `brightness(${bright})`,
-                  transition: "transform 0.60s cubic-bezier(0.22,1,0.36,1), filter 0.50s ease, border-color 0.32s ease, box-shadow 0.50s ease",
-                  border: abs === 0 ? "2px solid rgba(203,255,0,0.68)" : "1.5px solid rgba(255,255,255,0.07)",
-                  boxShadow: abs === 0
-                    ? "0 0 0 1px rgba(203,255,0,0.10), 0 0 52px rgba(203,255,0,0.24), 0 36px 90px rgba(0,0,0,0.90)"
-                    : "0 10px 44px rgba(0,0,0,0.72)",
-                }}
-              >
-                <img src={slide.img} alt={slide.label} draggable={false} className="block w-full h-auto select-none" />
-              </div>
-            );
-          })}
-        </div>
+        {/* ── DESKTOP: full-width for component slides, 3D coverflow for images ── */}
+        {slides[active].component ? (
+          <div className="hidden md:flex justify-center w-full">
+            <AnimatePresence mode="wait">
+              {(() => {
+                const DSlide = slides[active].component!;
+                return (
+                  <m.div
+                    key={active}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    style={{
+                      width: "min(88vw, 1000px)",
+                      background: "rgba(10,8,20,0.6)",
+                      borderRadius: 20,
+                      padding: "24px 28px",
+                    }}
+                  >
+                    <DSlide />
+                  </m.div>
+                );
+              })()}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <div
+            className="hidden md:block relative w-full"
+            style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
+          >
+            {slides.map((slide, i) => {
+              if (!slide.img) return null;
+              const off  = i - active;
+              const abs  = Math.abs(off);
+              if (abs > 2) return null;
+              const spreadX = off === 0 ? 0 : Math.sign(off) * (abs === 1 ? 275 : 490);
+              const rotY    = off * -46;
+              const depth   = -abs * 230;
+              const scl     = [1, 0.86, 0.68][abs];
+              const bright  = [1, 0.50, 0.25][abs];
+              return (
+                <div
+                  key={i}
+                  onClick={() => abs > 0 && setActive(i)}
+                  style={{
+                    position: "absolute",
+                    left: "50%", top: "50%",
+                    width: "min(28vw, 480px)",
+                    borderRadius: 20,
+                    overflow: "hidden",
+                    cursor: abs > 0 ? "pointer" : "default",
+                    zIndex: 10 - abs,
+                    transform: `translateX(calc(-50% + ${spreadX}px)) translateY(-50%) rotateY(${rotY}deg) translateZ(${depth}px) scale(${scl})`,
+                    filter: `brightness(${bright})`,
+                    transition: "transform 0.60s cubic-bezier(0.22,1,0.36,1), filter 0.50s ease, border-color 0.32s ease, box-shadow 0.50s ease",
+                    border: abs === 0 ? "2px solid rgba(203,255,0,0.68)" : "1.5px solid rgba(255,255,255,0.07)",
+                    boxShadow: abs === 0
+                      ? "0 0 0 1px rgba(203,255,0,0.10), 0 0 52px rgba(203,255,0,0.24), 0 36px 90px rgba(0,0,0,0.90)"
+                      : "0 10px 44px rgba(0,0,0,0.72)",
+                  }}
+                >
+                  <img src={slide.img} alt={slide.label} draggable={false} className="block w-full h-auto select-none" />
+                </div>
+              );
+            })}
+          </div>
+        )}
         {/* Desktop nav arrows */}
         <div className="hidden md:flex items-center gap-6 mt-6">
           <button
@@ -2266,7 +2433,7 @@ function CaseCard({ c, onOpen, isHovered }: { c: (typeof CASES)[0]; onOpen?: () 
 }
 
 function Cases() {
-  const [caseModal, setCaseModal] = useState<{ slides: typeof PROJECT_SLIDES; title: string } | null>(null);
+  const [caseModal, setCaseModal] = useState<{ slides: SlideEntry[]; title: string } | null>(null);
   const [hovCase, setHovCase] = useState<number | null>(null);
 
   const CASE_COLS = 3;
