@@ -2544,7 +2544,6 @@ function CaseDeckModal({ slides, title, onClose }: {
                   transition={{ duration: 0.22 }}
                   style={{
                     width: MSlide ? "min(74vw, 480px)" : "min(68vw, 360px)",
-                    height: "min(58dvh, 480px)",
                     flexShrink: 0,
                     borderRadius: 16,
                     overflow: "hidden",
@@ -2552,7 +2551,6 @@ function CaseDeckModal({ slides, title, onClose }: {
                     boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
                     background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
                     padding: MSlide ? "12px 10px" : undefined,
-                    overflowY: "auto",
                   }}
                 >
                   {MSlide
@@ -2596,8 +2594,7 @@ function CaseDeckModal({ slides, title, onClose }: {
                       left: "50%", top: "50%",
                       transform: "translate(-50%, -50%)",
                       width: "min(88vw, 1000px)",
-                      maxHeight: "min(60vh, 600px)",
-                      overflowY: "auto",
+                      overflow: "hidden",
                       background: "rgba(10,8,20,0.6)",
                       borderRadius: 20,
                       padding: "24px 28px",
