@@ -2030,7 +2030,7 @@ function GogglesSlide1() {
           style={{
             position: "absolute", inset: "-22%", borderRadius: "50%",
             background: "radial-gradient(ellipse at center, rgba(139,92,246,0.32) 0%, transparent 65%)",
-            filter: "blur(28px)",
+            filter: "blur(28px)", pointerEvents: "none",
           }}
         />
         {/* Card — entrance from right, then endless gentle float */}
@@ -2195,7 +2195,7 @@ function CaseDeckModal({ slides, title, onClose }: {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-y-auto"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
       style={{ background: "rgba(8,8,8,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
       onClick={onClose}
     >
@@ -2218,27 +2218,38 @@ function CaseDeckModal({ slides, title, onClose }: {
         {/* Title */}
         <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-8">{title}</p>
 
-        {/* ── MOBILE: single card + arrows ── */}
-        <div className="flex md:hidden flex-col items-center w-full mb-6">
+        {/* ── MOBILE: arrows flanking slide card ── */}
+        <div className="flex md:hidden items-center gap-3 w-full justify-center mb-4">
+          {/* Prev */}
+          <button
+            onClick={() => setActive((active + n - 1) % n)}
+            className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.06] flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
+            style={{ zIndex: 10 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+
+          {/* Slide card */}
           <AnimatePresence mode="wait">
             {(() => {
               const MSlide = slides[active].component;
               return (
                 <m.div
                   key={active}
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -30 }}
+                  initial={{ opacity: 0, scale: 0.94 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.94 }}
                   transition={{ duration: 0.22 }}
                   style={{
-                    width: MSlide ? "min(92vw, 500px)" : "min(86vw, 400px)",
+                    width: MSlide ? "min(74vw, 480px)" : "min(68vw, 360px)",
+                    flexShrink: 0,
                     borderRadius: 16,
                     overflow: "hidden",
                     border: "1.5px solid rgba(203,255,0,0.55)",
                     boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
                     background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
-                    padding: MSlide ? "14px 12px" : undefined,
-                    maxHeight: MSlide ? "58dvh" : undefined,
+                    padding: MSlide ? "12px 10px" : undefined,
+                    maxHeight: "60dvh",
                     overflowY: MSlide ? "auto" : undefined,
                   }}
                 >
@@ -2250,21 +2261,15 @@ function CaseDeckModal({ slides, title, onClose }: {
               );
             })()}
           </AnimatePresence>
-          <div className="flex items-center gap-5 mt-5">
-            <button
-              onClick={() => setActive((active + n - 1) % n)}
-              className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.06] flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <span className="text-xs font-mono text-zinc-500">{active + 1} / {n}</span>
-            <button
-              onClick={() => setActive((active + 1) % n)}
-              className="w-11 h-11 rounded-full border border-white/10 bg-white/[0.06] flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-          </div>
+
+          {/* Next */}
+          <button
+            onClick={() => setActive((active + 1) % n)}
+            className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.06] flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
+            style={{ zIndex: 10 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
         </div>
 
         {/* ── DESKTOP: full-width for component slides, 3D coverflow for images ── */}
