@@ -2520,52 +2520,54 @@ function CaseDeckModal({ slides, title, onClose }: {
         {/* Title */}
         <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-8">{title}</p>
 
-        {/* ── MOBILE: card with arrows absolutely overlaid on sides ── */}
-        <div className="md:hidden relative flex justify-center w-full mb-4">
-          {/* Slide card */}
-          <AnimatePresence mode="wait">
-            {(() => {
-              const MSlide = slides[active].component;
-              return (
-                <m.div
-                  key={active}
-                  initial={{ opacity: 0, scale: 0.94 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.94 }}
-                  transition={{ duration: 0.22 }}
-                  style={{
-                    width: MSlide ? "min(80vw, 500px)" : "min(72vw, 380px)",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    border: "1.5px solid rgba(203,255,0,0.55)",
-                    boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
-                    background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
-                    padding: MSlide ? "12px 10px" : undefined,
-                  }}
-                >
-                  {MSlide
-                    ? <MSlide />
-                    : <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
-                  }
-                </m.div>
-              );
-            })()}
-          </AnimatePresence>
-
-          {/* Prev — absolute, left edge, always on top */}
+        {/* ── MOBILE: arrows in dedicated columns, card in center column ── */}
+        <div className="md:hidden flex items-center w-full mb-4" style={{ gap: 0 }}>
+          {/* Prev — own column, always visible */}
           <button
             onClick={() => setActive((active + n - 1) % n)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full border border-white/10 bg-black/70 flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
-            style={{ zIndex: 100 }}
+            className="flex-none w-10 h-10 rounded-full border border-white/10 bg-black/80 flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
+            style={{ zIndex: 200, position: "relative", flexShrink: 0 }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
 
-          {/* Next — absolute, right edge, always on top */}
+          {/* Slide card — fills remaining space between arrows */}
+          <div style={{ flex: "1 1 0", minWidth: 0, position: "relative", zIndex: 10 }}>
+            <AnimatePresence mode="wait">
+              {(() => {
+                const MSlide = slides[active].component;
+                return (
+                  <m.div
+                    key={active}
+                    initial={{ opacity: 0, scale: 0.94 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.94 }}
+                    transition={{ duration: 0.22 }}
+                    style={{
+                      width: "100%",
+                      borderRadius: 16,
+                      overflow: "hidden",
+                      border: "1.5px solid rgba(203,255,0,0.55)",
+                      boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
+                      background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
+                      padding: MSlide ? "12px 10px" : undefined,
+                    }}
+                  >
+                    {MSlide
+                      ? <MSlide />
+                      : <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
+                    }
+                  </m.div>
+                );
+              })()}
+            </AnimatePresence>
+          </div>
+
+          {/* Next — own column, always visible */}
           <button
             onClick={() => setActive((active + 1) % n)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full border border-white/10 bg-black/70 flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
-            style={{ zIndex: 100 }}
+            className="flex-none w-10 h-10 rounded-full border border-white/10 bg-black/80 flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
+            style={{ zIndex: 200, position: "relative", flexShrink: 0 }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
           </button>
