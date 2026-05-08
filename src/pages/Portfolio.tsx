@@ -967,7 +967,7 @@ const FASHION_SLIDES = [
 const SWIM_SLIDES: SlideEntry[] = [
   { component: GogglesSlide1, label: "Плохая читаемость" },
   { component: GogglesSlide2, label: "Переработка структуры" },
-  { img: "/hero/Project%20Card%20003.png", label: "Новый Hero-визуал" },
+  { component: GogglesSlide3, label: "Новый Hero-визуал" },
   { img: "/hero/Project%20Card%20004.png", label: "Дополнительные слайды" },
 ];
 
@@ -2176,6 +2176,158 @@ function GogglesSlide2() {
           </m.div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── Swim goggles — Slide 3: «Новый Hero-визуал» ─────────────────────────────
+const GS3_ANNOTS = [
+  { icon: "◎", title: "АНТИЗАПОТЕВАНИЕ", desc: "наглядно показали технологию через визуал и текст" },
+  { icon: "180°", title: "ШИРОКИЙ ОБЗОР", desc: "понятное преимущество с акцентом на выгоду для пользователя" },
+] as const;
+
+const GS3_POINTS = [
+  { icon: "★", title: "СИЛЬНЫЙ ЗАГОЛОВОК",  desc: "крупный шрифт и контрастные флашки цепляют внимание" },
+  { icon: "◆", title: "ЧИСТАЯ КОМПОЗИЦИЯ",  desc: "ничего лишнего — всё внимание на продукт" },
+  { icon: "✦", title: "ПОНЯТНЫЕ ТРИГГЕРЫ",  desc: "ключевые выгоды выделены и легко считываются" },
+] as const;
+
+function GogglesSlide3() {
+  const E = [0.22, 1, 0.36, 1] as const;
+  const fly = (delay: number, x = 0, y = 0) => ({
+    initial: { opacity: 0, x, y },
+    animate: { opacity: 1, x: 0, y: 0 },
+    transition: { duration: 0.52, ease: E, delay },
+  });
+
+  return (
+    <div className="relative flex flex-col md:flex-row gap-6 md:gap-8 w-full items-start md:items-center"
+      style={{ padding: "8px 4px 12px" }}>
+
+      {/* ── LEFT: text ── */}
+      <div style={{ flex: "0 0 44%", minWidth: 0 }}>
+
+        {/* Title */}
+        <m.div {...fly(0.06, -32)}>
+          <p style={{ fontSize: "clamp(22px,3.0vw,38px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.05 }}>НОВЫЙ</p>
+          <p style={{ fontSize: "clamp(22px,3.0vw,38px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 4px 0", lineHeight: 1.05 }}>HERO-ВИЗУАЛ</p>
+          <p style={{ fontSize: "clamp(10px,1.2vw,13px)", color: "#71717a", margin: 0 }}>фокус на продукте и выгодах</p>
+        </m.div>
+
+        {/* Divider */}
+        <m.div {...fly(0.18, -12)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "12px 0" }}/>
+
+        {/* Annotation features (eye + 180°) */}
+        {GS3_ANNOTS.map((p, i) => (
+          <m.div key={i} {...fly(0.26 + i * 0.13, 0, 14)}
+            style={{ display: "flex", gap: 10, marginBottom: 9, alignItems: "flex-start" }}>
+            <div style={{
+              width: 30, height: 30, borderRadius: 7, flexShrink: 0,
+              background: "rgba(139,92,246,0.14)", border: "1px solid rgba(139,92,246,0.30)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#a78bfa", fontSize: 10, fontWeight: 800, letterSpacing: "0",
+            }}>{p.icon}</div>
+            <div>
+              <p style={{ fontSize: "clamp(10px,1.15vw,12.5px)", fontWeight: 700, color: "#a78bfa", margin: 0, letterSpacing: "0.06em" }}>{p.title}</p>
+              <p style={{ fontSize: "clamp(9px,1.05vw,11.5px)", color: "#52525b", margin: "2px 0 0 0", lineHeight: 1.4 }}>{p.desc}</p>
+            </div>
+          </m.div>
+        ))}
+
+        {/* Secondary divider */}
+        <m.div {...fly(0.54, -8)} style={{ height: 1, background: "rgba(139,92,246,0.14)", margin: "10px 0" }}/>
+
+        {/* Quality points */}
+        {GS3_POINTS.map((p, i) => (
+          <m.div key={i} {...fly(0.60 + i * 0.10, 0, 12)}
+            style={{ display: "flex", gap: 9, marginBottom: 8, alignItems: "flex-start" }}>
+            <div style={{
+              width: 26, height: 26, borderRadius: 6, flexShrink: 0,
+              background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.22)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#8B5CF6", fontSize: 11, fontWeight: 700,
+            }}>{p.icon}</div>
+            <div>
+              <p style={{ fontSize: "clamp(9.5px,1.1vw,12px)", fontWeight: 700, color: "rgba(255,255,255,0.85)", margin: 0, letterSpacing: "0.05em" }}>{p.title}</p>
+              <p style={{ fontSize: "clamp(9px,1.0vw,11px)", color: "#52525b", margin: "2px 0 0 0", lineHeight: 1.4 }}>{p.desc}</p>
+            </div>
+          </m.div>
+        ))}
+
+        {/* Conclusion box */}
+        <m.div {...fly(0.92, 0, 14)} style={{
+          marginTop: 10, padding: "9px 12px", borderRadius: 10,
+          background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.20)",
+          display: "flex", gap: 9, alignItems: "flex-start",
+        }}>
+          <span style={{ fontSize: 15, flexShrink: 0, marginTop: 1 }}>🎯</span>
+          <div>
+            <p style={{ fontSize: "clamp(9px,1.05vw,11px)", fontWeight: 700, color: "#8B5CF6", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>ЧТО СДЕЛАЛИ</p>
+            <p style={{ fontSize: "clamp(9px,1.0vw,11px)", color: "#52525b", margin: 0, lineHeight: 1.5 }}>
+              собрали сильный визуал, который моментально показывает продукт и его преимущества,{" "}
+              <span style={{ color: "#a78bfa" }}>выделяя карточку в выдаче</span>
+            </p>
+          </div>
+        </m.div>
+      </div>
+
+      {/* ── RIGHT: product card at 3D angle ── */}
+      <div style={{
+        flex: "1 1 auto", position: "relative",
+        display: "flex", justifyContent: "center", alignItems: "center",
+        minHeight: 260, perspective: "900px", perspectiveOrigin: "50% 50%",
+      }}>
+        {/* Purple glow */}
+        <m.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.0, delay: 0.55, ease: E }}
+          style={{
+            position: "absolute", inset: "-20%", borderRadius: "50%",
+            background: "radial-gradient(ellipse at center, rgba(139,92,246,0.30) 0%, transparent 65%)",
+            filter: "blur(28px)", pointerEvents: "none",
+          }}
+        />
+        {/* 3D card — enters from right with perspective tilt, then floats */}
+        <m.div
+          initial={{ opacity: 0, x: 90, rotateY: 42, rotateZ: 6, scale: 0.82 }}
+          animate={{
+            opacity: 1,
+            x: 0,
+            rotateY: 14,
+            rotateZ: 2,
+            scale: 1,
+            y: [0, -9, 0],
+          }}
+          transition={{
+            opacity:  { duration: 0.7,  delay: 0.42 },
+            x:        { duration: 0.78, ease: E, delay: 0.42 },
+            rotateY:  { duration: 0.78, ease: E, delay: 0.42 },
+            rotateZ:  { duration: 0.78, ease: E, delay: 0.42 },
+            scale:    { duration: 0.78, ease: E, delay: 0.42 },
+            y:        { duration: 4.5,  ease: "easeInOut", repeat: Infinity, delay: 1.4 },
+          }}
+          style={{
+            position: "relative",
+            maxWidth: "90%",
+            borderRadius: 16,
+            boxShadow: [
+              "0 24px 64px rgba(0,0,0,0.72)",
+              "-10px 10px 36px rgba(139,92,246,0.22)",
+              "0 0 0 1px rgba(255,255,255,0.06)",
+            ].join(", "),
+            transformStyle: "preserve-3d",
+          }}
+        >
+          <img
+            src="/hero/Project%20Card%20003.png"
+            alt="Новый Hero-визуал — FitSmile очки"
+            draggable={false}
+            style={{ width: "100%", height: "auto", display: "block", borderRadius: 16 }}
+          />
+        </m.div>
+      </div>
+
     </div>
   );
 }
