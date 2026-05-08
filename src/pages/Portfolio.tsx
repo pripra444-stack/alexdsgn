@@ -2520,17 +2520,8 @@ function CaseDeckModal({ slides, title, onClose }: {
         {/* Title */}
         <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-8">{title}</p>
 
-        {/* ── MOBILE: arrows flanking slide card ── */}
-        <div className="flex md:hidden items-center gap-3 w-full justify-center mb-4">
-          {/* Prev */}
-          <button
-            onClick={() => setActive((active + n - 1) % n)}
-            className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.06] flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
-            style={{ zIndex: 50, position: "relative" }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-
+        {/* ── MOBILE: card with arrows absolutely overlaid on sides ── */}
+        <div className="md:hidden relative flex justify-center w-full mb-4">
           {/* Slide card */}
           <AnimatePresence mode="wait">
             {(() => {
@@ -2543,12 +2534,9 @@ function CaseDeckModal({ slides, title, onClose }: {
                   exit={{ opacity: 0, scale: 0.94 }}
                   transition={{ duration: 0.22 }}
                   style={{
-                    width: MSlide ? "min(74vw, 480px)" : "min(68vw, 360px)",
-                    flexShrink: 0,
+                    width: MSlide ? "min(80vw, 500px)" : "min(72vw, 380px)",
                     borderRadius: 16,
                     overflow: "hidden",
-                    position: "relative",
-                    zIndex: 10,
                     border: "1.5px solid rgba(203,255,0,0.55)",
                     boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
                     background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
@@ -2564,11 +2552,20 @@ function CaseDeckModal({ slides, title, onClose }: {
             })()}
           </AnimatePresence>
 
-          {/* Next */}
+          {/* Prev — absolute, left edge, always on top */}
+          <button
+            onClick={() => setActive((active + n - 1) % n)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full border border-white/10 bg-black/70 flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
+            style={{ zIndex: 100 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+
+          {/* Next — absolute, right edge, always on top */}
           <button
             onClick={() => setActive((active + 1) % n)}
-            className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.06] flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
-            style={{ zIndex: 50, position: "relative" }}
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full border border-white/10 bg-black/70 flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
+            style={{ zIndex: 100 }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
           </button>
