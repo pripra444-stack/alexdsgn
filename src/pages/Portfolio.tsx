@@ -1352,13 +1352,42 @@ const CASES = [
 type Shape = { w: number; h: number; x: string; y: string; r: number; op: number };
 
 // ─── Card-deck modal for case studies ────────────────────────────────────────
-function CaseDeckModal({ slides, title, onClose }: {
+function CaseDeckModal({ slides, title, onClose, splitAnimation = false }: {
   slides: { img: string; label: string }[];
   title: string;
   onClose: () => void;
+  splitAnimation?: boolean;
 }) {
   const [active, setActive] = useState(0);
   const n = slides.length;
+
+  const SPLIT_DUR = { duration: 0.54, ease: [0.22, 1, 0.36, 1] } as const;
+
+  /** Renders image split into two halves that fly in/out vertically */
+  function SplitSlide({ src, alt, cardStyle }: { src: string; alt: string; cardStyle?: React.CSSProperties }) {
+    return (
+      <div style={{ position: "relative", lineHeight: 0, ...cardStyle }}>
+        {/* Top half — exits upward, enters from above */}
+        <AnimatePresence mode="sync" initial={false}>
+          <m.img key={`t-${src}`} src={src} alt={alt} draggable={false}
+            className="block w-full h-auto select-none"
+            style={{ clipPath: "inset(0 0 50.5% 0)" }}
+            initial={{ y: "-101%" }} animate={{ y: "0%" }} exit={{ y: "-101%" }}
+            transition={SPLIT_DUR}
+          />
+        </AnimatePresence>
+        {/* Bottom half — exits downward, enters from below */}
+        <AnimatePresence mode="sync" initial={false}>
+          <m.img key={`b-${src}`} src={src} alt="" aria-hidden draggable={false}
+            className="block w-full h-auto select-none"
+            style={{ position: "absolute", top: 0, left: 0, clipPath: "inset(49.5% 0 0 0)" }}
+            initial={{ y: "101%" }} animate={{ y: "0%" }} exit={{ y: "101%" }}
+            transition={SPLIT_DUR}
+          />
+        </AnimatePresence>
+      </div>
+    );
+  }
 
   return (
     <m.div
@@ -1391,24 +1420,38 @@ function CaseDeckModal({ slides, title, onClose }: {
 
         {/* ── MOBILE: single card + arrows ── */}
         <div className="flex md:hidden flex-col items-center w-full mb-6">
-          <AnimatePresence mode="wait">
-            <m.div
-              key={active}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.22 }}
-              style={{
-                width: "min(86vw, 400px)",
-                borderRadius: 16,
-                overflow: "hidden",
-                border: "1.5px solid rgba(203,255,0,0.55)",
-                boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
-              }}
-            >
-              <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
-            </m.div>
-          </AnimatePresence>
+          {splitAnimation
+            ? SplitSlide({
+                src: slides[active].img,
+                alt: slides[active].label,
+                cardStyle: {
+                  width: "min(86vw, 400px)",
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  border: "1.5px solid rgba(203,255,0,0.55)",
+                  boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
+                },
+              })
+            : (
+            <AnimatePresence mode="wait">
+              <m.div
+                key={active}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.22 }}
+                style={{
+                  width: "min(86vw, 400px)",
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  border: "1.5px solid rgba(203,255,0,0.55)",
+                  boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
+                }}
+              >
+                <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
+              </m.div>
+            </AnimatePresence>
+            )}
           <div className="flex items-center gap-5 mt-5">
             <button
               onClick={() => setActive((active + n - 1) % n)}
@@ -1431,10 +1474,30 @@ function CaseDeckModal({ slides, title, onClose }: {
           className="hidden md:block relative w-full"
           style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
         >
+          {/* Center card with split animation (rendered outside the coverflow loop) */}
+          {splitAnimation && (
+            <div
+              style={{
+                position: "absolute", left: "50%", top: "50%",
+                width: "min(28vw, 480px)",
+                zIndex: 10,
+                transform: "translateX(-50%) translateY(-50%)",
+                border: "2px solid rgba(203,255,0,0.68)",
+                boxShadow: "0 0 0 1px rgba(203,255,0,0.10), 0 0 52px rgba(203,255,0,0.24), 0 36px 90px rgba(0,0,0,0.90)",
+              }}
+            >
+              {SplitSlide({
+                src: slides[active].img,
+                alt: slides[active].label,
+                cardStyle: { borderRadius: 20, overflow: "hidden" },
+              })}
+            </div>
+          )}
           {slides.map((slide, i) => {
             const off  = i - active;
             const abs  = Math.abs(off);
             if (abs > 2) return null;
+            if (splitAnimation && abs === 0) return null; // center card rendered separately above
             const spreadX = off === 0 ? 0 : Math.sign(off) * (abs === 1 ? 275 : 490);
             const rotY    = off * -46;
             const depth   = -abs * 230;
@@ -1720,6 +1783,7 @@ function Cases() {
             slides={caseModal.slides}
             title={caseModal.title}
             onClose={() => setCaseModal(null)}
+            splitAnimation={caseModal.slides === SWIM_SLIDES}
           />
         )}
       </AnimatePresence>
