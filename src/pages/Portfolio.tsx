@@ -2520,19 +2520,10 @@ function CaseDeckModal({ slides, title, onClose }: {
         {/* Title */}
         <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-8">{title}</p>
 
-        {/* ── MOBILE: arrows in dedicated columns, card in center column ── */}
+        {/* ── MOBILE: card first in DOM (lowest stack), arrows after (on top) ── */}
         <div className="md:hidden flex items-center w-full mb-4" style={{ gap: 0 }}>
-          {/* Prev — own column, always visible */}
-          <button
-            onClick={() => setActive((active + n - 1) % n)}
-            className="flex-none w-10 h-10 rounded-full border border-white/10 bg-black/80 flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
-            style={{ zIndex: 200, position: "relative", flexShrink: 0 }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-
-          {/* Slide card — fills remaining space between arrows */}
-          <div style={{ flex: "1 1 0", minWidth: 0, position: "relative", zIndex: 10 }}>
+          {/* Card: DOM order 1 → display order 2 (center) via CSS order */}
+          <div style={{ flex: "1 1 0", minWidth: 0, order: 2, isolation: "isolate" }}>
             <AnimatePresence mode="wait">
               {(() => {
                 const MSlide = slides[active].component;
@@ -2563,11 +2554,20 @@ function CaseDeckModal({ slides, title, onClose }: {
             </AnimatePresence>
           </div>
 
-          {/* Next — own column, always visible */}
+          {/* Prev: DOM order 2 → display order 1 (left) — renders AFTER card so always on top */}
+          <button
+            onClick={() => setActive((active + n - 1) % n)}
+            className="flex-none w-10 h-10 rounded-full border border-white/15 bg-black/85 flex items-center justify-center text-white active:scale-95 transition-all duration-150"
+            style={{ order: 1, flexShrink: 0, position: "relative", zIndex: 10 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+
+          {/* Next: DOM order 3 → display order 3 (right) — renders AFTER card so always on top */}
           <button
             onClick={() => setActive((active + 1) % n)}
-            className="flex-none w-10 h-10 rounded-full border border-white/10 bg-black/80 flex items-center justify-center text-zinc-300 active:scale-95 transition-all duration-150"
-            style={{ zIndex: 200, position: "relative", flexShrink: 0 }}
+            className="flex-none w-10 h-10 rounded-full border border-white/15 bg-black/85 flex items-center justify-center text-white active:scale-95 transition-all duration-150"
+            style={{ order: 3, flexShrink: 0, position: "relative", zIndex: 10 }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
           </button>
