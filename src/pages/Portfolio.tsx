@@ -2035,36 +2035,37 @@ function GogglesSlide1() {
             boxShadow: "0 22px 60px rgba(0,0,0,0.70), 0 0 42px rgba(139,92,246,0.28)",
           }}
         >
-          <img src="/hero/Project%20Card%20001.png" alt="Карточка до редизайна" draggable={false}
+          <img src="/hero/goggles-product.png" alt="Карточка до редизайна" draggable={false}
             style={{ width: "100%", height: "auto", display: "block", borderRadius: 16 }}/>
         </m.div>
       </div>
 
-      {/* ── Connecting lines (desktop only) ── */}
-      <m.svg
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        transition={{ delay: 1.05, duration: 0.3 }}
+      {/* ── Connecting arrows (desktop only) ── */}
+      <svg
         className="hidden md:block"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", overflow: "visible" }}
         viewBox="0 0 100 100" preserveAspectRatio="none"
       >
+        <defs>
+          <marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+            <path d="M0,0.5 L4,2.5 L0,4.5" fill="none" stroke="rgba(139,92,246,0.75)" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </marker>
+        </defs>
         {[
-          { d: "M 44 35 C 47 35 48 38 49 38", delay: 1.1 },
-          { d: "M 44 50 C 47 50 48 50 49 50", delay: 1.22 },
-          { d: "M 44 65 C 47 63 48 61 49 61", delay: 1.34 },
-        ].map((line, i) => (
-          <m.path key={i} d={line.d}
-            stroke="rgba(139,92,246,0.5)" strokeWidth="0.7" fill="none" strokeDasharray="2.8 2.0"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 0.38, delay: line.delay }}/>
+          { x1: 44, y1: 34, x2: 52, y2: 28, delay: 1.1 },
+          { x1: 44, y1: 50, x2: 52, y2: 50, delay: 1.22 },
+          { x1: 44, y1: 66, x2: 52, y2: 72, delay: 1.34 },
+        ].map((ln, i) => (
+          <m.line key={i}
+            x1={ln.x1} y1={ln.y1} x2={ln.x2} y2={ln.y2}
+            stroke="rgba(139,92,246,0.7)" strokeWidth="0.55" strokeLinecap="round"
+            markerEnd="url(#arr)"
+            initial={{ opacity: 0, pathLength: 0 }}
+            animate={{ opacity: 1, pathLength: 1 }}
+            transition={{ duration: 0.32, delay: ln.delay, ease: "easeOut" }}
+          />
         ))}
-        {[{ cx: 49, cy: 38 }, { cx: 49, cy: 50 }, { cx: 49, cy: 61 }].map((pt, i) => (
-          <m.circle key={i} cx={pt.cx} cy={pt.cy} r="0.85"
-            fill="rgba(139,92,246,0.65)"
-            initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.42 + i * 0.09 }}/>
-        ))}
-      </m.svg>
+      </svg>
     </div>
   );
 }
