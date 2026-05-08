@@ -2520,13 +2520,10 @@ function CaseDeckModal({ slides, title, onClose }: {
         {/* Title */}
         <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-8">{title}</p>
 
-        {/* ── MOBILE: card first in DOM (lowest stack), arrows after (on top) ── */}
-        <div className="md:hidden flex items-center w-full mb-4" style={{ gap: 0 }}>
-          {/* Card: DOM order 1 → display order 2 (center).
-              Outer div: overflow:hidden (no transform — clips correctly on iOS Safari).
-              Inner m.div: Framer Motion animation only, no overflow. */}
+        {/* ── MOBILE: card only, no arrows here ── */}
+        <div className="md:hidden w-full mb-4 flex justify-center">
           <div style={{
-            flex: "1 1 0", minWidth: 0, order: 2,
+            width: "min(82vw, 500px)",
             borderRadius: 16, overflow: "hidden",
             border: "1.5px solid rgba(203,255,0,0.55)",
             boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
@@ -2556,24 +2553,6 @@ function CaseDeckModal({ slides, title, onClose }: {
               })()}
             </AnimatePresence>
           </div>
-
-          {/* Prev: DOM order 2 → display order 1 (left) — renders AFTER card so always on top */}
-          <button
-            onClick={() => setActive((active + n - 1) % n)}
-            className="flex-none w-10 h-10 rounded-full border border-white/15 bg-black/85 flex items-center justify-center text-white active:scale-95 transition-all duration-150"
-            style={{ order: 1, flexShrink: 0, position: "relative", zIndex: 10 }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-
-          {/* Next: DOM order 3 → display order 3 (right) — renders AFTER card so always on top */}
-          <button
-            onClick={() => setActive((active + 1) % n)}
-            className="flex-none w-10 h-10 rounded-full border border-white/15 bg-black/85 flex items-center justify-center text-white active:scale-95 transition-all duration-150"
-            style={{ order: 3, flexShrink: 0, position: "relative", zIndex: 10 }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
         </div>
 
         {/* ── DESKTOP: fixed-height area — arrows always at same Y position ── */}
@@ -2694,6 +2673,38 @@ function CaseDeckModal({ slides, title, onClose }: {
           ))}
         </div>
       </m.div>
+
+      {/* ── MOBILE arrows: direct children of backdrop, outside ALL stacking contexts ── */}
+      {/* position:fixed + z-index:9999 — nothing can ever render above these */}
+      <button
+        className="md:hidden"
+        onClick={(e) => { e.stopPropagation(); setActive((active + n - 1) % n); }}
+        style={{
+          position: "fixed", left: 8, top: "50%", transform: "translateY(-50%)",
+          zIndex: 9999,
+          width: 40, height: 40, borderRadius: "50%",
+          background: "rgba(0,0,0,0.85)", border: "1.5px solid rgba(255,255,255,0.18)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "white", cursor: "pointer",
+        }}
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button
+        className="md:hidden"
+        onClick={(e) => { e.stopPropagation(); setActive((active + 1) % n); }}
+        style={{
+          position: "fixed", right: 8, top: "50%", transform: "translateY(-50%)",
+          zIndex: 9999,
+          width: 40, height: 40, borderRadius: "50%",
+          background: "rgba(0,0,0,0.85)", border: "1.5px solid rgba(255,255,255,0.18)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "white", cursor: "pointer",
+        }}
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
     </m.div>
   );
 }
