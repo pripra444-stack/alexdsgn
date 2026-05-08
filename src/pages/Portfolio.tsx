@@ -1293,7 +1293,7 @@ const CASES = [
     result: "+34% CTR · ×2.1 конверсия",
     tags: ["WB", "Beauty"],
     gradient: "from-violet-900/80 via-purple-800/60 to-fuchsia-900/80",
-    accent: "#C084FC",
+    accent: "#CBFF00",
     shapes: [
       { w: 140, h: 190, x: "58%", y: "8%", r: 12, op: 0.9 },
       { w: 110, h: 190, x: "74%", y: "18%", r: 12, op: 0.6 },
@@ -1306,7 +1306,7 @@ const CASES = [
     result: "+28% CTR за первую неделю",
     tags: ["Ozon", "Electronics"],
     gradient: "from-blue-950/80 via-blue-800/60 to-cyan-900/70",
-    accent: "#38BDF8",
+    accent: "#CBFF00",
     shapes: [
       { w: 200, h: 130, x: "52%", y: "20%", r: 16, op: 0.85 },
       { w: 160, h: 40, x: "55%", y: "60%", r: 8, op: 0.5 },
@@ -1319,7 +1319,7 @@ const CASES = [
     result: "В 3× быстрее продакшна · бюджет −70%",
     tags: ["AI", "FMCG"],
     gradient: "from-emerald-950/80 via-teal-800/60 to-green-900/70",
-    accent: "#34D399",
+    accent: "#CBFF00",
     shapes: [
       { w: 60, h: 180, x: "56%", y: "10%", r: 30, op: 0.9 },
       { w: 60, h: 180, x: "67%", y: "18%", r: 30, op: 0.65 },
@@ -1332,7 +1332,7 @@ const CASES = [
     result: "Топ-3 выдачи через 14 дней",
     tags: ["WB", "Fashion"],
     gradient: "from-orange-950/80 via-amber-800/60 to-yellow-900/70",
-    accent: "#FBBF24",
+    accent: "#CBFF00",
     shapes: [
       { w: 150, h: 200, x: "58%", y: "5%", r: 8, op: 0.9 },
       { w: 110, h: 200, x: "73%", y: "15%", r: 8, op: 0.55 },
@@ -1344,7 +1344,7 @@ const CASES = [
     result: "Выход в розничную сеть",
     tags: ["Packaging", "Food"],
     gradient: "from-rose-950/80 via-pink-800/60 to-red-900/70",
-    accent: "#FB7185",
+    accent: "#CBFF00",
     shapes: [
       { w: 110, h: 160, x: "58%", y: "15%", r: 16, op: 0.9 },
       { w: 90, h: 160, x: "71%", y: "23%", r: 16, op: 0.6 },
@@ -1357,7 +1357,7 @@ const CASES = [
     result: "+28–35% CTR · очки FitSmile в Топ выдачи",
     tags: ["Ozon", "Sport"],
     gradient: "from-sky-950/90 via-cyan-900/70 to-blue-950/80",
-    accent: "#22D3EE",
+    accent: "#CBFF00",
     shapes: [
       { w: 180, h: 120, x: "52%", y: "22%", r: 14, op: 0.85 },
       { w: 140, h: 36, x: "54%", y: "58%", r: 8, op: 0.5 },
@@ -1391,26 +1391,23 @@ const CASE_BADGES: Record<number, readonly string[]> = {
   6: ["ANTI-FOG",     "UV PROTECT",   "SOFT SILICONE","WIDE VIEW"  ],
 };
 
+const CASE_BG_DARK = "radial-gradient(ellipse at 50% 0%, #181818 0%, #0a0a0a 55%, #050505 100%)";
 const CASE_BG: Record<number, string> = {
-  1: "radial-gradient(ellipse at 50% 0%, #2e1060 0%, #130430 48%, #07011a 100%)",
-  2: "radial-gradient(ellipse at 50% 0%, #0c2d5c 0%, #051428 48%, #020810 100%)",
-  3: "radial-gradient(ellipse at 50% 0%, #063d2c 0%, #021f17 48%, #010c09 100%)",
-  4: "radial-gradient(ellipse at 50% 0%, #3d1a0c 0%, #1c0a05 48%, #0d0502 100%)",
-  5: "radial-gradient(ellipse at 50% 0%, #3d0c1a 0%, #1c0510 48%, #0d020a 100%)",
-  6: "radial-gradient(ellipse at 50% 0%, #0c3d5c 0%, #051a2e 48%, #020b18 100%)",
+  1: CASE_BG_DARK, 2: CASE_BG_DARK, 3: CASE_BG_DARK,
+  4: CASE_BG_DARK, 5: CASE_BG_DARK, 6: CASE_BG_DARK,
 };
 
 // ─── Product scene: Beauty / cosmetics ───────────────────────────────────────
 function BeautyScene({ hovered }: { hovered: boolean }) {
-  const ac = "#C084FC";
+  const ac = hovered ? "#111111" : "#CBFF00";
   return (
     <svg viewBox="-230 -115 460 200" style={{ width:"100%", height:"auto", overflow:"visible" }}>
       <defs>
         <linearGradient id="bsCard" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#3b1060"/><stop offset="100%" stopColor="#1e0845"/>
+          <stop offset="0%" stopColor="#1a1a1a"/><stop offset="100%" stopColor="#080808"/>
         </linearGradient>
         <linearGradient id="bsImg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.5"/><stop offset="100%" stopColor="#4c1d95" stopOpacity="0.3"/>
+          <stop offset="0%" stopColor="#2a2a2a" stopOpacity="0.5"/><stop offset="100%" stopColor="#111111" stopOpacity="0.3"/>
         </linearGradient>
         <filter id="bsGlow" x="-25%" y="-25%" width="150%" height="150%">
           <feGaussianBlur stdDeviation="6" result="blur"/>
@@ -1456,12 +1453,12 @@ function BeautyScene({ hovered }: { hovered: boolean }) {
 
 // ─── Product scene: Electronics HERO screen ───────────────────────────────────
 function ElectronicsScene({ hovered }: { hovered: boolean }) {
-  const ac = "#38BDF8";
+  const ac = hovered ? "#111111" : "#CBFF00";
   return (
     <svg viewBox="-230 -118 460 210" style={{ width:"100%", height:"auto", overflow:"visible" }}>
       <defs>
         <linearGradient id="esScr" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0c2d5c"/><stop offset="100%" stopColor="#020d1e"/>
+          <stop offset="0%" stopColor="#181818"/><stop offset="100%" stopColor="#060606"/>
         </linearGradient>
         <filter id="esF" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="5" result="blur"/>
@@ -1469,50 +1466,50 @@ function ElectronicsScene({ hovered }: { hovered: boolean }) {
         </filter>
       </defs>
       {/* Monitor outer frame */}
-      <rect x="-165" y="-92" width="330" height="196" rx="14" fill="#0a1628"
-        stroke={ac} strokeWidth="1.5" strokeOpacity={hovered ? 0.72 : 0.35}/>
+      <rect x="-165" y="-92" width="330" height="196" rx="14" fill="#0d0d0d"
+        stroke={ac} strokeWidth="1.5" strokeOpacity={hovered ? 0.72 : 0.55}/>
       {/* Screen bezel */}
       <rect x="-157" y="-84" width="314" height="176" rx="10" fill="url(#esScr)"/>
       {/* Nav bar */}
-      <rect x="-147" y="-74" width="294" height="26" rx="4" fill={`rgba(56,189,248,0.08)`}/>
+      <rect x="-147" y="-74" width="294" height="26" rx="4" fill="rgba(255,255,255,0.04)"/>
       <rect x="-139" y="-67" width="58" height="8" rx="4" fill={ac} opacity="0.58"/>
       <rect x="62" y="-67" width="38" height="8" rx="4" fill={ac} opacity="0.28"/>
       <rect x="108" y="-67" width="28" height="8" rx="4" fill={ac} opacity="0.28"/>
       {/* Hero left panel */}
-      <rect x="-147" y="-42" width="198" height="120" rx="6" fill={`rgba(56,189,248,0.09)`}/>
+      <rect x="-147" y="-42" width="198" height="120" rx="6" fill="rgba(255,255,255,0.04)"/>
       <rect x="-139" y="-30" width="138" height="16" rx="4" fill={ac}
         opacity={hovered ? 0.82 : 0.52} filter={hovered ? "url(#esF)" : undefined}/>
       <rect x="-139" y="-9" width="98" height="8" rx="4" fill={ac} opacity="0.28"/>
       <rect x="-139" y="5" width="78" height="8" rx="4" fill={ac} opacity="0.2"/>
       <rect x="-139" y="28" width="68" height="22" rx="6" fill={ac} opacity={hovered ? 0.72 : 0.45}/>
       {/* Hero right image panel */}
-      <rect x="57" y="-42" width="90" height="120" rx="6" fill={`rgba(56,189,248,0.12)`}/>
-      <rect x="67" y="-32" width="70" height="68" rx="8" fill={`rgba(56,189,248,0.2)`}/>
+      <rect x="57" y="-42" width="90" height="120" rx="6" fill="rgba(255,255,255,0.05)"/>
+      <rect x="67" y="-32" width="70" height="68" rx="8" fill="rgba(255,255,255,0.07)"/>
       <ellipse cx="102" cy="2" rx="24" ry="19" fill={ac} opacity="0.23"/>
       {/* Data dots */}
       {[0,1,2,3,4].map(i=>(
         <circle key={i} cx={-139+i*16} cy="72" r="3" fill={ac} opacity={hovered ? 0.7 : 0.38}/>
       ))}
       {/* Stand */}
-      <rect x="-18" y="104" width="36" height="11" rx="4" fill="#0a1628" stroke={ac} strokeWidth="1" strokeOpacity="0.28"/>
-      <rect x="-28" y="115" width="56" height="6" rx="3" fill="#0a1628" stroke={ac} strokeWidth="1" strokeOpacity="0.18"/>
+      <rect x="-18" y="104" width="36" height="11" rx="4" fill="#0d0d0d" stroke={ac} strokeWidth="1" strokeOpacity="0.35"/>
+      <rect x="-28" y="115" width="56" height="6" rx="3" fill="#0d0d0d" stroke={ac} strokeWidth="1" strokeOpacity="0.22"/>
     </svg>
   );
 }
 
 // ─── Product scene: AI drinks ─────────────────────────────────────────────────
 function DrinksScene({ hovered }: { hovered: boolean }) {
-  const ac = "#34D399";
+  const ac = hovered ? "#111111" : "#CBFF00";
   return (
     <svg viewBox="-230 -120 460 210" style={{ width:"100%", height:"auto", overflow:"visible" }}>
       <defs>
         <linearGradient id="dsBot" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#065f46"/><stop offset="100%" stopColor="#022c22"/>
+          <stop offset="0%" stopColor="#1a1a1a"/><stop offset="100%" stopColor="#080808"/>
         </linearGradient>
         <linearGradient id="dsLbl" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#34d399" stopOpacity="0.28"/>
-          <stop offset="50%" stopColor="#34d399" stopOpacity="0.58"/>
-          <stop offset="100%" stopColor="#34d399" stopOpacity="0.28"/>
+          <stop offset="0%" stopColor={ac} stopOpacity="0.15"/>
+          <stop offset="50%" stopColor={ac} stopOpacity="0.35"/>
+          <stop offset="100%" stopColor={ac} stopOpacity="0.15"/>
         </linearGradient>
         <filter id="dsF">
           <feGaussianBlur stdDeviation="4" result="blur"/>
@@ -1556,12 +1553,12 @@ function DrinksScene({ hovered }: { hovered: boolean }) {
 
 // ─── Product scene: Street fashion jacket ─────────────────────────────────────
 function FashionScene({ hovered }: { hovered: boolean }) {
-  const ac = "#FBBF24";
+  const ac = hovered ? "#111111" : "#CBFF00";
   return (
     <svg viewBox="-230 -125 460 215" style={{ width:"100%", height:"auto", overflow:"visible" }}>
       <defs>
         <linearGradient id="fsGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#451a03"/><stop offset="100%" stopColor="#1c0a01"/>
+          <stop offset="0%" stopColor="#1a1a1a"/><stop offset="100%" stopColor="#080808"/>
         </linearGradient>
         <filter id="fsGlow">
           <feGaussianBlur stdDeviation="6" result="blur"/>
@@ -1598,15 +1595,15 @@ function FashionScene({ hovered }: { hovered: boolean }) {
 
 // ─── Product scene: Food packaging ───────────────────────────────────────────
 function FoodScene({ hovered }: { hovered: boolean }) {
-  const ac = "#FB7185";
+  const ac = hovered ? "#111111" : "#CBFF00";
   return (
     <svg viewBox="-230 -112 460 192" style={{ width:"100%", height:"auto", overflow:"visible" }}>
       <defs>
         <linearGradient id="pkB1" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#4c0519"/><stop offset="100%" stopColor="#1f0110"/>
+          <stop offset="0%" stopColor="#1a1a1a"/><stop offset="100%" stopColor="#080808"/>
         </linearGradient>
         <linearGradient id="pkB2" x1="1" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#600020"/><stop offset="100%" stopColor="#30000e"/>
+          <stop offset="0%" stopColor="#202020"/><stop offset="100%" stopColor="#0d0d0d"/>
         </linearGradient>
         <filter id="pkF">
           <feGaussianBlur stdDeviation="5" result="blur"/>
@@ -1653,28 +1650,29 @@ function FoodScene({ hovered }: { hovered: boolean }) {
 
 // ─── Swim Goggles: SVG scene ──────────────────────────────────────────────────
 function GogglesScene({ hovered }: { hovered: boolean }) {
+  const ac = hovered ? "#111111" : "#CBFF00";
   return (
     <svg viewBox="-230 -130 460 210" xmlns="http://www.w3.org/2000/svg"
       style={{ width: "100%", height: "auto", overflow: "visible" }}>
       <defs>
         <radialGradient id="gsLensL" cx="35%" cy="30%" r="65%">
-          <stop offset="0%" stopColor="#bae6fd" stopOpacity="0.65"/>
-          <stop offset="50%" stopColor="#0ea5e9" stopOpacity="0.4"/>
-          <stop offset="100%" stopColor="#0c4a6e" stopOpacity="0.88"/>
+          <stop offset="0%" stopColor="#2a2a2a" stopOpacity="0.7"/>
+          <stop offset="50%" stopColor="#141414" stopOpacity="0.85"/>
+          <stop offset="100%" stopColor="#060606" stopOpacity="0.95"/>
         </radialGradient>
         <radialGradient id="gsLensR" cx="65%" cy="30%" r="65%">
-          <stop offset="0%" stopColor="#bae6fd" stopOpacity="0.65"/>
-          <stop offset="50%" stopColor="#0ea5e9" stopOpacity="0.4"/>
-          <stop offset="100%" stopColor="#0c4a6e" stopOpacity="0.88"/>
+          <stop offset="0%" stopColor="#2a2a2a" stopOpacity="0.7"/>
+          <stop offset="50%" stopColor="#141414" stopOpacity="0.85"/>
+          <stop offset="100%" stopColor="#060606" stopOpacity="0.95"/>
         </radialGradient>
         <radialGradient id="gsDeep" cx="50%" cy="65%" r="55%">
-          <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.18"/>
-          <stop offset="55%" stopColor="#0c3d5c" stopOpacity="0.75"/>
-          <stop offset="100%" stopColor="#020d1a" stopOpacity="0.95"/>
+          <stop offset="0%" stopColor="#1a1a1a" stopOpacity="0.4"/>
+          <stop offset="55%" stopColor="#0d0d0d" stopOpacity="0.82"/>
+          <stop offset="100%" stopColor="#050505" stopOpacity="0.97"/>
         </radialGradient>
         <linearGradient id="gsFrame" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1e293b"/>
-          <stop offset="100%" stopColor="#0f172a"/>
+          <stop offset="0%" stopColor="#1a1a1a"/>
+          <stop offset="100%" stopColor="#080808"/>
         </linearGradient>
         <clipPath id="gsClipL"><ellipse cx="-100" cy="-2" rx="90" ry="76"/></clipPath>
         <clipPath id="gsClipR"><ellipse cx="100" cy="-2" rx="90" ry="76"/></clipPath>
@@ -1687,57 +1685,57 @@ function GogglesScene({ hovered }: { hovered: boolean }) {
       {/* Hover glow aura */}
       {hovered && (
         <ellipse cx="0" cy="-2" rx="208" ry="94" fill="none"
-          stroke="#22d3ee" strokeWidth="1.5" strokeOpacity="0.28"
+          stroke={ac} strokeWidth="1.5" strokeOpacity="0.28"
           filter="url(#gsGlowSoft)"/>
       )}
 
       {/* Left strap */}
-      <path d="M -190 -8 C -215 -2 -226 18 -220 40" stroke="#0d1829" strokeWidth="20" strokeLinecap="round" fill="none"/>
-      <path d="M -190 -8 C -215 -2 -226 18 -220 40" stroke="#1e293b" strokeWidth="13" strokeLinecap="round" fill="none"/>
-      <path d="M -190 -8 C -215 -2 -226 18 -220 40" stroke="#334155" strokeWidth="5"  strokeLinecap="round" fill="none" opacity="0.4"/>
+      <path d="M -190 -8 C -215 -2 -226 18 -220 40" stroke="#080808" strokeWidth="20" strokeLinecap="round" fill="none"/>
+      <path d="M -190 -8 C -215 -2 -226 18 -220 40" stroke="#181818" strokeWidth="13" strokeLinecap="round" fill="none"/>
+      <path d="M -190 -8 C -215 -2 -226 18 -220 40" stroke="#2a2a2a" strokeWidth="5"  strokeLinecap="round" fill="none" opacity="0.5"/>
 
       {/* Right strap */}
-      <path d="M 190 -8 C 215 -2 226 18 220 40" stroke="#0d1829" strokeWidth="20" strokeLinecap="round" fill="none"/>
-      <path d="M 190 -8 C 215 -2 226 18 220 40" stroke="#1e293b" strokeWidth="13" strokeLinecap="round" fill="none"/>
-      <path d="M 190 -8 C 215 -2 226 18 220 40" stroke="#334155" strokeWidth="5"  strokeLinecap="round" fill="none" opacity="0.4"/>
+      <path d="M 190 -8 C 215 -2 226 18 220 40" stroke="#080808" strokeWidth="20" strokeLinecap="round" fill="none"/>
+      <path d="M 190 -8 C 215 -2 226 18 220 40" stroke="#181818" strokeWidth="13" strokeLinecap="round" fill="none"/>
+      <path d="M 190 -8 C 215 -2 226 18 220 40" stroke="#2a2a2a" strokeWidth="5"  strokeLinecap="round" fill="none" opacity="0.5"/>
 
-      {/* Left lens: deep water + swimmer */}
+      {/* Left lens: dark + subtle highlight lines */}
       <g clipPath="url(#gsClipL)">
         <ellipse cx="-100" cy="-2" rx="90" ry="76" fill="url(#gsDeep)"/>
-        <path d="M -165 -58 Q -136 -44 -108 -54 Q -80 -64 -55 -50" stroke="rgba(125,211,252,0.20)" strokeWidth="1.5" fill="none"/>
-        <path d="M -165 -38 Q -139 -26 -104 -34 Q -72 -42 -50 -31" stroke="rgba(125,211,252,0.13)" strokeWidth="1"   fill="none"/>
-        <path d="M -165 -18 Q -140  -8 -100 -14 Q -62 -20 -46 -12" stroke="rgba(125,211,252,0.08)" strokeWidth="1"   fill="none"/>
-        <ellipse cx="-100" cy="40" rx="14" ry="6" fill="rgba(2,13,26,0.72)"/>
-        <ellipse cx="-100" cy="29" rx="8" ry="12" fill="rgba(2,13,26,0.72)"/>
-        <path d="M -123 16 Q -100 13 -77 16" stroke="rgba(2,13,26,0.55)" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        <path d="M -165 -58 Q -136 -44 -108 -54 Q -80 -64 -55 -50" stroke="rgba(255,255,255,0.06)" strokeWidth="1.5" fill="none"/>
+        <path d="M -165 -38 Q -139 -26 -104 -34 Q -72 -42 -50 -31" stroke="rgba(255,255,255,0.04)" strokeWidth="1"   fill="none"/>
+        <path d="M -165 -18 Q -140  -8 -100 -14 Q -62 -20 -46 -12" stroke="rgba(255,255,255,0.02)" strokeWidth="1"   fill="none"/>
+        <ellipse cx="-100" cy="40" rx="14" ry="6" fill="rgba(5,5,5,0.72)"/>
+        <ellipse cx="-100" cy="29" rx="8" ry="12" fill="rgba(5,5,5,0.72)"/>
+        <path d="M -123 16 Q -100 13 -77 16" stroke="rgba(5,5,5,0.55)" strokeWidth="4" fill="none" strokeLinecap="round"/>
       </g>
       <ellipse cx="-100" cy="-2" rx="90" ry="76" fill="url(#gsLensL)"/>
       <ellipse cx="-100" cy="-2" rx="97" ry="83" fill="none" stroke="url(#gsFrame)" strokeWidth="16"/>
-      <ellipse cx="-100" cy="-2" rx="90" ry="76" fill="none" stroke="#22d3ee"
-        strokeWidth={hovered ? 2 : 1.2} strokeOpacity={hovered ? 0.8 : 0.32}/>
+      <ellipse cx="-100" cy="-2" rx="90" ry="76" fill="none" stroke={ac}
+        strokeWidth={hovered ? 2 : 1.2} strokeOpacity={hovered ? 0.8 : 0.55}/>
 
-      {/* Right lens: deep water + swimmer */}
+      {/* Right lens: dark + subtle highlight lines */}
       <g clipPath="url(#gsClipR)">
         <ellipse cx="100" cy="-2" rx="90" ry="76" fill="url(#gsDeep)"/>
-        <path d="M 55  -58 Q 84  -44 112 -54 Q 140 -64 165 -50" stroke="rgba(125,211,252,0.20)" strokeWidth="1.5" fill="none"/>
-        <path d="M 50  -38 Q 79  -26 104 -34 Q 132 -42 160 -31" stroke="rgba(125,211,252,0.13)" strokeWidth="1"   fill="none"/>
-        <path d="M 48  -18 Q 72  -8  100 -14 Q 128 -20 158 -12" stroke="rgba(125,211,252,0.08)" strokeWidth="1"   fill="none"/>
-        <ellipse cx="100" cy="40" rx="14" ry="6" fill="rgba(2,13,26,0.72)"/>
-        <ellipse cx="100" cy="29" rx="8" ry="12" fill="rgba(2,13,26,0.72)"/>
-        <path d="M 77 16 Q 100 13 123 16" stroke="rgba(2,13,26,0.55)" strokeWidth="4" fill="none" strokeLinecap="round"/>
+        <path d="M 55  -58 Q 84  -44 112 -54 Q 140 -64 165 -50" stroke="rgba(255,255,255,0.06)" strokeWidth="1.5" fill="none"/>
+        <path d="M 50  -38 Q 79  -26 104 -34 Q 132 -42 160 -31" stroke="rgba(255,255,255,0.04)" strokeWidth="1"   fill="none"/>
+        <path d="M 48  -18 Q 72  -8  100 -14 Q 128 -20 158 -12" stroke="rgba(255,255,255,0.02)" strokeWidth="1"   fill="none"/>
+        <ellipse cx="100" cy="40" rx="14" ry="6" fill="rgba(5,5,5,0.72)"/>
+        <ellipse cx="100" cy="29" rx="8" ry="12" fill="rgba(5,5,5,0.72)"/>
+        <path d="M 77 16 Q 100 13 123 16" stroke="rgba(5,5,5,0.55)" strokeWidth="4" fill="none" strokeLinecap="round"/>
       </g>
       <ellipse cx="100" cy="-2" rx="90" ry="76" fill="url(#gsLensR)"/>
       <ellipse cx="100" cy="-2" rx="97" ry="83" fill="none" stroke="url(#gsFrame)" strokeWidth="16"/>
-      <ellipse cx="100" cy="-2" rx="90" ry="76" fill="none" stroke="#22d3ee"
-        strokeWidth={hovered ? 2 : 1.2} strokeOpacity={hovered ? 0.8 : 0.32}/>
+      <ellipse cx="100" cy="-2" rx="90" ry="76" fill="none" stroke={ac}
+        strokeWidth={hovered ? 2 : 1.2} strokeOpacity={hovered ? 0.8 : 0.55}/>
 
       {/* Nose bridge */}
-      <path d="M -10 22 Q 0 36 10 22" stroke="#0d1829" strokeWidth="12" strokeLinecap="round" fill="none"/>
-      <path d="M -10 22 Q 0 36 10 22" stroke="#263044" strokeWidth="7"  strokeLinecap="round" fill="none"/>
+      <path d="M -10 22 Q 0 36 10 22" stroke="#080808" strokeWidth="12" strokeLinecap="round" fill="none"/>
+      <path d="M -10 22 Q 0 36 10 22" stroke="#1a1a1a" strokeWidth="7"  strokeLinecap="round" fill="none"/>
 
       {/* Center connector */}
-      <rect x="-10" y="-14" width="20" height="26" rx="4" fill="#0f172a"/>
-      <rect x="-6"  y="-10" width="12" height="18" rx="3" fill="#1e293b"/>
+      <rect x="-10" y="-14" width="20" height="26" rx="4" fill="#0d0d0d"/>
+      <rect x="-6"  y="-10" width="12" height="18" rx="3" fill="#1a1a1a"/>
 
       {/* Left reflection highlights */}
       <ellipse cx="-128" cy="-45" rx="26" ry="13" fill="white"
@@ -1753,7 +1751,7 @@ function GogglesScene({ hovered }: { hovered: boolean }) {
 
       {/* Brand text */}
       <text x="0" y="-110" textAnchor="middle" fontFamily="monospace" fontSize="10"
-        fill="#22d3ee" opacity="0.5" letterSpacing="4">FITSMILE</text>
+        fill={ac} opacity="0.55" letterSpacing="4">FITSMILE</text>
     </svg>
   );
 }
@@ -1766,7 +1764,10 @@ function AnimatedCaseCard({ c, onOpen }: {
   const [hovered, setHovered] = useState(false);
   const [badgeIdx, setBadgeIdx] = useState(0);
   const badges = CASE_BADGES[c.id] ?? ["PORTFOLIO"];
-  const rgb = hexToRgb(c.accent);
+  // All accents are now #CBFF00; on hover everything inverts to dark
+  const eRgb  = hovered ? "17,17,17"  : "203,255,0";
+  const acCol = hovered ? "#111111"   : "#CBFF00";
+  const textCol = hovered ? "#0a0a0a" : "white";
 
   useEffect(() => {
     const t = setInterval(() => setBadgeIdx(p => (p + 1) % badges.length), 2300);
@@ -1789,51 +1790,57 @@ function AnimatedCaseCard({ c, onOpen }: {
     <div
       className="relative overflow-hidden rounded-2xl cursor-pointer select-none h-[320px] md:h-[360px]"
       style={{
-        background: CASE_BG[c.id] ?? "rgba(10,10,10,1)",
-        border: hovered ? `1.5px solid ${c.accent}66` : "1px solid rgba(255,255,255,0.06)",
-        transition: "border-color 0.4s ease, box-shadow 0.4s ease",
+        background: CASE_BG[c.id] ?? "#080808",
+        border: hovered ? "1.5px solid rgba(0,0,0,0.18)" : "1px solid rgba(203,255,0,0.16)",
+        transition: "border-color 0.38s ease, box-shadow 0.38s ease",
         boxShadow: hovered
-          ? `0 0 60px rgba(${rgb},0.12), 0 30px 80px rgba(0,0,0,0.8)`
-          : "0 20px 60px rgba(0,0,0,0.6)",
+          ? "0 0 70px rgba(203,255,0,0.28), 0 30px 80px rgba(0,0,0,0.7)"
+          : "0 0 0px rgba(203,255,0,0), 0 20px 60px rgba(0,0,0,0.6)",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onOpen}
     >
+      {/* ── Acid hover overlay ── */}
+      <div style={{
+        position:"absolute", inset:0, background:"#CBFF00", pointerEvents:"none",
+        opacity: hovered ? 1 : 0, transition:"opacity 0.38s ease", zIndex:0,
+      }}/>
+
       {/* Light rays */}
       {[0,1,2,3,4].map(i => (
         <m.div key={i} style={{
           position:"absolute", top:0, left:`${8+i*19}%`, width:`${5+i*2}%`, height:"65%",
-          background:`linear-gradient(180deg,rgba(${rgb},${0.04+i*0.012}) 0%,transparent 100%)`,
+          background:`linear-gradient(180deg,rgba(${eRgb},${hovered ? 0.06+i*0.016 : 0.04+i*0.012}) 0%,transparent 100%)`,
           transform:`skewX(${-14+i*7}deg)`, transformOrigin:"top center",
-          borderRadius:"0 0 60% 60%", pointerEvents:"none",
+          borderRadius:"0 0 60% 60%", pointerEvents:"none", zIndex:1,
         }}
-        animate={{ opacity: hovered ? [0.6,1,0.6] : [0.3,0.55,0.3] }}
+        animate={{ opacity: hovered ? [0.5,0.8,0.5] : [0.3,0.55,0.3] }}
         transition={{ duration:3.2+i*0.8, repeat:Infinity, ease:"easeInOut", delay:i*0.5 }}/>
       ))}
 
       {/* Caustic blobs */}
       {[0,1,2,3,4,5].map(i => (
         <m.div key={i} style={{
-          position:"absolute", pointerEvents:"none", borderRadius:"50%",
+          position:"absolute", pointerEvents:"none", borderRadius:"50%", zIndex:1,
           width:50+i*18, height:35+i*12,
           left:`${5+(i*39)%80}%`, top:`${8+(i*27)%62}%`,
-          background:`radial-gradient(circle,rgba(${rgb},${0.07+i*0.02}) 0%,transparent 70%)`,
+          background:`radial-gradient(circle,rgba(${eRgb},${hovered ? 0.1+i*0.025 : 0.07+i*0.02}) 0%,transparent 70%)`,
           filter:"blur(10px)",
         }}
         animate={{ x:[0,14,-8,10,0], y:[0,-10,5,-7,0],
-          opacity: hovered ? [0.65,1,0.7,1,0.65] : [0.3,0.55,0.35,0.5,0.3] }}
+          opacity: hovered ? [0.5,0.75,0.5,0.7,0.5] : [0.3,0.55,0.35,0.5,0.3] }}
         transition={{ duration:4.5+i*1.1, repeat:Infinity, ease:"easeInOut", delay:i*0.65 }}/>
       ))}
 
       {/* Bubbles */}
       {CARD_BUBBLES.map(b => (
         <m.div key={b.id} style={{
-          position:"absolute", pointerEvents:"none",
+          position:"absolute", pointerEvents:"none", zIndex:1,
           left:`${b.x}%`, bottom:-(b.size+4), width:b.size, height:b.size, borderRadius:"50%",
           background:"transparent",
-          border:`1px solid rgba(${rgb},${b.opa})`,
-          boxShadow:`0 0 ${b.size}px rgba(${rgb},${b.opa*0.5})`,
+          border:`1px solid rgba(${eRgb},${b.opa})`,
+          boxShadow:`0 0 ${b.size}px rgba(${eRgb},${b.opa*0.5})`,
         }}
         animate={{ y:[0,-380], x:[0,Math.sin(b.id*1.4)*10,0], opacity:[0,b.opa,b.opa*0.85,0] }}
         transition={{ duration:b.dur, repeat:Infinity, delay:b.delay, ease:"linear" }}/>
@@ -1842,8 +1849,8 @@ function AnimatedCaseCard({ c, onOpen }: {
       {/* Sparkles */}
       {[0,1,2,3,4,5,6,7].map(i => (
         <m.div key={i} style={{
-          position:"absolute", pointerEvents:"none",
-          width:2, height:2, borderRadius:"50%", background:`rgba(${rgb},0.9)`,
+          position:"absolute", pointerEvents:"none", zIndex:1,
+          width:2, height:2, borderRadius:"50%", background:`rgba(${eRgb},0.9)`,
           left:`${12+(i*43)%76}%`, top:`${15+(i*29)%60}%`,
         }}
         animate={{ opacity:[0,1,0], scale:[0,1.8,0] }}
@@ -1853,15 +1860,15 @@ function AnimatedCaseCard({ c, onOpen }: {
       {/* Scene glow halo */}
       <m.div style={{
         position:"absolute", left:"50%", top:"50%", width:"85%", aspectRatio:"2/1",
-        transform:"translate(-50%,-50%)", borderRadius:"50%",
-        background:`radial-gradient(ellipse,rgba(${rgb},0.07) 0%,transparent 70%)`,
+        transform:"translate(-50%,-50%)", borderRadius:"50%", zIndex:1,
+        background:`radial-gradient(ellipse,rgba(${eRgb},${hovered ? 0.12 : 0.07}) 0%,transparent 70%)`,
         filter:"blur(22px)", pointerEvents:"none",
       }}
       animate={{ opacity:hovered?1:0.45, scale:hovered?1.18:1 }}
       transition={{ duration:0.6, ease:[0.22,1,0.36,1] }}/>
 
       {/* Product scene */}
-      <m.div style={{ position:"absolute", left:"50%", top:"48%", width:"85%" }}
+      <m.div style={{ position:"absolute", left:"50%", top:"48%", width:"85%", zIndex:2 }}
         animate={{ x:"-50%", y:hovered?"-54%":"-50%", scale:hovered?1.07:1 }}
         transition={{ duration:0.6, ease:[0.22,1,0.36,1] }}>
         <m.div animate={{ y:[0,-9,0], rotate:[-0.6,0.6,-0.6] }}
@@ -1871,12 +1878,14 @@ function AnimatedCaseCard({ c, onOpen }: {
       </m.div>
 
       {/* Tags */}
-      <div style={{ position:"absolute", top:16, left:16, display:"flex", gap:6, pointerEvents:"none" }}>
+      <div style={{ position:"absolute", top:16, left:16, display:"flex", gap:6, pointerEvents:"none", zIndex:3 }}>
         {c.tags.map(t => (
           <span key={t} style={{
             padding:"3px 10px", borderRadius:100,
-            background:`${c.accent}20`, border:`1px solid ${c.accent}44`,
-            color:c.accent, fontSize:10, fontFamily:"monospace", fontWeight:600,
+            background: hovered ? "rgba(0,0,0,0.12)" : "rgba(203,255,0,0.13)",
+            border: hovered ? "1px solid rgba(0,0,0,0.28)" : "1px solid rgba(203,255,0,0.38)",
+            color: acCol, fontSize:10, fontFamily:"monospace", fontWeight:600,
+            transition:"all 0.35s ease",
           }}>{t}</span>
         ))}
       </div>
@@ -1884,10 +1893,13 @@ function AnimatedCaseCard({ c, onOpen }: {
       {/* Open hint */}
       {onOpen && (
         <m.div style={{
-          position:"absolute", top:16, right:16,
-          background:`${c.accent}1a`, border:`1px solid ${c.accent}38`,
+          position:"absolute", top:16, right:16, zIndex:3,
+          background: hovered ? "rgba(0,0,0,0.12)" : "rgba(203,255,0,0.12)",
+          border: hovered ? "1px solid rgba(0,0,0,0.28)" : "1px solid rgba(203,255,0,0.30)",
           borderRadius:8, padding:"3px 10px",
-          color:`${c.accent}cc`, fontSize:10, fontFamily:"monospace", letterSpacing:"0.06em",
+          color: hovered ? "#0a0a0a" : "rgba(203,255,0,0.88)",
+          fontSize:10, fontFamily:"monospace", letterSpacing:"0.06em",
+          transition:"all 0.35s ease",
         }}
         animate={{ opacity:hovered?1:0, y:hovered?0:-5 }}
         transition={{ duration:0.22 }}>
@@ -1896,7 +1908,7 @@ function AnimatedCaseCard({ c, onOpen }: {
       )}
 
       {/* Badge cycling */}
-      <div style={{ position:"absolute", bottom:56, left:0, right:0, display:"flex", justifyContent:"center", pointerEvents:"none" }}>
+      <div style={{ position:"absolute", bottom:56, left:0, right:0, display:"flex", justifyContent:"center", pointerEvents:"none", zIndex:3 }}>
         <AnimatePresence mode="wait">
           <m.div key={badgeIdx}
             initial={{ opacity:0, y:8, scale:0.88 }}
@@ -1905,8 +1917,10 @@ function AnimatedCaseCard({ c, onOpen }: {
             transition={{ duration:0.38, ease:[0.22,1,0.36,1] }}
             style={{
               padding:"5px 16px", borderRadius:100,
-              background:`${c.accent}18`, border:`1px solid ${c.accent}50`,
-              color:c.accent, fontSize:10, fontFamily:"monospace", letterSpacing:"0.20em", fontWeight:700,
+              background: hovered ? "rgba(0,0,0,0.12)" : "rgba(203,255,0,0.14)",
+              border: hovered ? "1px solid rgba(0,0,0,0.28)" : "1px solid rgba(203,255,0,0.45)",
+              color: acCol, fontSize:10, fontFamily:"monospace", letterSpacing:"0.20em", fontWeight:700,
+              transition:"all 0.35s ease",
             }}>
             ◆ {badges[badgeIdx]}
           </m.div>
@@ -1914,18 +1928,10 @@ function AnimatedCaseCard({ c, onOpen }: {
       </div>
 
       {/* Bottom label */}
-      <div style={{ position:"absolute", bottom:20, left:20, right:20, pointerEvents:"none" }}>
-        <p style={{ color:"white", fontSize:14, fontWeight:700, margin:0, lineHeight:1.3 }}>{c.title}</p>
-        <p style={{ color:`${c.accent}88`, fontSize:11, margin:"3px 0 0 0", fontFamily:"monospace" }}>{c.result}</p>
+      <div style={{ position:"absolute", bottom:20, left:20, right:20, pointerEvents:"none", zIndex:3 }}>
+        <p style={{ color: textCol, fontSize:14, fontWeight:700, margin:0, lineHeight:1.3, transition:"color 0.35s ease" }}>{c.title}</p>
+        <p style={{ color: hovered ? "#1a1a1a" : "rgba(203,255,0,0.62)", fontSize:11, margin:"3px 0 0 0", fontFamily:"monospace", transition:"color 0.35s ease" }}>{c.result}</p>
       </div>
-
-      {/* Hover vignette */}
-      <m.div style={{
-        position:"absolute", inset:0, pointerEvents:"none",
-        background:`radial-gradient(ellipse at 50% 50%,rgba(${rgb},0.04) 0%,rgba(0,0,0,0.25) 100%)`,
-      }}
-      animate={{ opacity:hovered?1:0 }}
-      transition={{ duration:0.4 }}/>
     </div>
   );
 }
