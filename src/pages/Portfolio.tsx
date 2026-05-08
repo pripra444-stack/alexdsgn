@@ -966,7 +966,7 @@ const FASHION_SLIDES = [
 
 const SWIM_SLIDES: SlideEntry[] = [
   { component: GogglesSlide1, label: "Плохая читаемость" },
-  { img: "/hero/Project%20Card%20002.png", label: "Переработка структуры" },
+  { component: GogglesSlide2, label: "Переработка структуры" },
   { img: "/hero/Project%20Card%20003.png", label: "Новый Hero-визуал" },
   { img: "/hero/Project%20Card%20004.png", label: "Дополнительные слайды" },
 ];
@@ -2072,6 +2072,125 @@ function GogglesSlide1() {
           />
         ))}
       </svg>
+    </div>
+  );
+}
+
+// ─── Swim goggles — Slide 2: «Переработка структуры» ────────────────────────
+const GS2_POINTS = [
+  { icon: "★", title: "АКЦЕНТ НА ГЛАВНЫХ УТП",          desc: "выгоды товара видны с первого взгляда" },
+  { icon: "◑", title: "УСИЛЕН КОНТРАСТ И ЧИТАЕМОСТЬ",   desc: "текст и элементы легко считываются"     },
+  { icon: "♡", title: "ЭМОЦИОНАЛЬНЫЙ И ДИНАМИЧНЫЙ ВИЗУАЛ", desc: "создаёт желание кликнуть"            },
+  { icon: "✓", title: "ЧИСТАЯ КОМПОЗИЦИЯ",               desc: "ничего лишнего, всё на месте"          },
+] as const;
+
+function GogglesSlide2() {
+  const E = [0.22, 1, 0.36, 1] as const;
+  const fly = (delay: number, x = 0, y = 0) => ({
+    initial: { opacity: 0, x, y },
+    animate: { opacity: 1, x: 0, y: 0 },
+    transition: { duration: 0.52, ease: E, delay },
+  });
+
+  // Three images: fanned from behind → in front
+  const imgs = [
+    { src: "/hero/goggles-slide2-c.png", rotate: -14, x: -28, y: 12,  scale: 0.82, delay: 0.52, zIndex: 1 },
+    { src: "/hero/goggles-slide2-b.png", rotate:  -4, x:  10, y:  4,  scale: 0.91, delay: 0.68, zIndex: 2 },
+    { src: "/hero/goggles-slide2-a.png", rotate:   7, x:  38, y: -8,  scale: 1.00, delay: 0.84, zIndex: 3 },
+  ];
+
+  return (
+    <div className="relative flex flex-col md:flex-row gap-6 md:gap-8 w-full items-start md:items-center"
+      style={{ padding: "8px 4px 12px" }}>
+
+      {/* ── LEFT: text ── */}
+      <div style={{ flex: "0 0 44%", minWidth: 0 }}>
+
+        {/* Title */}
+        <m.div {...fly(0.06, -32)}>
+          <p style={{ fontSize: "clamp(24px,3.2vw,40px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.05 }}>ПЕРЕРАБОТКА</p>
+          <p style={{ fontSize: "clamp(24px,3.2vw,40px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 5px 0", lineHeight: 1.05 }}>СТРУКТУРЫ</p>
+        </m.div>
+
+        {/* Goal line */}
+        <m.p {...fly(0.18, -16)} style={{ fontSize: "clamp(10px,1.2vw,13px)", color: "#71717a", margin: "0 0 12px 0", lineHeight: 1.5 }}>
+          Наша цель — сделать карточку{" "}
+          <span style={{ color: "#a78bfa" }}>заметной, понятной</span>
+          {" "}и <span style={{ color: "#a78bfa" }}>продающей</span> с первого взгляда
+        </m.p>
+
+        {/* Divider */}
+        <m.div {...fly(0.26, -12)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "0 0 12px 0" }}/>
+
+        {/* 4 points */}
+        {GS2_POINTS.map((p, i) => (
+          <m.div key={i} {...fly(0.32 + i * 0.12, 0, 16)}
+            style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
+            <div style={{
+              width: 30, height: 30, borderRadius: 7, flexShrink: 0,
+              background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.28)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#8B5CF6", fontSize: 13, fontWeight: 700,
+            }}>{p.icon}</div>
+            <div>
+              <p style={{ fontSize: "clamp(10px,1.15vw,12.5px)", fontWeight: 700, color: "rgba(255,255,255,0.88)", margin: 0, letterSpacing: "0.05em" }}>{p.title}</p>
+              <p style={{ fontSize: "clamp(9px,1.05vw,11.5px)", color: "#52525b", margin: "2px 0 0 0", lineHeight: 1.4 }}>{p.desc}</p>
+            </div>
+          </m.div>
+        ))}
+
+        {/* Hypothesis block */}
+        <m.div {...fly(0.84, 0, 14)} style={{
+          marginTop: 12, padding: "10px 12px", borderRadius: 10,
+          background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.20)",
+          display: "flex", gap: 9, alignItems: "flex-start",
+        }}>
+          <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>💡</span>
+          <div>
+            <p style={{ fontSize: "clamp(9px,1.05vw,11px)", fontWeight: 700, color: "#8B5CF6", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>ГИПОТЕЗА</p>
+            <p style={{ fontSize: "clamp(9px,1.0vw,11px)", color: "#52525b", margin: 0, lineHeight: 1.5 }}>
+              если сделать карточку более контрастной, сфокусироваться на выгодах и добавить динамичный визуал — она будет выделяться и привлекать больше кликов
+            </p>
+          </div>
+        </m.div>
+      </div>
+
+      {/* ── RIGHT: 3 photos fanned ── */}
+      <div style={{ flex: "1 1 auto", position: "relative", display: "flex", justifyContent: "center", alignItems: "center", minHeight: 260 }}>
+        {/* Purple glow */}
+        <m.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.0, delay: 0.55, ease: E }}
+          style={{
+            position: "absolute", inset: "-20%", borderRadius: "50%",
+            background: "radial-gradient(ellipse at center, rgba(139,92,246,0.28) 0%, transparent 65%)",
+            filter: "blur(28px)", pointerEvents: "none",
+          }}
+        />
+        {/* Fan of images */}
+        <div style={{ position: "relative", width: "100%", height: 240, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {imgs.map((img, i) => (
+            <m.div
+              key={i}
+              initial={{ opacity: 0, x: 80, rotate: img.rotate + 20, scale: img.scale * 0.7 }}
+              animate={{ opacity: 1, x: img.x, rotate: img.rotate, scale: img.scale }}
+              transition={{ duration: 0.65, ease: E, delay: img.delay }}
+              style={{
+                position: "absolute",
+                zIndex: img.zIndex,
+                borderRadius: 14,
+                boxShadow: `0 16px 48px rgba(0,0,0,0.65), 0 0 28px rgba(139,92,246,${0.12 + i * 0.06})`,
+                transformOrigin: "bottom center",
+                maxWidth: "72%",
+              }}
+            >
+              <img src={img.src} alt={`Вариант ${i + 1}`} draggable={false}
+                style={{ width: "100%", height: "auto", display: "block", borderRadius: 14 }}/>
+            </m.div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
