@@ -1368,6 +1368,289 @@ const CASES = [
 
 type Shape = { w: number; h: number; x: string; y: string; r: number; op: number };
 
+// ─── Animated Case Card infrastructure ───────────────────────────────────────
+function hexToRgb(hex: string): string {
+  const v = hex.replace("#", "");
+  return `${parseInt(v.slice(0,2),16)},${parseInt(v.slice(2,4),16)},${parseInt(v.slice(4,6),16)}`;
+}
+
+const CARD_BUBBLES = Array.from({ length: 14 }, (_, i) => ({
+  id: i, x: 4 + (i * 33 + 13) % 92,
+  size: 2 + (i * 3 + 5) % 7,
+  dur: 3 + (i * 1.1 + 0.4) % 4.5,
+  delay: (i * 0.85 + 0.1) % 7,
+  opa: 0.18 + (i * 0.08) % 0.42,
+}));
+
+const CASE_BADGES: Record<number, readonly string[]> = {
+  1: ["CTR +34%",     "HYDRATION",    "ANTI-AGING",  "NATURAL"    ],
+  2: ["HERO SCREEN",  "+28% CTR",     "REDESIGN",    "NEOTECH"    ],
+  3: ["AI GENERATED", "×3 FASTER",    "MIDJOURNEY",  "FMCG"       ],
+  4: ["ТОП-3 ВЫДАЧА", "STREET STYLE", "WB FASHION",  "MARUZE"     ],
+  5: ["ECO DESIGN",   "RETAIL READY", "ORGANIC",     "HEALTHY"    ],
+  6: ["ANTI-FOG",     "UV PROTECT",   "SOFT SILICONE","WIDE VIEW"  ],
+};
+
+const CASE_BG: Record<number, string> = {
+  1: "radial-gradient(ellipse at 50% 0%, #2e1060 0%, #130430 48%, #07011a 100%)",
+  2: "radial-gradient(ellipse at 50% 0%, #0c2d5c 0%, #051428 48%, #020810 100%)",
+  3: "radial-gradient(ellipse at 50% 0%, #063d2c 0%, #021f17 48%, #010c09 100%)",
+  4: "radial-gradient(ellipse at 50% 0%, #3d1a0c 0%, #1c0a05 48%, #0d0502 100%)",
+  5: "radial-gradient(ellipse at 50% 0%, #3d0c1a 0%, #1c0510 48%, #0d020a 100%)",
+  6: "radial-gradient(ellipse at 50% 0%, #0c3d5c 0%, #051a2e 48%, #020b18 100%)",
+};
+
+// ─── Product scene: Beauty / cosmetics ───────────────────────────────────────
+function BeautyScene({ hovered }: { hovered: boolean }) {
+  const ac = "#C084FC";
+  return (
+    <svg viewBox="-230 -115 460 200" style={{ width:"100%", height:"auto", overflow:"visible" }}>
+      <defs>
+        <linearGradient id="bsCard" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#3b1060"/><stop offset="100%" stopColor="#1e0845"/>
+        </linearGradient>
+        <linearGradient id="bsImg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.5"/><stop offset="100%" stopColor="#4c1d95" stopOpacity="0.3"/>
+        </linearGradient>
+        <filter id="bsGlow" x="-25%" y="-25%" width="150%" height="150%">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      {/* Back card */}
+      <g transform="rotate(-16) translate(-88,4)">
+        <rect x="-40" y="-65" width="80" height="130" rx="8" fill="url(#bsCard)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.32"/>
+        <rect x="-32" y="-57" width="64" height="73" rx="5" fill="url(#bsImg)"/>
+        <ellipse cx="0" cy="-18" rx="16" ry="20" fill={ac} opacity="0.32"/>
+        <ellipse cx="0" cy="-18" rx="10" ry="13" fill={ac} opacity="0.22"/>
+        <rect x="-32" y="22" width="64" height="5" rx="2.5" fill={ac} opacity="0.28"/>
+        <rect x="-32" y="32" width="44" height="3.5" rx="1.5" fill={ac} opacity="0.18"/>
+        <rect x="-32" y="40" width="28" height="7" rx="3" fill={ac} opacity="0.38"/>
+      </g>
+      {/* Middle card */}
+      <g transform="rotate(-4) translate(0,-8)">
+        <rect x="-40" y="-65" width="80" height="130" rx="8" fill="url(#bsCard)" stroke={ac} strokeWidth="1" strokeOpacity="0.48"/>
+        <rect x="-32" y="-57" width="64" height="73" rx="5" fill="url(#bsImg)"/>
+        <rect x="-8" y="-50" width="16" height="50" rx="5" fill={ac} opacity="0.48"/>
+        <ellipse cx="0" cy="-54" rx="5" ry="4" fill={ac} opacity="0.58"/>
+        <ellipse cx="0" cy="0" rx="12" ry="4" fill={ac} opacity="0.32"/>
+        <rect x="-32" y="22" width="64" height="5" rx="2.5" fill={ac} opacity="0.33"/>
+        <rect x="-32" y="32" width="44" height="3.5" rx="1.5" fill={ac} opacity="0.2"/>
+        <rect x="-32" y="40" width="28" height="7" rx="3" fill={ac} opacity="0.42"/>
+      </g>
+      {/* Front card */}
+      <g transform="rotate(13) translate(88,4)" filter={hovered ? "url(#bsGlow)" : undefined}>
+        <rect x="-40" y="-65" width="80" height="130" rx="8" fill="url(#bsCard)"
+          stroke={ac} strokeWidth={hovered ? 1.6 : 1.1} strokeOpacity={hovered ? 0.82 : 0.55}/>
+        <rect x="-32" y="-57" width="64" height="73" rx="5" fill="url(#bsImg)"/>
+        <ellipse cx="0" cy="-12" rx="24" ry="17" fill={ac} opacity="0.52"/>
+        <ellipse cx="0" cy="-12" rx="16" ry="11" fill={ac} opacity="0.3"/>
+        <rect x="-24" y="5" width="48" height="4" rx="2" fill={ac} opacity="0.58"/>
+        <rect x="-32" y="22" width="64" height="5" rx="2.5" fill={ac} opacity="0.38"/>
+        <rect x="-32" y="32" width="44" height="3.5" rx="1.5" fill={ac} opacity="0.24"/>
+        <rect x="-32" y="40" width="28" height="7" rx="3" fill={ac} opacity="0.48"/>
+      </g>
+    </svg>
+  );
+}
+
+// ─── Product scene: Electronics HERO screen ───────────────────────────────────
+function ElectronicsScene({ hovered }: { hovered: boolean }) {
+  const ac = "#38BDF8";
+  return (
+    <svg viewBox="-230 -118 460 210" style={{ width:"100%", height:"auto", overflow:"visible" }}>
+      <defs>
+        <linearGradient id="esScr" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#0c2d5c"/><stop offset="100%" stopColor="#020d1e"/>
+        </linearGradient>
+        <filter id="esF" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      {/* Monitor outer frame */}
+      <rect x="-165" y="-92" width="330" height="196" rx="14" fill="#0a1628"
+        stroke={ac} strokeWidth="1.5" strokeOpacity={hovered ? 0.72 : 0.35}/>
+      {/* Screen bezel */}
+      <rect x="-157" y="-84" width="314" height="176" rx="10" fill="url(#esScr)"/>
+      {/* Nav bar */}
+      <rect x="-147" y="-74" width="294" height="26" rx="4" fill={`rgba(56,189,248,0.08)`}/>
+      <rect x="-139" y="-67" width="58" height="8" rx="4" fill={ac} opacity="0.58"/>
+      <rect x="62" y="-67" width="38" height="8" rx="4" fill={ac} opacity="0.28"/>
+      <rect x="108" y="-67" width="28" height="8" rx="4" fill={ac} opacity="0.28"/>
+      {/* Hero left panel */}
+      <rect x="-147" y="-42" width="198" height="120" rx="6" fill={`rgba(56,189,248,0.09)`}/>
+      <rect x="-139" y="-30" width="138" height="16" rx="4" fill={ac}
+        opacity={hovered ? 0.82 : 0.52} filter={hovered ? "url(#esF)" : undefined}/>
+      <rect x="-139" y="-9" width="98" height="8" rx="4" fill={ac} opacity="0.28"/>
+      <rect x="-139" y="5" width="78" height="8" rx="4" fill={ac} opacity="0.2"/>
+      <rect x="-139" y="28" width="68" height="22" rx="6" fill={ac} opacity={hovered ? 0.72 : 0.45}/>
+      {/* Hero right image panel */}
+      <rect x="57" y="-42" width="90" height="120" rx="6" fill={`rgba(56,189,248,0.12)`}/>
+      <rect x="67" y="-32" width="70" height="68" rx="8" fill={`rgba(56,189,248,0.2)`}/>
+      <ellipse cx="102" cy="2" rx="24" ry="19" fill={ac} opacity="0.23"/>
+      {/* Data dots */}
+      {[0,1,2,3,4].map(i=>(
+        <circle key={i} cx={-139+i*16} cy="72" r="3" fill={ac} opacity={hovered ? 0.7 : 0.38}/>
+      ))}
+      {/* Stand */}
+      <rect x="-18" y="104" width="36" height="11" rx="4" fill="#0a1628" stroke={ac} strokeWidth="1" strokeOpacity="0.28"/>
+      <rect x="-28" y="115" width="56" height="6" rx="3" fill="#0a1628" stroke={ac} strokeWidth="1" strokeOpacity="0.18"/>
+    </svg>
+  );
+}
+
+// ─── Product scene: AI drinks ─────────────────────────────────────────────────
+function DrinksScene({ hovered }: { hovered: boolean }) {
+  const ac = "#34D399";
+  return (
+    <svg viewBox="-230 -120 460 210" style={{ width:"100%", height:"auto", overflow:"visible" }}>
+      <defs>
+        <linearGradient id="dsBot" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#065f46"/><stop offset="100%" stopColor="#022c22"/>
+        </linearGradient>
+        <linearGradient id="dsLbl" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#34d399" stopOpacity="0.28"/>
+          <stop offset="50%" stopColor="#34d399" stopOpacity="0.58"/>
+          <stop offset="100%" stopColor="#34d399" stopOpacity="0.28"/>
+        </linearGradient>
+        <filter id="dsF">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      {/* Left bottle */}
+      <g transform="translate(-82,10)" opacity="0.68">
+        <rect x="-20" y="-90" width="40" height="140" rx="12" fill="url(#dsBot)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.38"/>
+        <rect x="-14" y="-28" width="28" height="55" rx="4" fill="url(#dsLbl)"/>
+        <rect x="-10" y="-18" width="20" height="5" rx="2.5" fill={ac} opacity="0.68"/>
+        <rect x="-10" y="-8"  width="20" height="3" rx="1.5" fill={ac} opacity="0.43"/>
+        <ellipse cx="0" cy="-90" rx="12" ry="6" fill={ac} opacity="0.33"/>
+        <rect x="-6" y="-104" width="12" height="14" rx="4" fill={ac} opacity="0.43"/>
+      </g>
+      {/* Center bottle */}
+      <g transform="translate(0,0)" filter={hovered ? "url(#dsF)" : undefined}>
+        <rect x="-22" y="-102" width="44" height="158" rx="13" fill="url(#dsBot)"
+          stroke={ac} strokeWidth={hovered ? 2 : 1.2} strokeOpacity={hovered ? 0.92 : 0.56}/>
+        <rect x="-16" y="-32" width="32" height="62" rx="5" fill="url(#dsLbl)"/>
+        <rect x="-12" y="-20" width="24" height="6"  rx="3" fill={ac} opacity={hovered ? 0.92 : 0.7}/>
+        <rect x="-12" y="-8"  width="24" height="4"  rx="2" fill={ac} opacity="0.48"/>
+        <rect x="-12" y="2"   width="24" height="4"  rx="2" fill={ac} opacity="0.33"/>
+        <text x="0" y="19" textAnchor="middle" fontSize="14" fill={ac} opacity="0.8">✦</text>
+        <ellipse cx="0" cy="-102" rx="14" ry="7" fill={ac} opacity="0.43"/>
+        <rect x="-7" y="-116"  width="14" height="14" rx="4" fill={ac} opacity="0.53"/>
+        <rect x="-14" y="-84" width="5" height="62" rx="2.5" fill="white" opacity="0.09"/>
+      </g>
+      {/* Right bottle */}
+      <g transform="translate(82,10)" opacity="0.68">
+        <rect x="-20" y="-90" width="40" height="140" rx="12" fill="url(#dsBot)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.38"/>
+        <rect x="-14" y="-28" width="28" height="55" rx="4" fill="url(#dsLbl)"/>
+        <rect x="-10" y="-18" width="20" height="5" rx="2.5" fill={ac} opacity="0.68"/>
+        <rect x="-10" y="-8"  width="20" height="3" rx="1.5" fill={ac} opacity="0.43"/>
+        <ellipse cx="0" cy="-90" rx="12" ry="6" fill={ac} opacity="0.33"/>
+        <rect x="-6" y="-104" width="12" height="14" rx="4" fill={ac} opacity="0.43"/>
+      </g>
+    </svg>
+  );
+}
+
+// ─── Product scene: Street fashion jacket ─────────────────────────────────────
+function FashionScene({ hovered }: { hovered: boolean }) {
+  const ac = "#FBBF24";
+  return (
+    <svg viewBox="-230 -125 460 215" style={{ width:"100%", height:"auto", overflow:"visible" }}>
+      <defs>
+        <linearGradient id="fsGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#451a03"/><stop offset="100%" stopColor="#1c0a01"/>
+        </linearGradient>
+        <filter id="fsGlow">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      {/* Jacket body */}
+      <path d="M -80 -30 C -80 -90 -60 -112 0 -112 C 60 -112 80 -90 80 -30 L 80 72 C 80 80 73 87 65 87 L -65 87 C -73 87 -80 80 -80 72 Z"
+        fill="url(#fsGrad)" stroke={ac} strokeWidth={hovered ? 2 : 1.2}
+        strokeOpacity={hovered ? 0.9 : 0.5} filter={hovered ? "url(#fsGlow)" : undefined}/>
+      {/* Left sleeve */}
+      <path d="M -80 -30 C -100 -36 -142 -22 -162 8 C -172 30 -167 52 -152 57 L -112 62 C -96 60 -86 46 -80 30 Z"
+        fill="url(#fsGrad)" stroke={ac} strokeWidth="1" strokeOpacity="0.42"/>
+      {/* Right sleeve */}
+      <path d="M 80 -30 C 100 -36 142 -22 162 8 C 172 30 167 52 152 57 L 112 62 C 96 60 86 46 80 30 Z"
+        fill="url(#fsGrad)" stroke={ac} strokeWidth="1" strokeOpacity="0.42"/>
+      {/* Collar */}
+      <path d="M -36 -112 L 0 -82 L 36 -112" fill="none" stroke={ac} strokeWidth="2" strokeOpacity="0.62" strokeLinecap="round"/>
+      {/* Zipper */}
+      <line x1="0" y1="-77" x2="0" y2="82" stroke={ac} strokeWidth="1.5" strokeOpacity="0.48" strokeDasharray="6 4"/>
+      <rect x="-5" y="-80" width="10" height="8" rx="2" fill={ac} opacity="0.72"/>
+      {/* Pockets */}
+      <rect x="-72" y="18" width="46" height="28" rx="6" fill="none" stroke={ac} strokeWidth="1" strokeOpacity="0.42"/>
+      <rect x="26"  y="18" width="46" height="28" rx="6" fill="none" stroke={ac} strokeWidth="1" strokeOpacity="0.42"/>
+      {/* Cuffs */}
+      <rect x="-163" y="46" width="24" height="14" rx="4" fill="none" stroke={ac} strokeWidth="1.2" strokeOpacity="0.48"/>
+      <rect x="139"  y="46" width="24" height="14" rx="4" fill="none" stroke={ac} strokeWidth="1.2" strokeOpacity="0.48"/>
+      {/* Brand badge */}
+      <rect x="-26" y="-62" width="52" height="19" rx="4" fill={ac} opacity="0.14"/>
+      <text x="0" y="-49" textAnchor="middle" fontFamily="monospace" fontSize="9" fill={ac} opacity="0.72" letterSpacing="2">MARUZE</text>
+    </svg>
+  );
+}
+
+// ─── Product scene: Food packaging ───────────────────────────────────────────
+function FoodScene({ hovered }: { hovered: boolean }) {
+  const ac = "#FB7185";
+  return (
+    <svg viewBox="-230 -112 460 192" style={{ width:"100%", height:"auto", overflow:"visible" }}>
+      <defs>
+        <linearGradient id="pkB1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#4c0519"/><stop offset="100%" stopColor="#1f0110"/>
+        </linearGradient>
+        <linearGradient id="pkB2" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#600020"/><stop offset="100%" stopColor="#30000e"/>
+        </linearGradient>
+        <filter id="pkF">
+          <feGaussianBlur stdDeviation="5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      {/* Left box */}
+      <g transform="translate(-90,15)" opacity="0.72">
+        <rect x="-42" y="-65" width="84" height="110" rx="8" fill="url(#pkB1)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.28"/>
+        <path d="M 42 -65 L 58 -78 L 58 17 L 42 30" fill={ac} opacity="0.05"/>
+        <rect x="-30" y="-52" width="60" height="50" rx="5" fill={ac} opacity="0.11"/>
+        <ellipse cx="0" cy="-26" rx="18" ry="22" fill={ac} opacity="0.23" transform="rotate(12)"/>
+        <ellipse cx="0" cy="-26" rx="10" ry="14" fill={ac} opacity="0.16" transform="rotate(12)"/>
+        <rect x="-30" y="12" width="60" height="5" rx="2.5" fill={ac} opacity="0.28"/>
+        <rect x="-30" y="22" width="42" height="3.5" rx="1.5" fill={ac} opacity="0.18"/>
+      </g>
+      {/* Center tall box */}
+      <g transform="translate(0,0)" filter={hovered ? "url(#pkF)" : undefined}>
+        <rect x="-45" y="-92" width="90" height="148" rx="10" fill="url(#pkB2)"
+          stroke={ac} strokeWidth={hovered ? 1.8 : 1.1} strokeOpacity={hovered ? 0.88 : 0.52}/>
+        <rect x="-45" y="-92" width="90" height="20" rx="10" fill={ac} opacity="0.17"/>
+        <rect x="-35" y="-63" width="70" height="80" rx="6" fill={ac} opacity="0.11"/>
+        <ellipse cx="0" cy="-28" rx="16" ry="20" fill={ac} opacity="0.28" transform="rotate(8)"/>
+        <ellipse cx="0" cy="-28" rx="9"  ry="13" fill={ac} opacity="0.18" transform="rotate(8)"/>
+        <line x1="0" y1="-8" x2="0" y2="18" stroke={ac} strokeWidth="1.5" strokeOpacity="0.38"/>
+        <rect x="-28" y="26" width="56" height="7" rx="3.5" fill={ac} opacity={hovered ? 0.65 : 0.38}/>
+        <rect x="-20" y="37" width="40" height="5"  rx="2.5" fill={ac} opacity="0.26"/>
+        <rect x="-15" y="46" width="30" height="5"  rx="2.5" fill={ac} opacity="0.18"/>
+        <rect x="-36" y="-82" width="6" height="128" rx="3" fill="white" opacity="0.06"/>
+      </g>
+      {/* Right pouch */}
+      <g transform="translate(90,20)" opacity="0.72">
+        <path d="M -35 -56 Q -38 -72 0 -74 Q 38 -72 35 -56 L 35 52 Q 35 62 0 64 Q -35 62 -35 52 Z"
+          fill="url(#pkB1)" stroke={ac} strokeWidth="0.8" strokeOpacity="0.34"/>
+        <ellipse cx="0" cy="-62" rx="28" ry="8" fill={ac} opacity="0.23"/>
+        <rect x="-25" y="-42" width="50" height="56" rx="5" fill={ac} opacity="0.1"/>
+        <ellipse cx="0" cy="-14" rx="14" ry="17" fill={ac} opacity="0.2"/>
+        <rect x="-20" y="22" width="40" height="5" rx="2.5" fill={ac} opacity="0.28"/>
+        <rect x="-15" y="31" width="30" height="4" rx="2"   fill={ac} opacity="0.18"/>
+      </g>
+    </svg>
+  );
+}
+
 // ─── Swim Goggles: SVG scene ──────────────────────────────────────────────────
 function GogglesScene({ hovered }: { hovered: boolean }) {
   return (
@@ -1475,219 +1758,186 @@ function GogglesScene({ hovered }: { hovered: boolean }) {
   );
 }
 
-// ─── Swim Goggles: animated product card ─────────────────────────────────────
-function SwimGogglesAnimatedCard({ onOpen }: { onOpen: () => void }) {
+// ─── Generalized animated case card ──────────────────────────────────────────
+function AnimatedCaseCard({ c, onOpen }: {
+  c: (typeof CASES)[0];
+  onOpen?: () => void;
+}) {
   const [hovered, setHovered] = useState(false);
   const [badgeIdx, setBadgeIdx] = useState(0);
+  const badges = CASE_BADGES[c.id] ?? ["PORTFOLIO"];
+  const rgb = hexToRgb(c.accent);
 
   useEffect(() => {
-    const t = setInterval(() => setBadgeIdx(p => (p + 1) % SWIM_BADGES.length), 2300);
+    const t = setInterval(() => setBadgeIdx(p => (p + 1) % badges.length), 2300);
     return () => clearInterval(t);
-  }, []);
+  }, [badges.length]);
 
-  const badge = SWIM_BADGES[badgeIdx];
+  const scene = (h: boolean): React.ReactNode => {
+    switch (c.id) {
+      case 1: return <BeautyScene hovered={h}/>;
+      case 2: return <ElectronicsScene hovered={h}/>;
+      case 3: return <DrinksScene hovered={h}/>;
+      case 4: return <FashionScene hovered={h}/>;
+      case 5: return <FoodScene hovered={h}/>;
+      case 6: return <GogglesScene hovered={h}/>;
+      default: return null;
+    }
+  };
 
   return (
     <div
       className="relative overflow-hidden rounded-2xl cursor-pointer select-none h-[320px] md:h-[360px]"
       style={{
-        background: "radial-gradient(ellipse at 50% 0%, #0c3d5c 0%, #051a2e 48%, #020b18 100%)",
-        border: hovered ? "1.5px solid rgba(34,211,238,0.4)" : "1px solid rgba(255,255,255,0.06)",
+        background: CASE_BG[c.id] ?? "rgba(10,10,10,1)",
+        border: hovered ? `1.5px solid ${c.accent}66` : "1px solid rgba(255,255,255,0.06)",
         transition: "border-color 0.4s ease, box-shadow 0.4s ease",
         boxShadow: hovered
-          ? "0 0 60px rgba(34,211,238,0.12), 0 30px 80px rgba(0,0,0,0.8)"
+          ? `0 0 60px rgba(${rgb},0.12), 0 30px 80px rgba(0,0,0,0.8)`
           : "0 20px 60px rgba(0,0,0,0.6)",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onOpen}
     >
-      {/* ── Light rays from above ── */}
+      {/* Light rays */}
       {[0,1,2,3,4].map(i => (
         <m.div key={i} style={{
-          position: "absolute", top: 0,
-          left: `${8 + i * 19}%`, width: `${5 + i * 2}%`, height: "65%",
-          background: `linear-gradient(180deg, rgba(34,211,238,${0.03 + i * 0.012}) 0%, transparent 100%)`,
-          transform: `skewX(${-14 + i * 7}deg)`, transformOrigin: "top center",
-          borderRadius: "0 0 60% 60%", pointerEvents: "none",
+          position:"absolute", top:0, left:`${8+i*19}%`, width:`${5+i*2}%`, height:"65%",
+          background:`linear-gradient(180deg,rgba(${rgb},${0.04+i*0.012}) 0%,transparent 100%)`,
+          transform:`skewX(${-14+i*7}deg)`, transformOrigin:"top center",
+          borderRadius:"0 0 60% 60%", pointerEvents:"none",
         }}
-        animate={{ opacity: hovered ? [0.6, 1, 0.6] : [0.3, 0.55, 0.3] }}
-        transition={{ duration: 3.2 + i * 0.8, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}/>
+        animate={{ opacity: hovered ? [0.6,1,0.6] : [0.3,0.55,0.3] }}
+        transition={{ duration:3.2+i*0.8, repeat:Infinity, ease:"easeInOut", delay:i*0.5 }}/>
       ))}
 
-      {/* ── Caustic light blobs ── */}
+      {/* Caustic blobs */}
       {[0,1,2,3,4,5].map(i => (
         <m.div key={i} style={{
-          position: "absolute", pointerEvents: "none", borderRadius: "50%",
-          width: 50 + i * 18, height: 35 + i * 12,
-          left: `${5 + (i * 39) % 80}%`, top: `${8 + (i * 27) % 62}%`,
-          background: `radial-gradient(circle, rgba(34,211,238,${0.07 + i * 0.02}) 0%, transparent 70%)`,
-          filter: "blur(10px)",
+          position:"absolute", pointerEvents:"none", borderRadius:"50%",
+          width:50+i*18, height:35+i*12,
+          left:`${5+(i*39)%80}%`, top:`${8+(i*27)%62}%`,
+          background:`radial-gradient(circle,rgba(${rgb},${0.07+i*0.02}) 0%,transparent 70%)`,
+          filter:"blur(10px)",
         }}
-        animate={{
-          x: [0, 14, -8, 10, 0], y: [0, -10, 5, -7, 0],
-          opacity: hovered ? [0.65, 1, 0.7, 1, 0.65] : [0.3, 0.55, 0.35, 0.5, 0.3],
-        }}
-        transition={{ duration: 4.5 + i * 1.1, repeat: Infinity, ease: "easeInOut", delay: i * 0.65 }}/>
+        animate={{ x:[0,14,-8,10,0], y:[0,-10,5,-7,0],
+          opacity: hovered ? [0.65,1,0.7,1,0.65] : [0.3,0.55,0.35,0.5,0.3] }}
+        transition={{ duration:4.5+i*1.1, repeat:Infinity, ease:"easeInOut", delay:i*0.65 }}/>
       ))}
 
-      {/* ── Bubbles ── */}
-      {SWIM_BUBBLES.map(b => (
+      {/* Bubbles */}
+      {CARD_BUBBLES.map(b => (
         <m.div key={b.id} style={{
-          position: "absolute", pointerEvents: "none",
-          left: `${b.x}%`, bottom: -(b.size + 4),
-          width: b.size, height: b.size, borderRadius: "50%",
-          background: "transparent",
-          border: `1px solid rgba(34,211,238,${b.opa})`,
-          boxShadow: `0 0 ${b.size}px rgba(34,211,238,${b.opa * 0.5})`,
+          position:"absolute", pointerEvents:"none",
+          left:`${b.x}%`, bottom:-(b.size+4), width:b.size, height:b.size, borderRadius:"50%",
+          background:"transparent",
+          border:`1px solid rgba(${rgb},${b.opa})`,
+          boxShadow:`0 0 ${b.size}px rgba(${rgb},${b.opa*0.5})`,
         }}
-        animate={{ y: [0, -380], x: [0, Math.sin(b.id * 1.4) * 10, 0], opacity: [0, b.opa, b.opa * 0.85, 0] }}
-        transition={{ duration: b.dur, repeat: Infinity, delay: b.delay, ease: "linear" }}/>
+        animate={{ y:[0,-380], x:[0,Math.sin(b.id*1.4)*10,0], opacity:[0,b.opa,b.opa*0.85,0] }}
+        transition={{ duration:b.dur, repeat:Infinity, delay:b.delay, ease:"linear" }}/>
       ))}
 
-      {/* ── Sparkle particles ── */}
+      {/* Sparkles */}
       {[0,1,2,3,4,5,6,7].map(i => (
         <m.div key={i} style={{
-          position: "absolute", pointerEvents: "none",
-          width: 2, height: 2, borderRadius: "50%",
-          background: "rgba(186,230,253,0.9)",
-          left: `${12 + (i * 43) % 76}%`, top: `${15 + (i * 29) % 60}%`,
+          position:"absolute", pointerEvents:"none",
+          width:2, height:2, borderRadius:"50%", background:`rgba(${rgb},0.9)`,
+          left:`${12+(i*43)%76}%`, top:`${15+(i*29)%60}%`,
         }}
-        animate={{ opacity: [0, 1, 0], scale: [0, 1.8, 0] }}
-        transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.7, ease: "easeInOut" }}/>
+        animate={{ opacity:[0,1,0], scale:[0,1.8,0] }}
+        transition={{ duration:1.4, repeat:Infinity, delay:i*0.7, ease:"easeInOut" }}/>
       ))}
 
-      {/* ── Goggles glow halo ── */}
+      {/* Scene glow halo */}
       <m.div style={{
-        position: "absolute", left: "50%", top: "50%",
-        width: "85%", aspectRatio: "2.3 / 1",
-        transform: "translate(-50%, -50%)",
-        borderRadius: "50%",
-        background: "radial-gradient(ellipse, rgba(34,211,238,0.08) 0%, transparent 70%)",
-        filter: "blur(22px)", pointerEvents: "none",
+        position:"absolute", left:"50%", top:"50%", width:"85%", aspectRatio:"2/1",
+        transform:"translate(-50%,-50%)", borderRadius:"50%",
+        background:`radial-gradient(ellipse,rgba(${rgb},0.07) 0%,transparent 70%)`,
+        filter:"blur(22px)", pointerEvents:"none",
       }}
-      animate={{ opacity: hovered ? 1 : 0.45, scale: hovered ? 1.18 : 1 }}
-      transition={{ duration: 0.6, ease: [0.22,1,0.36,1] }}/>
+      animate={{ opacity:hovered?1:0.45, scale:hovered?1.18:1 }}
+      transition={{ duration:0.6, ease:[0.22,1,0.36,1] }}/>
 
-      {/* ── Goggles SVG (floating + hover scale) ── */}
-      <m.div
-        style={{ position: "absolute", left: "50%", top: "48%", width: "85%" }}
-        animate={{ x: "-50%", y: hovered ? "-54%" : "-50%", scale: hovered ? 1.07 : 1 }}
-        transition={{ duration: 0.6, ease: [0.22,1,0.36,1] }}
-      >
-        <m.div
-          animate={{ y: [0, -9, 0], rotate: [-0.6, 0.6, -0.6] }}
-          transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <GogglesScene hovered={hovered} />
+      {/* Product scene */}
+      <m.div style={{ position:"absolute", left:"50%", top:"48%", width:"85%" }}
+        animate={{ x:"-50%", y:hovered?"-54%":"-50%", scale:hovered?1.07:1 }}
+        transition={{ duration:0.6, ease:[0.22,1,0.36,1] }}>
+        <m.div animate={{ y:[0,-9,0], rotate:[-0.6,0.6,-0.6] }}
+          transition={{ duration:4.2, repeat:Infinity, ease:"easeInOut" }}>
+          {scene(hovered)}
         </m.div>
       </m.div>
 
-      {/* ── Tags ── */}
-      <div style={{ position: "absolute", top: 16, left: 16, display: "flex", gap: 6, pointerEvents: "none" }}>
-        {["Ozon", "Sport"].map(t => (
+      {/* Tags */}
+      <div style={{ position:"absolute", top:16, left:16, display:"flex", gap:6, pointerEvents:"none" }}>
+        {c.tags.map(t => (
           <span key={t} style={{
-            padding: "3px 10px", borderRadius: 100,
-            background: "rgba(34,211,238,0.12)", border: "1px solid rgba(34,211,238,0.25)",
-            color: "rgba(34,211,238,0.8)", fontSize: 10, fontFamily: "monospace", fontWeight: 600,
+            padding:"3px 10px", borderRadius:100,
+            background:`${c.accent}20`, border:`1px solid ${c.accent}44`,
+            color:c.accent, fontSize:10, fontFamily:"monospace", fontWeight:600,
           }}>{t}</span>
         ))}
       </div>
 
-      {/* ── "Open" hint on hover ── */}
-      <m.div style={{
-        position: "absolute", top: 16, right: 16,
-        background: "rgba(34,211,238,0.1)", border: "1px solid rgba(34,211,238,0.22)",
-        borderRadius: 8, padding: "3px 10px",
-        color: "rgba(34,211,238,0.75)", fontSize: 10, fontFamily: "monospace", letterSpacing: "0.06em",
-      }}
-      animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : -5 }}
-      transition={{ duration: 0.22 }}>
-        смотреть →
-      </m.div>
+      {/* Open hint */}
+      {onOpen && (
+        <m.div style={{
+          position:"absolute", top:16, right:16,
+          background:`${c.accent}1a`, border:`1px solid ${c.accent}38`,
+          borderRadius:8, padding:"3px 10px",
+          color:`${c.accent}cc`, fontSize:10, fontFamily:"monospace", letterSpacing:"0.06em",
+        }}
+        animate={{ opacity:hovered?1:0, y:hovered?0:-5 }}
+        transition={{ duration:0.22 }}>
+          смотреть →
+        </m.div>
+      )}
 
-      {/* ── UTP badge cycling ── */}
-      <div style={{
-        position: "absolute", bottom: 56, left: 0, right: 0,
-        display: "flex", justifyContent: "center", pointerEvents: "none",
-      }}>
+      {/* Badge cycling */}
+      <div style={{ position:"absolute", bottom:56, left:0, right:0, display:"flex", justifyContent:"center", pointerEvents:"none" }}>
         <AnimatePresence mode="wait">
-          <m.div
-            key={badgeIdx}
-            initial={{ opacity: 0, y: 8, scale: 0.88 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.88 }}
-            transition={{ duration: 0.38, ease: [0.22,1,0.36,1] }}
+          <m.div key={badgeIdx}
+            initial={{ opacity:0, y:8, scale:0.88 }}
+            animate={{ opacity:1, y:0, scale:1 }}
+            exit={{ opacity:0, y:-8, scale:0.88 }}
+            transition={{ duration:0.38, ease:[0.22,1,0.36,1] }}
             style={{
-              padding: "5px 16px", borderRadius: 100,
-              background: `${badge.col}18`, border: `1px solid ${badge.col}50`,
-              color: badge.col, fontSize: 10, fontFamily: "monospace",
-              letterSpacing: "0.20em", fontWeight: 700,
-            }}
-          >
-            ◆ {badge.text}
+              padding:"5px 16px", borderRadius:100,
+              background:`${c.accent}18`, border:`1px solid ${c.accent}50`,
+              color:c.accent, fontSize:10, fontFamily:"monospace", letterSpacing:"0.20em", fontWeight:700,
+            }}>
+            ◆ {badges[badgeIdx]}
           </m.div>
         </AnimatePresence>
       </div>
 
-      {/* ── Bottom label ── */}
-      <div style={{ position: "absolute", bottom: 20, left: 20, right: 20, pointerEvents: "none" }}>
-        <p style={{ color: "white", fontSize: 14, fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
-          Hero + карточки для спорт-бренда на Ozon
-        </p>
-        <p style={{ color: "rgba(34,211,238,0.55)", fontSize: 11, margin: "3px 0 0 0", fontFamily: "monospace" }}>
-          +28–35% CTR · FitSmile в Топ выдачи
-        </p>
+      {/* Bottom label */}
+      <div style={{ position:"absolute", bottom:20, left:20, right:20, pointerEvents:"none" }}>
+        <p style={{ color:"white", fontSize:14, fontWeight:700, margin:0, lineHeight:1.3 }}>{c.title}</p>
+        <p style={{ color:`${c.accent}88`, fontSize:11, margin:"3px 0 0 0", fontFamily:"monospace" }}>{c.result}</p>
       </div>
 
-      {/* ── Hover depth vignette ── */}
+      {/* Hover vignette */}
       <m.div style={{
-        position: "absolute", inset: 0, pointerEvents: "none",
-        background: "radial-gradient(ellipse at 50% 50%, rgba(34,211,238,0.04) 0%, rgba(0,0,0,0.25) 100%)",
+        position:"absolute", inset:0, pointerEvents:"none",
+        background:`radial-gradient(ellipse at 50% 50%,rgba(${rgb},0.04) 0%,rgba(0,0,0,0.25) 100%)`,
       }}
-      animate={{ opacity: hovered ? 1 : 0 }}
-      transition={{ duration: 0.4 }}/>
+      animate={{ opacity:hovered?1:0 }}
+      transition={{ duration:0.4 }}/>
     </div>
   );
 }
 
 // ─── Card-deck modal for case studies ────────────────────────────────────────
-function CaseDeckModal({ slides, title, onClose, splitAnimation = false }: {
+function CaseDeckModal({ slides, title, onClose }: {
   slides: { img: string; label: string }[];
   title: string;
   onClose: () => void;
-  splitAnimation?: boolean;
 }) {
   const [active, setActive] = useState(0);
   const n = slides.length;
-
-  const SPLIT_DUR = { duration: 0.54, ease: [0.22, 1, 0.36, 1] } as const;
-
-  /** Renders image split into two halves that fly in/out vertically */
-  function SplitSlide({ src, alt, cardStyle }: { src: string; alt: string; cardStyle?: React.CSSProperties }) {
-    return (
-      <div style={{ position: "relative", lineHeight: 0, ...cardStyle }}>
-        {/* Top half — exits upward, enters from above */}
-        <AnimatePresence mode="sync" initial={false}>
-          <m.img key={`t-${src}`} src={src} alt={alt} draggable={false}
-            className="block w-full h-auto select-none"
-            style={{ clipPath: "inset(0 0 50.5% 0)" }}
-            initial={{ y: "-101%" }} animate={{ y: "0%" }} exit={{ y: "-101%" }}
-            transition={SPLIT_DUR}
-          />
-        </AnimatePresence>
-        {/* Bottom half — exits downward, enters from below */}
-        <AnimatePresence mode="sync" initial={false}>
-          <m.img key={`b-${src}`} src={src} alt="" aria-hidden draggable={false}
-            className="block w-full h-auto select-none"
-            style={{ position: "absolute", top: 0, left: 0, clipPath: "inset(49.5% 0 0 0)" }}
-            initial={{ y: "101%" }} animate={{ y: "0%" }} exit={{ y: "101%" }}
-            transition={SPLIT_DUR}
-          />
-        </AnimatePresence>
-      </div>
-    );
-  }
 
   return (
     <m.div
@@ -1720,38 +1970,24 @@ function CaseDeckModal({ slides, title, onClose, splitAnimation = false }: {
 
         {/* ── MOBILE: single card + arrows ── */}
         <div className="flex md:hidden flex-col items-center w-full mb-6">
-          {splitAnimation
-            ? SplitSlide({
-                src: slides[active].img,
-                alt: slides[active].label,
-                cardStyle: {
-                  width: "min(86vw, 400px)",
-                  borderRadius: 16,
-                  overflow: "hidden",
-                  border: "1.5px solid rgba(203,255,0,0.55)",
-                  boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
-                },
-              })
-            : (
-            <AnimatePresence mode="wait">
-              <m.div
-                key={active}
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.22 }}
-                style={{
-                  width: "min(86vw, 400px)",
-                  borderRadius: 16,
-                  overflow: "hidden",
-                  border: "1.5px solid rgba(203,255,0,0.55)",
-                  boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
-                }}
-              >
-                <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
-              </m.div>
-            </AnimatePresence>
-            )}
+          <AnimatePresence mode="wait">
+            <m.div
+              key={active}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.22 }}
+              style={{
+                width: "min(86vw, 400px)",
+                borderRadius: 16,
+                overflow: "hidden",
+                border: "1.5px solid rgba(203,255,0,0.55)",
+                boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
+              }}
+            >
+              <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
+            </m.div>
+          </AnimatePresence>
           <div className="flex items-center gap-5 mt-5">
             <button
               onClick={() => setActive((active + n - 1) % n)}
@@ -1774,30 +2010,10 @@ function CaseDeckModal({ slides, title, onClose, splitAnimation = false }: {
           className="hidden md:block relative w-full"
           style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
         >
-          {/* Center card with split animation (rendered outside the coverflow loop) */}
-          {splitAnimation && (
-            <div
-              style={{
-                position: "absolute", left: "50%", top: "50%",
-                width: "min(28vw, 480px)",
-                zIndex: 10,
-                transform: "translateX(-50%) translateY(-50%)",
-                border: "2px solid rgba(203,255,0,0.68)",
-                boxShadow: "0 0 0 1px rgba(203,255,0,0.10), 0 0 52px rgba(203,255,0,0.24), 0 36px 90px rgba(0,0,0,0.90)",
-              }}
-            >
-              {SplitSlide({
-                src: slides[active].img,
-                alt: slides[active].label,
-                cardStyle: { borderRadius: 20, overflow: "hidden" },
-              })}
-            </div>
-          )}
           {slides.map((slide, i) => {
             const off  = i - active;
             const abs  = Math.abs(off);
             if (abs > 2) return null;
-            if (splitAnimation && abs === 0) return null; // center card rendered separately above
             const spreadX = off === 0 ? 0 : Math.sign(off) * (abs === 1 ? 275 : 490);
             const rotY    = off * -46;
             const depth   = -abs * 230;
@@ -2083,7 +2299,6 @@ function Cases() {
             slides={caseModal.slides}
             title={caseModal.title}
             onClose={() => setCaseModal(null)}
-            splitAnimation={caseModal.slides === SWIM_SLIDES}
           />
         )}
       </AnimatePresence>
@@ -2106,21 +2321,16 @@ function Cases() {
                 onMouseLeave={() => setHovCase(null)}
                 style={{ position: "relative", ...caseStyle(idx) }}
               >
-                {c.id === 6
-                  ? <SwimGogglesAnimatedCard
-                      onOpen={() => setCaseModal({ slides: SWIM_SLIDES, title: "Hero + карточки для спорт-бренда на Ozon" })}
-                    />
-                  : <CaseCard
-                      c={c}
-                      isHovered={hovCase === idx}
-                      onOpen={
-                        c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
-                        c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
-                        c.id === 4 ? () => setCaseModal({ slides: FASHION_SLIDES,      title: "Карточки для бренда уличной одежды" }) :
-                        undefined
-                      }
-                    />
-                }
+                <AnimatedCaseCard
+                  c={c}
+                  onOpen={
+                    c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
+                    c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
+                    c.id === 4 ? () => setCaseModal({ slides: FASHION_SLIDES,      title: "Карточки для бренда уличной одежды" }) :
+                    c.id === 6 ? () => setCaseModal({ slides: SWIM_SLIDES,         title: "Hero + карточки для спорт-бренда на Ozon" }) :
+                    undefined
+                  }
+                />
               </div>
             ))}
           </div>
