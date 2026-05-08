@@ -2070,6 +2070,62 @@ const GS2_POINTS = [
   { icon: "✓", title: "ЧИСТАЯ КОМПОЗИЦИЯ",               desc: "ничего лишнего, всё на месте"          },
 ] as const;
 
+/**
+ * Slide-2 pool+swimmer composite, drawn into a single opaque canvas bitmap.
+ * Why canvas? Stacking transparent PNGs with CSS produces a checkerboard on some
+ * production browsers/GPUs. Rendering the composite into a `{ alpha: false }`
+ * canvas yields a flat opaque bitmap — every pixel is RGB, no alpha channel
+ * survives to be misrendered. Bulletproof on any browser.
+ */
+function GS2PoolSwimmerCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return;
+
+    const W = 900, H = 900;          // square output, matches pool aspect 1:1
+    canvas.width = W;
+    canvas.height = H;
+
+    // Dark fallback (visible until pool loads)
+    ctx.fillStyle = "#0a0a0a";
+    ctx.fillRect(0, 0, W, H);
+
+    const pool    = new Image();
+    const swimmer = new Image();
+    let poolReady = false, swimReady = false;
+
+    const draw = () => {
+      ctx.fillStyle = "#0a0a0a";
+      ctx.fillRect(0, 0, W, H);
+      if (poolReady) ctx.drawImage(pool, 0, 0, W, H);
+      if (swimReady) {
+        const aspect = swimmer.naturalWidth / swimmer.naturalHeight; // ≈0.667
+        const sH = H * 1.0;
+        const sW = sH * aspect;
+        const sX = W - sW - W * 0.02; // 2% gutter from right edge
+        const sY = 0;
+        ctx.drawImage(swimmer, sX, sY, sW, sH);
+      }
+    };
+
+    pool.onload    = () => { poolReady = true; draw(); };
+    swimmer.onload = () => { swimReady = true; draw(); };
+    pool.src    = "/hero/goggles-slide2-b.png";
+    swimmer.src = "/hero/goggles-slide2-c.png";
+  }, []);
+
+  return (
+    <canvas
+      ref={ref}
+      aria-label="Бассейн и пловец"
+      style={{ width: "100%", height: "auto", display: "block" }}
+    />
+  );
+}
+
 function GogglesSlide2() {
   const E = [0.22, 1, 0.36, 1] as const;
   const fly = (delay: number, x = 0, y = 0) => ({
@@ -2151,10 +2207,8 @@ function GogglesSlide2() {
 
         <div style={{ position: "relative", width: "100%", height: 290 }}>
 
-          {/* ▸ COMPOSITE CARD — pool + swimmer baked inside (FULL swimmer visible) ▸ */}
-          {/*    Pool is opaque RGB, swimmer fits ENTIRELY inside card height,     */}
-          {/*    so head is visible AND transparency artifacts are physically      */}
-          {/*    impossible (every transparent swimmer pixel sits on pool image).  */}
+          {/* ▸ POOL + SWIMMER — pre-composited via canvas into one OPAQUE bitmap ▸ */}
+          {/*   No alpha channel survives → no checkerboard / mosaic ever possible. */}
           <m.div
             initial={{ opacity: 0, x: 55, scale: 0.88 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -2166,31 +2220,9 @@ function GogglesSlide2() {
               background: "#0a0a0a",
               boxShadow: "0 18px 52px rgba(0,0,0,0.70)",
               border: "1px solid rgba(203,255,0,0.18)",
-              isolation: "isolate",
             }}
           >
-            {/* Pool — base, opaque RGB image (no alpha at all) */}
-            <img
-              src="/hero/goggles-slide2-b.png"
-              alt="Бассейн"
-              draggable={false}
-              style={{ width: "100%", height: "auto", display: "block", position: "relative", zIndex: 1 }}
-            />
-            {/* Swimmer — FULL HEIGHT of card, head at top, feet at bottom; right-aligned so pool stays visible on the left */}
-            <m.img
-              src="/hero/goggles-slide2-c.png"
-              alt="Пловец"
-              draggable={false}
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: E, delay: 0.65 }}
-              style={{
-                position: "absolute", right: "2%", top: 0, bottom: 0,
-                height: "100%", width: "auto", display: "block", zIndex: 2,
-                filter: "drop-shadow(-6px 6px 12px rgba(0,0,0,0.55))",
-                pointerEvents: "none",
-              }}
-            />
+            <GS2PoolSwimmerCanvas />
           </m.div>
 
           {/* Goggles — large foreground-left, drop-shadow on img directly */}
