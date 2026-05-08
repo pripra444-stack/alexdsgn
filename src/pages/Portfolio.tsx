@@ -1292,7 +1292,7 @@ const CASES = [
     title: "Карточки для бренда натуральной косметики",
     result: "+34% CTR · ×2.1 конверсия",
     tags: ["WB", "Beauty"],
-    gradient: "from-violet-900/80 via-purple-800/60 to-fuchsia-900/80",
+    gradient: "from-zinc-950/90 via-neutral-900/70 to-zinc-950/90",
     accent: "#CBFF00",
     shapes: [
       { w: 140, h: 190, x: "58%", y: "8%", r: 12, op: 0.9 },
@@ -1979,12 +1979,12 @@ function GogglesSlide1() {
         {/* Title block */}
         <m.div {...fly(0.08, -32)}>
           <p style={{ fontSize: "clamp(28px,3.8vw,46px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.05 }}>ПЛОХАЯ</p>
-          <p style={{ fontSize: "clamp(28px,3.8vw,46px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 6px 0", lineHeight: 1.05 }}>ЧИТАЕМОСТЬ</p>
-          <p style={{ fontSize: "clamp(11px,1.3vw,14px)", color: "#71717a", margin: 0 }}>карточка не выделялась в выдаче Ozon</p>
+          <p style={{ fontSize: "clamp(28px,3.8vw,46px)", fontWeight: 900, color: "#CBFF00", margin: "0 0 6px 0", lineHeight: 1.05 }}>ЧИТАЕМОСТЬ</p>
+          <p style={{ fontSize: "clamp(11px,1.3vw,14px)", color: "rgba(255,255,255,0.38)", margin: 0 }}>карточка не выделялась в выдаче Ozon</p>
         </m.div>
 
         {/* Divider */}
-        <m.div {...fly(0.26, -16)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "14px 0" }}/>
+        <m.div {...fly(0.26, -16)} style={{ height: 1, background: "rgba(203,255,0,0.18)", margin: "14px 0" }}/>
 
         {/* Problem list */}
         {GS1_PROBLEMS.map((p, i) => (
@@ -1992,9 +1992,9 @@ function GogglesSlide1() {
             style={{ display: "flex", gap: 11, marginBottom: 12, alignItems: "flex-start" }}>
             <div style={{
               width: 34, height: 34, borderRadius: 8, flexShrink: 0,
-              background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.28)",
+              background: "rgba(203,255,0,0.08)", border: "1px solid rgba(203,255,0,0.25)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#8B5CF6", fontSize: 14, fontWeight: 700,
+              color: "#CBFF00", fontSize: 14, fontWeight: 700,
             }}>{p.icon}</div>
             <div>
               <p style={{ fontSize: "clamp(11px,1.2vw,13px)", fontWeight: 700, color: "rgba(255,255,255,0.88)", margin: 0, letterSpacing: "0.06em" }}>{p.title}</p>
@@ -2011,10 +2011,10 @@ function GogglesSlide1() {
           ] as const).map(b => (
             <m.div key={b.key} {...fly(b.d, 0, 14)} style={{
               flex: 1, padding: "10px 12px", borderRadius: 10,
-              background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.18)",
+              background: "rgba(203,255,0,0.05)", border: "1px solid rgba(203,255,0,0.18)",
             }}>
-              <p style={{ fontSize: "clamp(10px,1.1vw,12px)", fontWeight: 700, color: "#8B5CF6", margin: "0 0 4px 0", letterSpacing: "0.1em" }}>◆ {b.label}</p>
-              <p style={{ fontSize: "clamp(10px,1.0vw,11.5px)", color: "#52525b", margin: 0, lineHeight: 1.45 }}>{b.text}</p>
+              <p style={{ fontSize: "clamp(10px,1.1vw,12px)", fontWeight: 700, color: "#CBFF00", margin: "0 0 4px 0", letterSpacing: "0.1em" }}>◆ {b.label}</p>
+              <p style={{ fontSize: "clamp(10px,1.0vw,11.5px)", color: "rgba(255,255,255,0.38)", margin: 0, lineHeight: 1.45 }}>{b.text}</p>
             </m.div>
           ))}
         </div>
@@ -2029,7 +2029,7 @@ function GogglesSlide1() {
           transition={{ duration: 1.1, delay: 0.6, ease: E }}
           style={{
             position: "absolute", inset: "-22%", borderRadius: "50%",
-            background: "radial-gradient(ellipse at center, rgba(139,92,246,0.32) 0%, transparent 65%)",
+            background: "radial-gradient(ellipse at center, rgba(203,255,0,0.18) 0%, transparent 65%)",
             filter: "blur(28px)", pointerEvents: "none",
           }}
         />
@@ -2050,7 +2050,7 @@ function GogglesSlide1() {
           }}
           style={{
             position: "relative", borderRadius: 16, maxWidth: "100%",
-            boxShadow: "0 22px 60px rgba(0,0,0,0.70), 0 0 42px rgba(139,92,246,0.28)",
+            boxShadow: "0 22px 60px rgba(0,0,0,0.70), 0 0 32px rgba(203,255,0,0.18)",
           }}
         >
           <img src="/hero/goggles-product.png" alt="Карточка до редизайна" draggable={false}
@@ -2089,18 +2089,18 @@ function GogglesSlide2() {
         {/* Title */}
         <m.div {...fly(0.06, -32)}>
           <p style={{ fontSize: "clamp(24px,3.2vw,40px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.05 }}>ПЕРЕРАБОТКА</p>
-          <p style={{ fontSize: "clamp(24px,3.2vw,40px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 5px 0", lineHeight: 1.05 }}>СТРУКТУРЫ</p>
+          <p style={{ fontSize: "clamp(24px,3.2vw,40px)", fontWeight: 900, color: "#CBFF00", margin: "0 0 5px 0", lineHeight: 1.05 }}>СТРУКТУРЫ</p>
         </m.div>
 
         {/* Goal line */}
-        <m.p {...fly(0.18, -16)} style={{ fontSize: "clamp(10px,1.2vw,13px)", color: "#71717a", margin: "0 0 12px 0", lineHeight: 1.5 }}>
+        <m.p {...fly(0.18, -16)} style={{ fontSize: "clamp(10px,1.2vw,13px)", color: "rgba(255,255,255,0.38)", margin: "0 0 12px 0", lineHeight: 1.5 }}>
           Наша цель — сделать карточку{" "}
-          <span style={{ color: "#a78bfa" }}>заметной, понятной</span>
-          {" "}и <span style={{ color: "#a78bfa" }}>продающей</span> с первого взгляда
+          <span style={{ color: "#CBFF00" }}>заметной, понятной</span>
+          {" "}и <span style={{ color: "#CBFF00" }}>продающей</span> с первого взгляда
         </m.p>
 
         {/* Divider */}
-        <m.div {...fly(0.26, -12)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "0 0 12px 0" }}/>
+        <m.div {...fly(0.26, -12)} style={{ height: 1, background: "rgba(203,255,0,0.18)", margin: "0 0 12px 0" }}/>
 
         {/* 4 points */}
         {GS2_POINTS.map((p, i) => (
@@ -2108,9 +2108,9 @@ function GogglesSlide2() {
             style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
             <div style={{
               width: 30, height: 30, borderRadius: 7, flexShrink: 0,
-              background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.28)",
+              background: "rgba(203,255,0,0.08)", border: "1px solid rgba(203,255,0,0.25)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#8B5CF6", fontSize: 13, fontWeight: 700,
+              color: "#CBFF00", fontSize: 13, fontWeight: 700,
             }}>{p.icon}</div>
             <div>
               <p style={{ fontSize: "clamp(10px,1.15vw,12.5px)", fontWeight: 700, color: "rgba(255,255,255,0.88)", margin: 0, letterSpacing: "0.05em" }}>{p.title}</p>
@@ -2122,12 +2122,12 @@ function GogglesSlide2() {
         {/* Hypothesis block */}
         <m.div {...fly(0.84, 0, 14)} style={{
           marginTop: 12, padding: "10px 12px", borderRadius: 10,
-          background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.20)",
+          background: "rgba(203,255,0,0.05)", border: "1px solid rgba(203,255,0,0.18)",
           display: "flex", gap: 9, alignItems: "flex-start",
         }}>
           <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>💡</span>
           <div>
-            <p style={{ fontSize: "clamp(9px,1.05vw,11px)", fontWeight: 700, color: "#8B5CF6", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>ГИПОТЕЗА</p>
+            <p style={{ fontSize: "clamp(9px,1.05vw,11px)", fontWeight: 700, color: "#CBFF00", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>ГИПОТЕЗА</p>
             <p style={{ fontSize: "clamp(9px,1.0vw,11px)", color: "#52525b", margin: 0, lineHeight: 1.5 }}>
               если сделать карточку более контрастной, сфокусироваться на выгодах и добавить динамичный визуал — она будет выделяться и привлекать больше кликов
             </p>
@@ -2144,7 +2144,7 @@ function GogglesSlide2() {
           transition={{ duration: 1.0, delay: 0.55, ease: E }}
           style={{
             position: "absolute", inset: "-20%", borderRadius: "50%",
-            background: "radial-gradient(ellipse at center, rgba(139,92,246,0.28) 0%, transparent 65%)",
+            background: "radial-gradient(ellipse at center, rgba(203,255,0,0.15) 0%, transparent 65%)",
             filter: "blur(28px)", pointerEvents: "none",
           }}
         />
@@ -2170,7 +2170,7 @@ function GogglesSlide2() {
           <m.div initial={{ opacity: 0, x: -40, y: 30, rotate: -8 }} animate={{ opacity: 1, x: 0, y: 0, rotate: -4 }}
             transition={{ duration: 0.72, ease: E, delay: 0.84 }}
             style={{ position: "absolute", left: "0%", bottom: "0%", width: "65%", zIndex: 3,
-              filter: "drop-shadow(0 16px 36px rgba(0,0,0,0.75)) drop-shadow(0 0 24px rgba(139,92,246,0.3))" }}>
+              filter: "drop-shadow(0 16px 36px rgba(0,0,0,0.75)) drop-shadow(0 0 24px rgba(203,255,0,0.22))" }}>
             <img src="/hero/goggles-slide2-a.png" alt="Очки" draggable={false}
               style={{ width: "100%", height: "auto", display: "block" }}/>
           </m.div>
@@ -2210,12 +2210,12 @@ function GogglesSlide3() {
         {/* Title */}
         <m.div {...fly(0.06, -32)}>
           <p style={{ fontSize: "clamp(22px,3.0vw,38px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.05 }}>НОВЫЙ</p>
-          <p style={{ fontSize: "clamp(22px,3.0vw,38px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 4px 0", lineHeight: 1.05 }}>HERO-ВИЗУАЛ</p>
-          <p style={{ fontSize: "clamp(10px,1.2vw,13px)", color: "#71717a", margin: 0 }}>фокус на продукте и выгодах</p>
+          <p style={{ fontSize: "clamp(22px,3.0vw,38px)", fontWeight: 900, color: "#CBFF00", margin: "0 0 4px 0", lineHeight: 1.05 }}>HERO-ВИЗУАЛ</p>
+          <p style={{ fontSize: "clamp(10px,1.2vw,13px)", color: "rgba(255,255,255,0.38)", margin: 0 }}>фокус на продукте и выгодах</p>
         </m.div>
 
         {/* Divider */}
-        <m.div {...fly(0.18, -12)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "12px 0" }}/>
+        <m.div {...fly(0.18, -12)} style={{ height: 1, background: "rgba(203,255,0,0.18)", margin: "12px 0" }}/>
 
         {/* Annotation features (eye + 180°) */}
         {GS3_ANNOTS.map((p, i) => (
@@ -2223,19 +2223,19 @@ function GogglesSlide3() {
             style={{ display: "flex", gap: 10, marginBottom: 9, alignItems: "flex-start" }}>
             <div style={{
               width: 30, height: 30, borderRadius: 7, flexShrink: 0,
-              background: "rgba(139,92,246,0.14)", border: "1px solid rgba(139,92,246,0.30)",
+              background: "rgba(203,255,0,0.08)", border: "1px solid rgba(203,255,0,0.28)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#a78bfa", fontSize: 10, fontWeight: 800, letterSpacing: "0",
+              color: "#CBFF00", fontSize: 10, fontWeight: 800, letterSpacing: "0",
             }}>{p.icon}</div>
             <div>
-              <p style={{ fontSize: "clamp(10px,1.15vw,12.5px)", fontWeight: 700, color: "#a78bfa", margin: 0, letterSpacing: "0.06em" }}>{p.title}</p>
+              <p style={{ fontSize: "clamp(10px,1.15vw,12.5px)", fontWeight: 700, color: "#CBFF00", margin: 0, letterSpacing: "0.06em" }}>{p.title}</p>
               <p style={{ fontSize: "clamp(9px,1.05vw,11.5px)", color: "#52525b", margin: "2px 0 0 0", lineHeight: 1.4 }}>{p.desc}</p>
             </div>
           </m.div>
         ))}
 
         {/* Secondary divider */}
-        <m.div {...fly(0.54, -8)} style={{ height: 1, background: "rgba(139,92,246,0.14)", margin: "10px 0" }}/>
+        <m.div {...fly(0.54, -8)} style={{ height: 1, background: "rgba(203,255,0,0.12)", margin: "10px 0" }}/>
 
         {/* Quality points */}
         {GS3_POINTS.map((p, i) => (
@@ -2243,9 +2243,9 @@ function GogglesSlide3() {
             style={{ display: "flex", gap: 9, marginBottom: 8, alignItems: "flex-start" }}>
             <div style={{
               width: 26, height: 26, borderRadius: 6, flexShrink: 0,
-              background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.22)",
+              background: "rgba(203,255,0,0.06)", border: "1px solid rgba(203,255,0,0.20)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#8B5CF6", fontSize: 11, fontWeight: 700,
+              color: "#CBFF00", fontSize: 11, fontWeight: 700,
             }}>{p.icon}</div>
             <div>
               <p style={{ fontSize: "clamp(9.5px,1.1vw,12px)", fontWeight: 700, color: "rgba(255,255,255,0.85)", margin: 0, letterSpacing: "0.05em" }}>{p.title}</p>
@@ -2257,15 +2257,15 @@ function GogglesSlide3() {
         {/* Conclusion box */}
         <m.div {...fly(0.92, 0, 14)} style={{
           marginTop: 10, padding: "9px 12px", borderRadius: 10,
-          background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.20)",
+          background: "rgba(203,255,0,0.05)", border: "1px solid rgba(203,255,0,0.18)",
           display: "flex", gap: 9, alignItems: "flex-start",
         }}>
           <span style={{ fontSize: 15, flexShrink: 0, marginTop: 1 }}>🎯</span>
           <div>
-            <p style={{ fontSize: "clamp(9px,1.05vw,11px)", fontWeight: 700, color: "#8B5CF6", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>ЧТО СДЕЛАЛИ</p>
-            <p style={{ fontSize: "clamp(9px,1.0vw,11px)", color: "#52525b", margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: "clamp(9px,1.05vw,11px)", fontWeight: 700, color: "#CBFF00", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>ЧТО СДЕЛАЛИ</p>
+            <p style={{ fontSize: "clamp(9px,1.0vw,11px)", color: "rgba(255,255,255,0.40)", margin: 0, lineHeight: 1.5 }}>
               собрали сильный визуал, который моментально показывает продукт и его преимущества,{" "}
-              <span style={{ color: "#a78bfa" }}>выделяя карточку в выдаче</span>
+              <span style={{ color: "rgba(203,255,0,0.80)" }}>выделяя карточку в выдаче</span>
             </p>
           </div>
         </m.div>
@@ -2284,7 +2284,7 @@ function GogglesSlide3() {
           transition={{ duration: 1.0, delay: 0.55, ease: E }}
           style={{
             position: "absolute", inset: "-20%", borderRadius: "50%",
-            background: "radial-gradient(ellipse at center, rgba(139,92,246,0.30) 0%, transparent 65%)",
+            background: "radial-gradient(ellipse at center, rgba(203,255,0,0.16) 0%, transparent 65%)",
             filter: "blur(28px)", pointerEvents: "none",
           }}
         />
@@ -2313,7 +2313,7 @@ function GogglesSlide3() {
             borderRadius: 16,
             boxShadow: [
               "0 24px 64px rgba(0,0,0,0.72)",
-              "-10px 10px 36px rgba(139,92,246,0.22)",
+              "-10px 10px 36px rgba(203,255,0,0.14)",
               "0 0 0 1px rgba(255,255,255,0.06)",
             ].join(", "),
             transformStyle: "preserve-3d",
@@ -2528,6 +2528,7 @@ function CaseDeckModal({ slides, title, onClose }: {
                   transition={{ duration: 0.22 }}
                   style={{
                     width: MSlide ? "min(74vw, 480px)" : "min(68vw, 360px)",
+                    height: "min(58dvh, 480px)",
                     flexShrink: 0,
                     borderRadius: 16,
                     overflow: "hidden",
@@ -2535,8 +2536,7 @@ function CaseDeckModal({ slides, title, onClose }: {
                     boxShadow: "0 0 36px rgba(203,255,0,0.18), 0 20px 50px rgba(0,0,0,0.75)",
                     background: MSlide ? "rgba(10,8,20,0.95)" : undefined,
                     padding: MSlide ? "12px 10px" : undefined,
-                    maxHeight: "60dvh",
-                    overflowY: MSlide ? "auto" : undefined,
+                    overflowY: "auto",
                   }}
                 >
                   {MSlide
@@ -2558,9 +2558,13 @@ function CaseDeckModal({ slides, title, onClose }: {
           </button>
         </div>
 
-        {/* ── DESKTOP: full-width for component slides, 3D coverflow for images ── */}
-        {slides[active].component ? (
-          <div className="hidden md:flex justify-center w-full">
+        {/* ── DESKTOP: fixed-height area — arrows always at same Y position ── */}
+        <div
+          className="hidden md:block relative w-full"
+          style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
+        >
+          {slides[active].component ? (
+            /* Component slide — centered card inside fixed area */
             <AnimatePresence mode="wait">
               {(() => {
                 const DSlide = slides[active].component!;
@@ -2572,7 +2576,12 @@ function CaseDeckModal({ slides, title, onClose }: {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.18 }}
                     style={{
+                      position: "absolute",
+                      left: "50%", top: "50%",
+                      transform: "translate(-50%, -50%)",
                       width: "min(88vw, 1000px)",
+                      maxHeight: "min(60vh, 600px)",
+                      overflowY: "auto",
                       background: "rgba(10,8,20,0.6)",
                       borderRadius: 20,
                       padding: "24px 28px",
@@ -2583,13 +2592,9 @@ function CaseDeckModal({ slides, title, onClose }: {
                 );
               })()}
             </AnimatePresence>
-          </div>
-        ) : (
-          <div
-            className="hidden md:block relative w-full"
-            style={{ height: "min(65vh, 660px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
-          >
-            {slides.map((slide, i) => {
+          ) : (
+            /* Image slides — coverflow */
+            slides.map((slide, i) => {
               if (!slide.img) return null;
               const off  = i - active;
               const abs  = Math.abs(off);
@@ -2623,9 +2628,9 @@ function CaseDeckModal({ slides, title, onClose }: {
                   <img src={slide.img} alt={slide.label} draggable={false} className="block w-full h-auto select-none" />
                 </div>
               );
-            })}
-          </div>
-        )}
+            })
+          )}
+        </div>
         {/* Desktop nav arrows */}
         <div className="hidden md:flex items-center gap-6 mt-6">
           <button
