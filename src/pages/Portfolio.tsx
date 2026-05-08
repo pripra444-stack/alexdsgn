@@ -1948,111 +1948,121 @@ function GogglesSlide1() {
   const fly = (delay: number, x = 0, y = 0) => ({
     initial: { opacity: 0, x, y },
     animate: { opacity: 1, x: 0, y: 0 },
-    transition: { duration: 0.48, ease: E, delay },
+    transition: { duration: 0.52, ease: E, delay },
   });
 
   return (
-    <div className="relative flex flex-col md:flex-row gap-5 md:gap-6 w-full items-start md:items-center"
-      style={{ padding: "6px 2px 10px" }}>
+    <div className="relative flex flex-col md:flex-row gap-6 md:gap-8 w-full items-start md:items-center"
+      style={{ padding: "8px 4px 12px" }}>
 
       {/* ── LEFT: text analysis ── */}
-      <div style={{ flex: "0 0 42%", minWidth: 0 }}>
+      <div style={{ flex: "0 0 44%", minWidth: 0 }}>
 
         {/* Title block */}
-        <m.div {...fly(0.08, -28)}>
-          <p style={{ fontSize: "clamp(18px,2.8vw,28px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.1 }}>ПЛОХАЯ</p>
-          <p style={{ fontSize: "clamp(18px,2.8vw,28px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 5px 0", lineHeight: 1.1 }}>ЧИТАЕМОСТЬ</p>
-          <p style={{ fontSize: 10, color: "#71717a", margin: 0 }}>карточка не выделялась в выдаче</p>
+        <m.div {...fly(0.08, -32)}>
+          <p style={{ fontSize: "clamp(28px,3.8vw,46px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.05 }}>ПЛОХАЯ</p>
+          <p style={{ fontSize: "clamp(28px,3.8vw,46px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 6px 0", lineHeight: 1.05 }}>ЧИТАЕМОСТЬ</p>
+          <p style={{ fontSize: "clamp(11px,1.3vw,14px)", color: "#71717a", margin: 0 }}>карточка не выделялась в выдаче Ozon</p>
         </m.div>
 
         {/* Divider */}
-        <m.div {...fly(0.26, -16)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "11px 0" }}/>
+        <m.div {...fly(0.26, -16)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "14px 0" }}/>
 
         {/* Problem list */}
         {GS1_PROBLEMS.map((p, i) => (
           <m.div key={i} {...fly(0.36 + i * 0.14, 0, 18)}
-            style={{ display: "flex", gap: 9, marginBottom: 10, alignItems: "flex-start" }}>
+            style={{ display: "flex", gap: 11, marginBottom: 12, alignItems: "flex-start" }}>
             <div style={{
-              width: 28, height: 28, borderRadius: 6, flexShrink: 0,
-              background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)",
+              width: 34, height: 34, borderRadius: 8, flexShrink: 0,
+              background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.28)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#8B5CF6", fontSize: 12, fontWeight: 700,
+              color: "#8B5CF6", fontSize: 14, fontWeight: 700,
             }}>{p.icon}</div>
             <div>
-              <p style={{ fontSize: 9.5, fontWeight: 700, color: "rgba(255,255,255,0.86)", margin: 0, letterSpacing: "0.06em" }}>{p.title}</p>
-              <p style={{ fontSize: 9,   color: "#52525b",             margin: "2px 0 0 0",  lineHeight: 1.4  }}>{p.desc}</p>
+              <p style={{ fontSize: "clamp(11px,1.2vw,13px)", fontWeight: 700, color: "rgba(255,255,255,0.88)", margin: 0, letterSpacing: "0.06em" }}>{p.title}</p>
+              <p style={{ fontSize: "clamp(10px,1.1vw,12px)", color: "#52525b", margin: "3px 0 0 0", lineHeight: 1.4 }}>{p.desc}</p>
             </div>
           </m.div>
         ))}
 
         {/* ВЫВОД + ИТОГ */}
-        <div style={{ display: "flex", gap: 7, marginTop: 12 }}>
+        <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
           {([
             { key: "v", label: "ВЫВОД", text: "карточка не привлекает внимание и не вызывает желания кликнуть", d: 0.84 },
-            { key: "i", label: "ИТОГ",  text: "карточка теряется среди конкурентов и не приносит ключевые выгоды", d: 0.93 },
+            { key: "i", label: "ИТОГ",  text: "карточка теряется среди конкурентов и не доносит ключевые выгоды", d: 0.96 },
           ] as const).map(b => (
             <m.div key={b.key} {...fly(b.d, 0, 14)} style={{
-              flex: 1, padding: "8px 10px", borderRadius: 8,
-              background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.17)",
+              flex: 1, padding: "10px 12px", borderRadius: 10,
+              background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.18)",
             }}>
-              <p style={{ fontSize: 8.5, fontWeight: 700, color: "#8B5CF6", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>◆ {b.label}</p>
-              <p style={{ fontSize: 8.5, color: "#52525b", margin: 0, lineHeight: 1.45 }}>{b.text}</p>
+              <p style={{ fontSize: "clamp(10px,1.1vw,12px)", fontWeight: 700, color: "#8B5CF6", margin: "0 0 4px 0", letterSpacing: "0.1em" }}>◆ {b.label}</p>
+              <p style={{ fontSize: "clamp(10px,1.0vw,11.5px)", color: "#52525b", margin: 0, lineHeight: 1.45 }}>{b.text}</p>
             </m.div>
           ))}
         </div>
       </div>
 
-      {/* ── RIGHT: product card ── */}
-      <div style={{ flex: "1 1 auto", position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      {/* ── RIGHT: product card swimming in ── */}
+      <div style={{ flex: "1 1 auto", position: "relative", display: "flex", justifyContent: "center", alignItems: "center", minHeight: 260 }}>
         {/* Glow halo */}
         <m.div
-          initial={{ opacity: 0, scale: 0.6 }}
+          initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.9, delay: 0.68 }}
+          transition={{ duration: 1.1, delay: 0.6, ease: E }}
           style={{
-            position: "absolute", inset: "-18%", borderRadius: "50%",
-            background: "radial-gradient(ellipse at center, rgba(139,92,246,0.28) 0%, transparent 65%)",
-            filter: "blur(24px)",
+            position: "absolute", inset: "-22%", borderRadius: "50%",
+            background: "radial-gradient(ellipse at center, rgba(139,92,246,0.32) 0%, transparent 65%)",
+            filter: "blur(28px)",
           }}
         />
-        {/* Card */}
+        {/* Card — entrance from right, then endless gentle float */}
         <m.div
-          initial={{ opacity: 0, x: 60, rotate: 16 }}
-          animate={{ opacity: 1, x: 0, rotate: 6 }}
-          transition={{ duration: 0.6, ease: E, delay: 0.5 }}
+          initial={{ opacity: 0, x: 110, rotate: 20 }}
+          animate={{
+            opacity: 1,
+            x: 0,
+            rotate: 5,
+            y: [0, -10, 0],
+          }}
+          transition={{
+            opacity:  { duration: 0.7, delay: 0.45 },
+            x:        { duration: 0.75, ease: E, delay: 0.45 },
+            rotate:   { duration: 0.75, ease: E, delay: 0.45 },
+            y:        { duration: 4, ease: "easeInOut", repeat: Infinity, delay: 1.25 },
+          }}
           style={{
-            position: "relative", borderRadius: 14, maxWidth: "100%",
-            boxShadow: "0 18px 55px rgba(0,0,0,0.65), 0 0 36px rgba(139,92,246,0.22)",
+            position: "relative", borderRadius: 16, maxWidth: "100%",
+            boxShadow: "0 22px 60px rgba(0,0,0,0.70), 0 0 42px rgba(139,92,246,0.28)",
           }}
         >
           <img src="/hero/Project%20Card%20001.png" alt="Карточка до редизайна" draggable={false}
-            style={{ width: "100%", height: "auto", display: "block", borderRadius: 14 }}/>
+            style={{ width: "100%", height: "auto", display: "block", borderRadius: 16 }}/>
         </m.div>
       </div>
 
       {/* ── Connecting lines (desktop only) ── */}
       <m.svg
         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        transition={{ delay: 0.98, duration: 0.25 }}
+        transition={{ delay: 1.05, duration: 0.3 }}
         className="hidden md:block"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", overflow: "visible" }}
         viewBox="0 0 100 100" preserveAspectRatio="none"
       >
         {[
-          { d: "M 42 37 Q 45 37 46.5 39", delay: 1.0 },
-          { d: "M 42 51 Q 45 49 46.5 49", delay: 1.14 },
-          { d: "M 42 64 Q 45 59 46.5 57", delay: 1.28 },
+          { d: "M 44 35 C 47 35 48 38 49 38", delay: 1.1 },
+          { d: "M 44 50 C 47 50 48 50 49 50", delay: 1.22 },
+          { d: "M 44 65 C 47 63 48 61 49 61", delay: 1.34 },
         ].map((line, i) => (
           <m.path key={i} d={line.d}
-            stroke="rgba(139,92,246,0.45)" strokeWidth="0.65" fill="none" strokeDasharray="2.6 2.1"
+            stroke="rgba(139,92,246,0.5)" strokeWidth="0.7" fill="none" strokeDasharray="2.8 2.0"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 0.35, delay: line.delay }}/>
+            transition={{ duration: 0.38, delay: line.delay }}/>
         ))}
-        {[{ cx:46.5,cy:39 }, { cx:46.5,cy:49 }, { cx:46.5,cy:57 }].map((pt,i)=>(
-          <m.circle key={i} cx={pt.cx} cy={pt.cy} r="0.7"
-            fill="rgba(139,92,246,0.55)"
-            initial={{ opacity:0, scale:0 }} animate={{ opacity:1, scale:1 }}
-            transition={{ delay: 1.32+i*0.08 }}/>
+        {[{ cx: 49, cy: 38 }, { cx: 49, cy: 50 }, { cx: 49, cy: 61 }].map((pt, i) => (
+          <m.circle key={i} cx={pt.cx} cy={pt.cy} r="0.85"
+            fill="rgba(139,92,246,0.65)"
+            initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 1.42 + i * 0.09 }}/>
         ))}
       </m.svg>
     </div>
