@@ -2356,131 +2356,111 @@ function GogglesSlide4() {
   });
 
   return (
-    <div className="relative flex flex-col md:flex-row gap-6 md:gap-8 w-full items-start md:items-center"
-      style={{ padding: "8px 4px 12px" }}>
+    <div className="relative flex flex-col w-full" style={{ padding: "8px 4px 12px", gap: 10 }}>
 
-      {/* ── LEFT: text (flies in from left) ── */}
-      <div style={{ flex: "0 0 44%", minWidth: 0 }}>
+      {/* ── TOP: Title ── */}
+      <m.div {...fly(0.06, 0, -18)} style={{ textAlign: "center" }}>
+        <p style={{ fontSize: "clamp(17px,2.4vw,30px)", fontWeight: 900, color: "white", margin: 0, lineHeight: 1.05 }}>
+          ДОПОЛНИТЕЛЬНЫЕ{" "}
+          <span style={{ color: "#CBFF00" }}>СЛАЙДЫ</span>
+        </p>
+        <p style={{ fontSize: "clamp(9px,1.05vw,11.5px)", color: "rgba(255,255,255,0.38)", margin: "3px 0 0", lineHeight: 1.4 }}>
+          которые усиливают карточку и повышают CTR
+        </p>
+      </m.div>
 
-        {/* Title */}
-        <m.div {...fly(0.06, -36)}>
-          <p style={{ fontSize: "clamp(19px,2.6vw,34px)", fontWeight: 900, color: "white",   margin: 0, lineHeight: 1.05 }}>ДОПОЛНИТЕЛЬНЫЕ</p>
-          <p style={{ fontSize: "clamp(19px,2.6vw,34px)", fontWeight: 900, color: "#8B5CF6", margin: "0 0 4px 0", lineHeight: 1.05 }}>СЛАЙДЫ</p>
-          <p style={{ fontSize: "clamp(10px,1.15vw,12.5px)", color: "#71717a", margin: 0, lineHeight: 1.4 }}>которые усиливают карточку и повышают CTR</p>
-        </m.div>
-
-        {/* Divider */}
-        <m.div {...fly(0.18, -14)} style={{ height: 1, background: "rgba(139,92,246,0.22)", margin: "11px 0" }}/>
-
-        {/* 4 slide labels — 2×2 mini grid */}
-        <m.div {...fly(0.24, -20, 10)} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 8px", marginBottom: 10 }}>
-          {GS4_CARDS.map((s, i) => (
-            <div key={i} style={{
-              display: "flex", gap: 7, alignItems: "center",
-              padding: "6px 8px", borderRadius: 8,
-              background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.18)",
+      {/* ── CENTER: 4 cards in a row (full portrait height) ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 6, position: "relative" }}>
+        {/* Acid glow */}
+        <m.div
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 0.55, scale: 1 }}
+          transition={{ duration: 1.1, delay: 0.4, ease: E }}
+          style={{
+            position: "absolute", inset: "-20%", borderRadius: "50%",
+            background: "radial-gradient(ellipse at 50% 50%, rgba(203,255,0,0.14) 0%, transparent 65%)",
+            filter: "blur(20px)", pointerEvents: "none",
+          }}
+        />
+        {GS4_CARDS.map((card, i) => (
+          <m.div
+            key={i}
+            initial={{ opacity: 0, x: 55 + i * 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.62, ease: E, delay: 0.22 + i * 0.11 }}
+            style={{
+              position: "relative",
+              borderRadius: 9,
+              overflow: "hidden",
+              boxShadow: "0 10px 28px rgba(0,0,0,0.65), 0 0 0 1px rgba(203,255,0,0.12)",
+              border: "1px solid rgba(203,255,0,0.22)",
+            }}
+          >
+            <img
+              src={card.img}
+              alt={card.title}
+              draggable={false}
+              style={{ width: "100%", height: "auto", display: "block" }}
+            />
+            {/* Badge */}
+            <div style={{
+              position: "absolute", bottom: 0, left: 0, right: 0,
+              padding: "18px 6px 5px",
+              background: "linear-gradient(to top, rgba(0,0,0,0.80) 0%, transparent 100%)",
             }}>
-              <div style={{
-                width: 20, height: 20, borderRadius: 5, flexShrink: 0,
-                background: "rgba(139,92,246,0.20)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#a78bfa", fontSize: 10, fontWeight: 800,
-              }}>{s.n}</div>
-              <div>
-                <p style={{ fontSize: "clamp(8px,0.95vw,10.5px)", fontWeight: 700, color: "rgba(255,255,255,0.85)", margin: 0, letterSpacing: "0.04em", lineHeight: 1.2 }}>{s.title}</p>
-                <p style={{ fontSize: "clamp(7.5px,0.85vw,9.5px)", color: "#52525b", margin: 0, lineHeight: 1.3 }}>{s.sub}</p>
-              </div>
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 3,
+                background: "rgba(203,255,0,0.15)", borderRadius: 5,
+                border: "1px solid rgba(203,255,0,0.35)",
+                padding: "2px 6px", color: "#CBFF00", fontSize: 8, fontWeight: 800, letterSpacing: "0.05em",
+              }}>
+                {card.n} {card.title}
+              </span>
             </div>
-          ))}
-        </m.div>
+          </m.div>
+        ))}
+      </div>
+
+      {/* ── BOTTOM: ЧТО СДЕЛАЛИ + РЕЗУЛЬТАТ ── */}
+      <m.div {...fly(0.72, 0, 16)} style={{
+        display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap",
+      }}>
 
         {/* ЧТО СДЕЛАЛИ */}
-        <m.div {...fly(0.50, -16, 10)} style={{
-          padding: "9px 12px", borderRadius: 10,
-          background: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.20)",
-          display: "flex", gap: 9, alignItems: "flex-start", marginBottom: 10,
+        <div style={{
+          flex: "1 1 auto", minWidth: 160,
+          padding: "8px 11px", borderRadius: 9,
+          background: "rgba(203,255,0,0.05)", border: "1px solid rgba(203,255,0,0.18)",
+          display: "flex", gap: 8, alignItems: "flex-start",
         }}>
-          <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>💡</span>
+          <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1 }}>💡</span>
           <div>
-            <p style={{ fontSize: "clamp(9px,1.05vw,11px)", fontWeight: 700, color: "#8B5CF6", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>ЧТО СДЕЛАЛИ</p>
-            <p style={{ fontSize: "clamp(8.5px,0.98vw,10.5px)", color: "#52525b", margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: "clamp(9px,1.05vw,11px)", fontWeight: 700, color: "#CBFF00", margin: "0 0 3px 0", letterSpacing: "0.1em" }}>ЧТО СДЕЛАЛИ</p>
+            <p style={{ fontSize: "clamp(8.5px,0.98vw,10.5px)", color: "rgba(255,255,255,0.45)", margin: 0, lineHeight: 1.5 }}>
               добавили информативные слайды, раскрывающие{" "}
-              <span style={{ color: "#a78bfa" }}>ключевые преимущества</span>
-              {" "}и снимающие возражения — повышает доверие и конверсию
+              <span style={{ color: "rgba(203,255,0,0.75)" }}>ключевые преимущества</span>
+              {" "}и снимающие возражения
             </p>
           </div>
-        </m.div>
+        </div>
 
         {/* РЕЗУЛЬТАТ */}
-        <m.div {...fly(0.66, -12, 8)}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-            <span style={{ fontSize: "clamp(20px,2.4vw,30px)", fontWeight: 900, color: "#8B5CF6", lineHeight: 1 }}>+28–35%</span>
-            <span style={{ fontSize: "clamp(8.5px,0.95vw,11px)", color: "#71717a", fontWeight: 700, letterSpacing: "0.08em" }}>РОСТ CTR</span>
+        <div style={{ flex: "0 0 auto" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginBottom: 5 }}>
+            <span style={{ fontSize: "clamp(26px,3.4vw,44px)", fontWeight: 900, color: "#CBFF00", lineHeight: 1 }}>+28–35%</span>
+            <span style={{ fontSize: "clamp(13px,1.7vw,20px)", fontWeight: 900, color: "#CBFF00", letterSpacing: "0.06em", lineHeight: 1 }}>РОСТ CTR</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 10px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px 12px" }}>
             {GS4_RESULTS.map((r, i) => (
               <div key={i} style={{ display: "flex", gap: 5, alignItems: "flex-start" }}>
-                <span style={{ color: "#8B5CF6", fontSize: 8, marginTop: 3, flexShrink: 0 }}>▸</span>
-                <p style={{ fontSize: "clamp(8px,0.88vw,10px)", color: "#52525b", margin: 0, lineHeight: 1.35 }}>{r}</p>
+                <span style={{ color: "#CBFF00", fontSize: 7, marginTop: 4, flexShrink: 0 }}>▸</span>
+                <p style={{ fontSize: "clamp(8.5px,0.96vw,10.5px)", color: "rgba(255,255,255,0.45)", margin: 0, lineHeight: 1.35 }}>{r}</p>
               </div>
             ))}
           </div>
-        </m.div>
-      </div>
-
-      {/* ── RIGHT: 2×2 grid of cards (fly in from right) ── */}
-      <div style={{ flex: "1 1 auto" }}>
-        {/* Purple glow */}
-        <m.div
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.0, delay: 0.5, ease: E }}
-          style={{
-            position: "absolute", inset: "-10%", borderRadius: "50%",
-            background: "radial-gradient(ellipse at 60% 50%, rgba(139,92,246,0.20) 0%, transparent 65%)",
-            filter: "blur(22px)", pointerEvents: "none",
-          }}
-        />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, position: "relative" }}>
-          {GS4_CARDS.map((card, i) => (
-            <m.div
-              key={i}
-              initial={{ opacity: 0, x: 60 + i * 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.65, ease: E, delay: 0.36 + i * 0.13 }}
-              style={{
-                position: "relative",
-                borderRadius: 10,
-                overflow: "hidden",
-                height: 148,
-                boxShadow: "0 10px 28px rgba(0,0,0,0.60), 0 0 0 1px rgba(255,255,255,0.06)",
-                border: "1px solid rgba(139,92,246,0.18)",
-              }}
-            >
-              <img
-                src={card.img}
-                alt={card.title}
-                draggable={false}
-                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
-              />
-              {/* Number + label badge */}
-              <div style={{
-                position: "absolute", bottom: 0, left: 0, right: 0,
-                padding: "14px 7px 5px",
-                background: "linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)",
-              }}>
-                <span style={{
-                  display: "inline-flex", alignItems: "center", gap: 4,
-                  background: "rgba(139,92,246,0.88)", borderRadius: 5,
-                  padding: "2px 6px", color: "white", fontSize: 9, fontWeight: 800, letterSpacing: "0.04em",
-                }}>
-                  {card.n} {card.title}
-                </span>
-              </div>
-            </m.div>
-          ))}
         </div>
-      </div>
+
+      </m.div>
 
     </div>
   );
