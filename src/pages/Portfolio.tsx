@@ -1541,29 +1541,8 @@ function Services() {
   }
 
   return (
-    <section id="services" className="relative py-28 md:py-36 overflow-hidden">
-      {/* 3D acid sculpture — sits behind the cards, top-right */}
-      <m.img
-        src="/hero/bg-3d.png"
-        alt=""
-        aria-hidden="true"
-        draggable={false}
-        initial={{ opacity: 0, x: 80, rotate: -12 }}
-        whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          position: "absolute",
-          right: "-6%", top: "8%",
-          width: "min(38vw, 520px)",
-          height: "auto",
-          pointerEvents: "none",
-          zIndex: 0,
-          filter: "drop-shadow(0 30px 80px rgba(203,255,0,0.18))",
-        }}
-      />
-      {/* Slow rotating wrapper for the 3D figure */}
-      <div className="relative max-w-[1280px] mx-auto px-5 md:px-10" style={{ zIndex: 1 }}>
+    <section id="services" className="py-28 md:py-36">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Услуги</Label>
           <m.h2
@@ -3566,6 +3545,44 @@ function ArrowDownIcon() {
 }
 
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
+/* Decorative interlude between Services and Cases — a slowly rotating + floating
+   3D acid sculpture, dimmed so it reads as background ambience, not focus. */
+function Bg3DInterlude() {
+  return (
+    <section
+      aria-hidden="true"
+      className="relative w-full overflow-hidden pointer-events-none"
+      style={{ height: "clamp(220px, 32vw, 380px)" }}
+    >
+      <m.div
+        animate={{ x: [0, 22, -16, 0], y: [0, -14, 10, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute", left: "50%", top: "50%",
+          width: "min(46vw, 460px)",
+          aspectRatio: "1 / 1",
+          translate: "-50% -50%",
+          opacity: 0.42,
+          filter: "drop-shadow(0 30px 60px rgba(203,255,0,0.16))",
+        }}
+      >
+        <m.img
+          src="/hero/bg-3d.png"
+          alt=""
+          draggable={false}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 55, repeat: Infinity, ease: "linear" }}
+          style={{
+            width: "100%", height: "100%",
+            objectFit: "contain",
+            display: "block",
+          }}
+        />
+      </m.div>
+    </section>
+  );
+}
+
 export default function Portfolio() {
   return (
     <div className="grain bg-canvas text-white min-h-[100dvh]">
@@ -3573,6 +3590,7 @@ export default function Portfolio() {
       <Hero />
       <Marquee />
       <Services />
+      <Bg3DInterlude />
       <Cases />
       <WhyMe />
       <Process />
