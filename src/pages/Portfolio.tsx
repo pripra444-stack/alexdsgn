@@ -1307,63 +1307,71 @@ const SWIM_BUBBLES = Array.from({ length: 16 }, (_, i) => ({
   opa: 0.2 + (i * 0.08) % 0.45,
 }));
 
-/* Brand-coloured typographic wordmarks (stylized text — NOT trademark logos).
-   Each variant uses fonts/colours associated with the marketplace as a creative
-   homage. The mini floating copies repeat the brand's short name. */
+/* Brand metadata: short name, brand colour, plus a logo file path.
+   If the logo PNG exists in /public/hero/, BrandWordmark renders it as an
+   <img>. If the file is missing (onError), it falls back to a stylized text
+   wordmark in the brand colour. This way the user can drop logo files in the
+   folder whenever they're ready, without code changes. */
 const BRAND_META: Record<BrandKey, {
-  short: string;
-  long:  string;
+  short: string;       // short name for floating copies
+  long:  string;       // text fallback if logo file missing
   color: string;       // primary brand colour
-  accent: string;      // small dot/decor colour
-  longSize: number;    // font-size hint for centerpiece
-  weight: number;
+  accent: string;      // accent decor colour
+  logo:  string;       // expected path to PNG logo
+  longSize: number;    // font-size hint for fallback text
 }> = {
-  wb:     { short: "WB",     long: "wildberries",   color: "#E8338A", accent: "#FFFFFF", longSize: 46, weight: 900 },
-  ozon:   { short: "OZON",   long: "ozon",          color: "#0079FF", accent: "#FFCC00", longSize: 76, weight: 900 },
-  yandex: { short: "ЯНДЕКС", long: "Я.Маркет",      color: "#FFCC00", accent: "#FC3F1D", longSize: 56, weight: 900 },
-  avito:  { short: "AVITO",  long: "Avito",         color: "#00AAFF", accent: "#97CF26", longSize: 70, weight: 900 },
+  wb:     { short: "WB",     long: "wildberries", color: "#E8338A", accent: "#FFFFFF", logo: "/hero/logo-wb.png",     longSize: 46 },
+  ozon:   { short: "OZON",   long: "ozon",        color: "#0079FF", accent: "#FFCC00", logo: "/hero/logo-ozon.png",   longSize: 76 },
+  yandex: { short: "ЯНДЕКС", long: "Я.Маркет",    color: "#FFCC00", accent: "#FC3F1D", logo: "/hero/logo-yandex.png", longSize: 56 },
+  avito:  { short: "AVITO",  long: "Avito",       color: "#00AAFF", accent: "#97CF26", logo: "/hero/logo-avito.png",  longSize: 70 },
+};
+
+/* Per-brand displayed logo size. Tweak per logo aspect ratio so they read
+   uniformly across the four cards (icon-style logos taller, wordmarks wider). */
+const BRAND_LOGO_SIZE: Record<BrandKey, { maxH: number; maxW: number }> = {
+  wb:     { maxH: 90, maxW: 200 },   // square WB icon
+  ozon:   { maxH: 64, maxW: 240 },   // wide OZON wordmark
+  yandex: { maxH: 92, maxW: 200 },   // square Я.Маркет icon
+  avito:  { maxH: 70, maxW: 240 },   // wide Avito wordmark
 };
 
 function BrandWordmark({ brand }: { brand: BrandKey }) {
   const meta = BRAND_META[brand];
-  // Small visual quirks per brand to make each wordmark distinctive
+  const size = BRAND_LOGO_SIZE[brand];
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  // ── Logo found: render <img> with brand-tinted glow on hover ──
+  if (!logoFailed) {
+    return (
+      <img
+        src={meta.logo}
+        alt=""
+        draggable={false}
+        onError={() => setLogoFailed(true)}
+        className="transition-all duration-300 group-hover:brightness-0"
+        style={{
+          maxHeight: size.maxH,
+          maxWidth: size.maxW,
+          width: "auto",
+          height: "auto",
+          objectFit: "contain",
+          filter: `drop-shadow(0 0 22px ${meta.color}55)`,
+        }}
+      />
+    );
+  }
+
+  // ── Fallback: stylized text wordmark in brand colour ──
   const decor = (() => {
     switch (brand) {
       case "wb":
-        return (
-          <span style={{
-            display: "inline-block", width: 14, height: 14, marginRight: 8,
-            borderRadius: 4, background: meta.color,
-            boxShadow: `0 0 18px ${meta.color}80`,
-            verticalAlign: "middle",
-          }}/>
-        );
+        return <span style={{ display: "inline-block", width: 14, height: 14, marginRight: 8, borderRadius: 4, background: meta.color, boxShadow: `0 0 18px ${meta.color}80`, verticalAlign: "middle" }}/>;
       case "ozon":
-        // bullet over the "o"
-        return (
-          <span style={{
-            position: "absolute", top: -6, left: 10,
-            width: 10, height: 10, borderRadius: "50%",
-            background: meta.accent, boxShadow: `0 0 10px ${meta.accent}aa`,
-          }}/>
-        );
+        return <span style={{ position: "absolute", top: -6, left: 10, width: 10, height: 10, borderRadius: "50%", background: meta.accent, boxShadow: `0 0 10px ${meta.accent}aa` }}/>;
       case "yandex":
-        return (
-          <span style={{
-            display: "inline-block", marginRight: 6,
-            color: meta.accent, fontWeight: 900,
-            textShadow: `0 0 14px ${meta.accent}77`,
-          }}>›</span>
-        );
+        return <span style={{ display: "inline-block", marginRight: 6, color: meta.accent, fontWeight: 900, textShadow: `0 0 14px ${meta.accent}77` }}>›</span>;
       case "avito":
-        return (
-          <span style={{
-            display: "inline-block", width: 8, height: 8, marginRight: 8,
-            borderRadius: "50%", background: meta.accent,
-            boxShadow: `0 0 14px ${meta.accent}aa`,
-            verticalAlign: "middle",
-          }}/>
-        );
+        return <span style={{ display: "inline-block", width: 8, height: 8, marginRight: 8, borderRadius: "50%", background: meta.accent, boxShadow: `0 0 14px ${meta.accent}aa`, verticalAlign: "middle" }}/>;
     }
   })();
 
@@ -1374,7 +1382,7 @@ function BrandWordmark({ brand }: { brand: BrandKey }) {
         position: "relative",
         display: "inline-flex", alignItems: "center",
         fontSize: meta.longSize,
-        fontWeight: meta.weight,
+        fontWeight: 900,
         letterSpacing: brand === "yandex" ? "-0.01em" : "-0.03em",
         color: meta.color,
         whiteSpace: "nowrap",
