@@ -1307,42 +1307,47 @@ const SWIM_BUBBLES = Array.from({ length: 16 }, (_, i) => ({
   opa: 0.2 + (i * 0.08) % 0.45,
 }));
 
-/* Brand metadata: a neutral category descriptor for the centrepiece + a short
-   marketplace text label for the small floating copies. Marketplace names
-   appear only as text mentions (nominative use), no brand mark reproduction. */
+/* Brand metadata: short marketplace text label (for small floating copies)
+   plus path to user-uploaded logo file (already recoloured to acid green by
+   the user). BrandWordmark renders the file with pulsing animation + glow,
+   and inverts to black on parent group hover so it stays legible on the
+   acid card background. */
 const BRAND_META: Record<BrandKey, {
-  short: string;       // small floating-copy label
-  category: string;    // big centrepiece descriptor (NOT a brand)
-  glyph: string;       // small decorative glyph next to category
+  short: string;
+  logo:  string;
+  maxH:  number;
+  maxW:  number;
 }> = {
-  wb:     { short: "WB",     category: "КАРТОЧКИ", glyph: "▦" },
-  ozon:   { short: "OZON",   category: "HERO",     glyph: "⚡" },
-  yandex: { short: "ЯНДЕКС", category: "AI",       glyph: "✦" },
-  avito:  { short: "AVITO",  category: "АНАЛИЗ",   glyph: "◎" },
+  wb:     { short: "WB",     logo: "/hero/logo-wb-acid.png",     maxH: 100, maxW: 200 },
+  ozon:   { short: "OZON",   logo: "/hero/logo-ozon-acid.png",   maxH: 64,  maxW: 240 },
+  yandex: { short: "ЯНДЕКС", logo: "/hero/logo-yandex-acid.png", maxH: 100, maxW: 200 },
+  avito:  { short: "AVITO",  logo: "/hero/logo-avito-acid.png",  maxH: 70,  maxW: 240 },
 };
 
 function BrandWordmark({ brand }: { brand: BrandKey }) {
   const meta = BRAND_META[brand];
   return (
-    <span
-      className="group-hover:!text-black transition-colors duration-300"
-      style={{
-        position: "relative",
-        display: "inline-flex", alignItems: "center", gap: 14,
-        fontSize: "clamp(34px, 5.6vw, 64px)",
-        fontWeight: 900,
-        letterSpacing: "-0.04em",
-        color: "#CBFF00",
-        whiteSpace: "nowrap",
-        textShadow: "0 0 32px rgba(203,255,0,0.30)",
-        fontFamily: "Geist, system-ui, sans-serif",
+    <m.img
+      src={meta.logo}
+      alt=""
+      draggable={false}
+      animate={{
+        scale:     [1, 1.045, 1],
+        opacity:   [0.92, 1, 0.92],
+        y:         [0, -3, 0],
       }}
-    >
-      <span style={{
-        fontSize: "0.75em", lineHeight: 1, opacity: 0.7,
-      }}>{meta.glyph}</span>
-      <span style={{ position: "relative" }}>{meta.category}</span>
-    </span>
+      transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
+      className="transition-[filter] duration-300 group-hover:[filter:brightness(0)_drop-shadow(0_0_8px_rgba(0,0,0,0.6))]"
+      style={{
+        maxHeight: meta.maxH,
+        maxWidth:  meta.maxW,
+        width:  "auto",
+        height: "auto",
+        objectFit: "contain",
+        filter:
+          "drop-shadow(0 0 14px rgba(203,255,0,0.55)) drop-shadow(0 0 36px rgba(203,255,0,0.32))",
+      }}
+    />
   );
 }
 
