@@ -52,36 +52,50 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ─── Acid wavy grid background — uses user-provided PNG ───────────────────
-   Renders /hero/bg-lines.png at full section coverage with adjustable opacity
-   and optional flip for variation between sections. */
-function AcidGridBg({
-  opacity = 0.18,
-  flip = false,
-  position = "center",
-}: {
-  opacity?: number;
-  flip?: boolean;
-  position?: "top" | "center" | "bottom";
-}) {
-  const objectPosition = position === "top" ? "center top" : position === "bottom" ? "center bottom" : "center";
+/* ─── Acid wavy "wings" background ─────────────────────────────────────────
+   Two copies of the user-provided PNG: one anchored to the LEFT edge fading
+   toward center, one mirrored on the RIGHT edge also fading toward center.
+   They overlap in the lower-center, "embracing" the cards from both sides. */
+function CasesWingsBg({ opacity = 0.32 }: { opacity?: number }) {
+  const wing: React.CSSProperties = {
+    position: "absolute",
+    width: "62%",
+    height: "85%",
+    objectFit: "cover",
+    pointerEvents: "none",
+    mixBlendMode: "screen",
+    opacity,
+  };
   return (
     <div
       aria-hidden="true"
-      style={{
-        position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0,
-        opacity, overflow: "hidden",
-      }}
+      style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}
     >
+      {/* LEFT wing — wide on left, fades right toward center */}
       <img
         src="/hero/bg-lines.png"
         alt=""
         draggable={false}
         style={{
-          position: "absolute", inset: 0, width: "100%", height: "100%",
-          objectFit: "cover", objectPosition,
-          transform: flip ? "scaleX(-1)" : "none",
-          mixBlendMode: "screen",      /* keeps lines glowing on dark bg */
+          ...wing,
+          left: 0, top: "4%",
+          objectPosition: "left center",
+          maskImage: "linear-gradient(to right, black 5%, black 35%, transparent 95%)",
+          WebkitMaskImage: "linear-gradient(to right, black 5%, black 35%, transparent 95%)",
+        }}
+      />
+      {/* RIGHT wing — mirror of left, anchored right */}
+      <img
+        src="/hero/bg-lines.png"
+        alt=""
+        draggable={false}
+        style={{
+          ...wing,
+          right: 0, bottom: "4%",
+          transform: "scaleX(-1)",
+          objectPosition: "left center",
+          maskImage: "linear-gradient(to right, black 5%, black 35%, transparent 95%)",
+          WebkitMaskImage: "linear-gradient(to right, black 5%, black 35%, transparent 95%)",
         }}
       />
     </div>
@@ -926,6 +940,8 @@ const SERVICES = [
     subtitle: "WB / Ozon",
     desc: "Фото + инфографика + А+ контент. Дизайн, который работает на выдаче — тестирую гипотезы по CTR и конверсии.",
     tags: ["WB", "Ozon", "Инфографика", "А+ контент"],
+    marketplace: "WB",
+    marketplaceFull: "WILDBERRIES",
   },
   {
     num: "02",
@@ -934,6 +950,8 @@ const SERVICES = [
     subtitle: "Первый слайд",
     desc: "Главный экран, который останавливает прокрутку. Сильный визуал + читаемое УТП = больше кликов в карточку.",
     tags: ["HERO", "CTR", "Конверсия"],
+    marketplace: "OZON",
+    marketplaceFull: "OZON",
   },
   {
     num: "03",
@@ -942,6 +960,8 @@ const SERVICES = [
     subtitle: "Midjourney · Flux",
     desc: "Генерирую уникальный визуал за часы. Без фотостудии, без долгих согласований — готово к публикации.",
     tags: ["AI", "Midjourney", "Flux", "Быстро"],
+    marketplace: "ЯНДЕКС",
+    marketplaceFull: "ЯНДЕКС.МАРКЕТ",
   },
   {
     num: "04",
@@ -950,6 +970,8 @@ const SERVICES = [
     subtitle: "WB · Ozon · Unit-экономика",
     desc: "Разбираю, где теряются покупатели: CTR, конверсия, корзина. Нахожу точки роста и даю конкретные рекомендации по дизайну.",
     tags: ["CTR", "Конверсия", "Аналитика", "Рост"],
+    marketplace: "AVITO",
+    marketplaceFull: "AVITO",
   },
 ];
 
@@ -1279,67 +1301,93 @@ const SWIM_BUBBLES = Array.from({ length: 16 }, (_, i) => ({
   opa: 0.2 + (i * 0.08) % 0.45,
 }));
 
-/* Mini coverflow preview shown inside each ServiceCard.
-   Auto-rotates through 3 thumbnails so user sees there's content inside. */
-function ServiceCardPreview({ imgs }: { imgs: string[] }) {
-  const [active, setActive] = useState(0);
-  useEffect(() => {
-    if (imgs.length < 2) return;
-    const id = setInterval(() => setActive((a) => (a + 1) % imgs.length), 2400);
-    return () => clearInterval(id);
-  }, [imgs.length]);
+/* Marketplace name as oversized animated typography inside ServiceCard.
+   One huge centerpiece word + several smaller copies floating around it.
+   Inverts color on parent group hover so it stays legible on the acid bg. */
+function MarketplaceFlair({
+  short,
+  full,
+}: {
+  short: string;   // short variant for floating copies (WB, OZON, AVITO…)
+  full: string;    // full variant for the giant centerpiece
+}) {
+  // Fixed pseudo-random positions/timings so SSR matches CSR + no jitter on re-render
+  const blobs = [
+    { x: "-2%",  y: "12%", size: 16, dur: 7.2, delay: 0,    op: 0.32, dx: 22, dy: -14 },
+    { x: "85%",  y: "8%",  size: 14, dur: 8.5, delay: 1.1,  op: 0.26, dx: -28, dy: 18 },
+    { x: "10%",  y: "78%", size: 18, dur: 6.4, delay: 0.6,  op: 0.36, dx: 32, dy: -22 },
+    { x: "72%",  y: "82%", size: 13, dur: 9.1, delay: 1.8,  op: 0.22, dx: -20, dy: -14 },
+    { x: "42%",  y: "-5%", size: 12, dur: 7.8, delay: 0.3,  op: 0.20, dx: 18, dy: 26 },
+    { x: "55%",  y: "92%", size: 15, dur: 8.0, delay: 2.2,  op: 0.30, dx: -24, dy: -28 },
+  ];
 
   return (
     <div
       style={{
-        position: "relative",
-        width: "100%",
-        height: 120,
-        marginTop: 18,
-        perspective: "800px",
-        perspectiveOrigin: "50% 50%",
+        position: "relative", width: "100%", height: 140,
+        marginTop: 18, overflow: "hidden",
+        borderRadius: 12,
+        background:
+          "linear-gradient(135deg, rgba(203,255,0,0.04) 0%, rgba(255,255,255,0.02) 50%, rgba(203,255,0,0.04) 100%)",
+        border: "1px solid rgba(255,255,255,0.05)",
       }}
     >
-      {imgs.map((src, i) => {
-        const off = i - active;
-        const abs = Math.abs(off);
-        if (abs > 1 && imgs.length > 2) return null;
-        const x = off === 0 ? 0 : Math.sign(off) * 44;
-        const rotY = off * -22;
-        const z = -abs * 60;
-        const scale = abs === 0 ? 1 : 0.78;
-        const bright = abs === 0 ? 1 : 0.45;
-        return (
-          <div
-            key={src}
-            style={{
-              position: "absolute",
-              left: "50%", top: "50%",
-              width: 92, height: 92,
-              borderRadius: 10,
-              overflow: "hidden",
-              border: abs === 0
-                ? "1.5px solid rgba(203,255,0,0.55)"
-                : "1px solid rgba(255,255,255,0.08)",
-              boxShadow: abs === 0
-                ? "0 0 18px rgba(203,255,0,0.20), 0 8px 22px rgba(0,0,0,0.55)"
-                : "0 4px 14px rgba(0,0,0,0.45)",
-              transform: `translateX(calc(-50% + ${x}px)) translateY(-50%) rotateY(${rotY}deg) translateZ(${z}px) scale(${scale})`,
-              filter: `brightness(${bright})`,
-              transition: "transform 0.55s cubic-bezier(0.22,1,0.36,1), filter 0.42s ease, border-color 0.32s ease, box-shadow 0.42s ease",
-              zIndex: 10 - abs,
-              background: "#0a0a0a",
-            }}
-          >
-            <img
-              src={src}
-              alt=""
-              draggable={false}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
-          </div>
-        );
-      })}
+      {/* Subtle radial glow that intensifies on hover */}
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{
+          background: "radial-gradient(ellipse at center, rgba(203,255,0,0.10) 0%, transparent 70%)",
+          opacity: 0.6,
+        }}
+      />
+
+      {/* Giant centerpiece word — pulses in scale + opacity */}
+      <m.div
+        animate={{ scale: [1, 1.04, 1], opacity: [0.18, 0.30, 0.18] }}
+        transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          pointerEvents: "none",
+        }}
+      >
+        <span
+          className="font-luna group-hover:!text-black/40 transition-colors duration-300"
+          style={{
+            fontSize: full.length > 6 ? "clamp(28px, 5vw, 56px)" : "clamp(38px, 6.5vw, 78px)",
+            fontWeight: 900,
+            letterSpacing: "-0.02em",
+            color: "#CBFF00",
+            whiteSpace: "nowrap",
+            textShadow: "0 0 32px rgba(203,255,0,0.30)",
+          }}
+        >
+          {full}
+        </span>
+      </m.div>
+
+      {/* Small floating copies of the short name */}
+      {blobs.map((b, i) => (
+        <m.span
+          key={i}
+          animate={{ x: [0, b.dx, 0], y: [0, b.dy, 0], opacity: [b.op * 0.6, b.op, b.op * 0.6] }}
+          transition={{ duration: b.dur, repeat: Infinity, ease: "easeInOut", delay: b.delay }}
+          className="font-mono group-hover:!text-black/45 transition-colors duration-300"
+          style={{
+            position: "absolute",
+            left: b.x, top: b.y,
+            fontSize: b.size,
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            color: "#CBFF00",
+            opacity: b.op,
+            pointerEvents: "none",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {short}
+        </m.span>
+      ))}
     </div>
   );
 }
@@ -1348,12 +1396,10 @@ function ServiceCard({
   s,
   idx,
   onOpen,
-  previewImgs,
 }: {
   s: (typeof SERVICES)[0];
   idx: number;
   onOpen?: () => void;
-  previewImgs?: string[];
 }) {
   const hasSlideshow = idx === 0 || idx === 1 || idx === 2 || idx === 3;
   return (
@@ -1375,9 +1421,7 @@ function ServiceCard({
             </span>
           ))}
         </div>
-        {previewImgs && previewImgs.length > 0 && (
-          <ServiceCardPreview imgs={previewImgs} />
-        )}
+        <MarketplaceFlair short={s.marketplace} full={s.marketplaceFull} />
         {hasSlideshow && (
           <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/55 transition-colors duration-200">
             смотреть примеры →
@@ -1420,9 +1464,8 @@ function Services() {
   }
 
   return (
-    <section id="services" className="relative py-28 md:py-36 overflow-hidden">
-      <AcidGridBg opacity={0.20} position="top" />
-      <div className="relative max-w-[1280px] mx-auto px-5 md:px-10">
+    <section id="services" className="py-28 md:py-36">
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Услуги</Label>
           <m.h2
@@ -1445,13 +1488,6 @@ function Services() {
                 <ServiceCard
                   s={s}
                   idx={idx}
-                  previewImgs={
-                    idx === 0 ? SHOWCASE_SLIDES.map(s => s.img) :
-                    idx === 1 ? HERO_SLIDES.slice(0, 3).map(s => s.img) :
-                    idx === 2 ? AI_SLIDES.map(s => s.img) :
-                    idx === 3 ? VORONKA_SLIDES.map(s => s.img) :
-                    undefined
-                  }
                   onOpen={
                     idx === 0 ? () => setDeck({ slides: PRODUCT_DECK_SLIDES, title: "Карточки товаров" }) :
                     idx === 1 ? () => setDeck({ slides: HERO_DECK_SLIDES,    title: "HERO-экраны"      }) :
@@ -3201,7 +3237,7 @@ function Cases() {
 
   return (
     <section id="cases" className="relative py-28 md:py-36 bg-surface/30 overflow-hidden">
-      <AcidGridBg opacity={0.18} position="bottom" flip />
+      <CasesWingsBg opacity={0.34} />
       <AnimatePresence>
         {caseModal && (
           <CaseDeckModal
