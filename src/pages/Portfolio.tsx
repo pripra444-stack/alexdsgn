@@ -1307,99 +1307,49 @@ const SWIM_BUBBLES = Array.from({ length: 16 }, (_, i) => ({
   opa: 0.2 + (i * 0.08) % 0.45,
 }));
 
-/* Brand metadata: short name, brand colour, plus a logo file path.
-   If the logo PNG exists in /public/hero/, BrandWordmark renders it as an
-   <img>. If the file is missing (onError), it falls back to a stylized text
-   wordmark in the brand colour. This way the user can drop logo files in the
-   folder whenever they're ready, without code changes. */
+/* Brand metadata: a neutral category descriptor for the centrepiece + a short
+   marketplace text label for the small floating copies. Marketplace names
+   appear only as text mentions (nominative use), no brand mark reproduction. */
 const BRAND_META: Record<BrandKey, {
-  short: string;       // short name for floating copies
-  long:  string;       // text fallback if logo file missing
-  color: string;       // primary brand colour
-  accent: string;      // accent decor colour
-  logo:  string;       // expected path to PNG logo
-  longSize: number;    // font-size hint for fallback text
+  short: string;       // small floating-copy label
+  category: string;    // big centrepiece descriptor (NOT a brand)
+  glyph: string;       // small decorative glyph next to category
 }> = {
-  wb:     { short: "WB",     long: "wildberries", color: "#E8338A", accent: "#FFFFFF", logo: "/hero/logo-wb.png",     longSize: 46 },
-  ozon:   { short: "OZON",   long: "ozon",        color: "#0079FF", accent: "#FFCC00", logo: "/hero/logo-ozon.png",   longSize: 76 },
-  yandex: { short: "ЯНДЕКС", long: "Я.Маркет",    color: "#FFCC00", accent: "#FC3F1D", logo: "/hero/logo-yandex.png", longSize: 56 },
-  avito:  { short: "AVITO",  long: "Avito",       color: "#00AAFF", accent: "#97CF26", logo: "/hero/logo-avito.png",  longSize: 70 },
-};
-
-/* Per-brand displayed logo size. Tweak per logo aspect ratio so they read
-   uniformly across the four cards (icon-style logos taller, wordmarks wider). */
-const BRAND_LOGO_SIZE: Record<BrandKey, { maxH: number; maxW: number }> = {
-  wb:     { maxH: 90, maxW: 200 },   // square WB icon
-  ozon:   { maxH: 64, maxW: 240 },   // wide OZON wordmark
-  yandex: { maxH: 92, maxW: 200 },   // square Я.Маркет icon
-  avito:  { maxH: 70, maxW: 240 },   // wide Avito wordmark
+  wb:     { short: "WB",     category: "КАРТОЧКИ", glyph: "▦" },
+  ozon:   { short: "OZON",   category: "HERO",     glyph: "⚡" },
+  yandex: { short: "ЯНДЕКС", category: "AI",       glyph: "✦" },
+  avito:  { short: "AVITO",  category: "АНАЛИЗ",   glyph: "◎" },
 };
 
 function BrandWordmark({ brand }: { brand: BrandKey }) {
   const meta = BRAND_META[brand];
-  const size = BRAND_LOGO_SIZE[brand];
-  const [logoFailed, setLogoFailed] = useState(false);
-
-  // ── Logo found: render <img> through SVG filter (white-bg knockout +
-  //    acid-green outline only). On parent group hover, swap to black outline
-  //    so it stays legible on the bright acid card background. ──
-  if (!logoFailed) {
-    return (
-      <img
-        src={meta.logo}
-        alt=""
-        draggable={false}
-        onError={() => setLogoFailed(true)}
-        className="[filter:url(#acid-outline)] group-hover:[filter:url(#black-outline)] transition-[filter] duration-300"
-        style={{
-          maxHeight: size.maxH,
-          maxWidth: size.maxW,
-          width: "auto",
-          height: "auto",
-          objectFit: "contain",
-        }}
-      />
-    );
-  }
-
-  // ── Fallback: stylized text wordmark in brand colour ──
-  const decor = (() => {
-    switch (brand) {
-      case "wb":
-        return <span style={{ display: "inline-block", width: 14, height: 14, marginRight: 8, borderRadius: 4, background: meta.color, boxShadow: `0 0 18px ${meta.color}80`, verticalAlign: "middle" }}/>;
-      case "ozon":
-        return <span style={{ position: "absolute", top: -6, left: 10, width: 10, height: 10, borderRadius: "50%", background: meta.accent, boxShadow: `0 0 10px ${meta.accent}aa` }}/>;
-      case "yandex":
-        return <span style={{ display: "inline-block", marginRight: 6, color: meta.accent, fontWeight: 900, textShadow: `0 0 14px ${meta.accent}77` }}>›</span>;
-      case "avito":
-        return <span style={{ display: "inline-block", width: 8, height: 8, marginRight: 8, borderRadius: "50%", background: meta.accent, boxShadow: `0 0 14px ${meta.accent}aa`, verticalAlign: "middle" }}/>;
-    }
-  })();
-
   return (
     <span
       className="group-hover:!text-black transition-colors duration-300"
       style={{
         position: "relative",
-        display: "inline-flex", alignItems: "center",
-        fontSize: meta.longSize,
+        display: "inline-flex", alignItems: "center", gap: 14,
+        fontSize: "clamp(34px, 5.6vw, 64px)",
         fontWeight: 900,
-        letterSpacing: brand === "yandex" ? "-0.01em" : "-0.03em",
-        color: meta.color,
+        letterSpacing: "-0.04em",
+        color: "#CBFF00",
         whiteSpace: "nowrap",
-        textShadow: `0 0 28px ${meta.color}55`,
+        textShadow: "0 0 32px rgba(203,255,0,0.30)",
         fontFamily: "Geist, system-ui, sans-serif",
       }}
     >
-      {decor}
-      <span style={{ position: "relative" }}>{meta.long}</span>
+      <span style={{
+        fontSize: "0.75em", lineHeight: 1, opacity: 0.7,
+      }}>{meta.glyph}</span>
+      <span style={{ position: "relative" }}>{meta.category}</span>
     </span>
   );
 }
 
-/* Marketplace flair: stylized brand wordmark in centre + small floating
-   short-name copies in same brand colour, all subtly animated. Inverts to
-   black on parent group-hover so it stays legible on the acid bg. */
+/* Centrepiece category typography + small floating marketplace text labels.
+   All acid-green, all text — no logo image rendering. Marketplace short names
+   appear only as text mentions (descriptive use, not brand mark reproduction).
+   Inverts to black on parent group-hover so it stays legible on the acid bg. */
 function MarketplaceFlair({ brand }: { brand: BrandKey }) {
   const meta = BRAND_META[brand];
   // Fixed pseudo-random positions/timings so SSR matches CSR + no jitter
@@ -1419,19 +1369,19 @@ function MarketplaceFlair({ brand }: { brand: BrandKey }) {
         marginTop: 18, overflow: "hidden",
         borderRadius: 12,
         background:
-          `linear-gradient(135deg, ${meta.color}08 0%, rgba(255,255,255,0.02) 50%, ${meta.color}08 100%)`,
-        border: `1px solid ${meta.color}15`,
+          "linear-gradient(135deg, rgba(203,255,0,0.04) 0%, rgba(255,255,255,0.02) 50%, rgba(203,255,0,0.04) 100%)",
+        border: "1px solid rgba(203,255,0,0.10)",
       }}
     >
-      {/* Brand-coloured radial glow */}
+      {/* Acid radial glow */}
       <div
         className="absolute inset-0 transition-opacity duration-500"
         style={{
-          background: `radial-gradient(ellipse at center, ${meta.color}1F 0%, transparent 70%)`,
+          background: "radial-gradient(ellipse at center, rgba(203,255,0,0.12) 0%, transparent 70%)",
         }}
       />
 
-      {/* Centerpiece stylized wordmark — pulses subtly */}
+      {/* Centrepiece category typography — pulses subtly */}
       <m.div
         animate={{ scale: [1, 1.03, 1], opacity: [0.85, 1, 0.85] }}
         transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
@@ -1444,7 +1394,7 @@ function MarketplaceFlair({ brand }: { brand: BrandKey }) {
         <BrandWordmark brand={brand} />
       </m.div>
 
-      {/* Small floating copies of short name in brand colour */}
+      {/* Small floating marketplace text labels — mention, not mark reproduction */}
       {blobs.map((b, i) => (
         <m.span
           key={i}
@@ -1457,7 +1407,7 @@ function MarketplaceFlair({ brand }: { brand: BrandKey }) {
             fontSize: b.size,
             fontWeight: 700,
             letterSpacing: "0.08em",
-            color: meta.color,
+            color: "#CBFF00",
             opacity: b.op,
             pointerEvents: "none",
             whiteSpace: "nowrap",
@@ -1542,8 +1492,60 @@ function Services() {
   }
 
   return (
-    <section id="services" className="py-28 md:py-36">
-      <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <section id="services" className="relative py-28 md:py-36 overflow-hidden">
+      {/* 3D acid sphere — top-right, behind cards */}
+      <m.div
+        animate={{ x: [0, 18, -14, 0], y: [0, -12, 8, 0] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute",
+          right: "-4%", top: "5%",
+          width: "min(34vw, 460px)",
+          aspectRatio: "1 / 1",
+          opacity: 0.55,
+          filter: "drop-shadow(0 30px 70px rgba(203,255,0,0.18))",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      >
+        <m.img
+          src="/hero/bg-3d.png"
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+        />
+      </m.div>
+
+      {/* 3D acid spiral — bottom-left, behind cards, counter-rotating */}
+      <m.div
+        animate={{ x: [0, -16, 12, 0], y: [0, 14, -10, 0] }}
+        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute",
+          left: "-6%", bottom: "2%",
+          width: "min(30vw, 420px)",
+          aspectRatio: "3 / 4",
+          opacity: 0.50,
+          filter: "drop-shadow(0 30px 70px rgba(203,255,0,0.18))",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      >
+        <m.img
+          src="/hero/bg-3d-spiral.png"
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          animate={{ rotate: -360 }}
+          transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+        />
+      </m.div>
+
+      <div className="relative max-w-[1280px] mx-auto px-5 md:px-10" style={{ zIndex: 1 }}>
         <Reveal>
           <Label>Услуги</Label>
           <m.h2
@@ -3546,105 +3548,13 @@ function ArrowDownIcon() {
 }
 
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
-/* Reusable SVG filter defs that turn any opaque-with-white-bg image into an
-   outline silhouette. Mounted once globally; referenced by className filter
-   url(#acid-outline) / url(#black-outline). Pure display-time transformation —
-   doesn't modify source image files. */
-function GlobalSvgFilters() {
-  return (
-    <svg
-      width="0" height="0"
-      style={{ position: "absolute", width: 0, height: 0, pointerEvents: "none" }}
-      aria-hidden="true"
-      focusable="false"
-    >
-      <defs>
-        {/* ── Acid green outline ── */}
-        <filter id="acid-outline" x="-3%" y="-3%" width="106%" height="106%" colorInterpolationFilters="sRGB">
-          {/* 1. Knock out near-white pixels, paint the rest acid green (#CBFF00) */}
-          <feColorMatrix
-            type="matrix"
-            values="
-              0 0 0 0 0.796
-              0 0 0 0 1
-              0 0 0 0 0
-              -3 -3 -3 0 8
-            "
-            result="filled"
-          />
-          {/* 2. Erode silhouette inward by 2px */}
-          <feMorphology in="filled" operator="erode" radius="2" result="eroded" />
-          {/* 3. filled MINUS eroded = outline ring only */}
-          <feComposite in="filled" in2="eroded" operator="out" />
-        </filter>
-
-        {/* ── Black outline (used on hover when card bg is acid green) ── */}
-        <filter id="black-outline" x="-3%" y="-3%" width="106%" height="106%" colorInterpolationFilters="sRGB">
-          <feColorMatrix
-            type="matrix"
-            values="
-              0 0 0 0 0
-              0 0 0 0 0
-              0 0 0 0 0
-              -3 -3 -3 0 8
-            "
-            result="filled"
-          />
-          <feMorphology in="filled" operator="erode" radius="2" result="eroded" />
-          <feComposite in="filled" in2="eroded" operator="out" />
-        </filter>
-      </defs>
-    </svg>
-  );
-}
-
-/* Decorative interlude between Services and Cases — a slowly rotating + floating
-   3D acid sculpture, dimmed so it reads as background ambience, not focus. */
-function Bg3DInterlude() {
-  return (
-    <section
-      aria-hidden="true"
-      className="relative w-full overflow-hidden pointer-events-none"
-      style={{ height: "clamp(220px, 32vw, 380px)" }}
-    >
-      <m.div
-        animate={{ x: [0, 22, -16, 0], y: [0, -14, 10, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          position: "absolute", left: "50%", top: "50%",
-          width: "min(46vw, 460px)",
-          aspectRatio: "1 / 1",
-          translate: "-50% -50%",
-          opacity: 0.42,
-          filter: "drop-shadow(0 30px 60px rgba(203,255,0,0.16))",
-        }}
-      >
-        <m.img
-          src="/hero/bg-3d.png"
-          alt=""
-          draggable={false}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 55, repeat: Infinity, ease: "linear" }}
-          style={{
-            width: "100%", height: "100%",
-            objectFit: "contain",
-            display: "block",
-          }}
-        />
-      </m.div>
-    </section>
-  );
-}
-
 export default function Portfolio() {
   return (
     <div className="grain bg-canvas text-white min-h-[100dvh]">
-      <GlobalSvgFilters />
       <Nav />
       <Hero />
       <Marquee />
       <Services />
-      <Bg3DInterlude />
       <Cases />
       <WhyMe />
       <Process />
