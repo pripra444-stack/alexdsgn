@@ -1307,47 +1307,70 @@ const SWIM_BUBBLES = Array.from({ length: 16 }, (_, i) => ({
   opa: 0.2 + (i * 0.08) % 0.45,
 }));
 
-/* Brand metadata: short marketplace text label (for small floating copies)
-   plus path to user-uploaded logo file (already recoloured to acid green by
-   the user). BrandWordmark renders the file with pulsing animation + glow,
-   and inverts to black on parent group hover so it stays legible on the
-   acid card background. */
+/* Brand metadata: short marketplace text label + path to the user-uploaded
+   acid-green logo file. BrandWordmark renders all four at a uniform max size
+   with a pulsing radial halo behind and a multi-stop drop-shadow glow on the
+   image itself; inverts to pure black on parent group hover. */
 const BRAND_META: Record<BrandKey, {
   short: string;
   logo:  string;
-  maxH:  number;
-  maxW:  number;
 }> = {
-  wb:     { short: "WB",     logo: "/hero/logo-wb-acid.png",     maxH: 100, maxW: 200 },
-  ozon:   { short: "OZON",   logo: "/hero/logo-ozon-acid.png",   maxH: 64,  maxW: 240 },
-  yandex: { short: "ЯНДЕКС", logo: "/hero/logo-yandex-acid.png", maxH: 100, maxW: 200 },
-  avito:  { short: "AVITO",  logo: "/hero/logo-avito-acid.png",  maxH: 70,  maxW: 240 },
+  wb:     { short: "WB",     logo: "/hero/logo-wb-acid.png"     },
+  ozon:   { short: "OZON",   logo: "/hero/logo-ozon-acid.png"   },
+  yandex: { short: "ЯНДЕКС", logo: "/hero/logo-yandex-acid.png" },
+  avito:  { short: "AVITO",  logo: "/hero/logo-avito-acid.png"  },
 };
+
+/* Uniform display box for every brand wordmark — same maxH/maxW so square
+   icons and wide wordmarks visually balance across the four cards. */
+const LOGO_MAX_H = 78;
+const LOGO_MAX_W = 240;
 
 function BrandWordmark({ brand }: { brand: BrandKey }) {
   const meta = BRAND_META[brand];
   return (
-    <m.img
-      src={meta.logo}
-      alt=""
-      draggable={false}
-      animate={{
-        scale:     [1, 1.045, 1],
-        opacity:   [0.92, 1, 0.92],
-        y:         [0, -3, 0],
-      }}
-      transition={{ duration: 4.4, repeat: Infinity, ease: "easeInOut" }}
-      className="transition-[filter] duration-300 group-hover:[filter:brightness(0)_drop-shadow(0_0_8px_rgba(0,0,0,0.6))]"
-      style={{
-        maxHeight: meta.maxH,
-        maxWidth:  meta.maxW,
-        width:  "auto",
-        height: "auto",
-        objectFit: "contain",
-        filter:
-          "drop-shadow(0 0 14px rgba(203,255,0,0.55)) drop-shadow(0 0 36px rgba(203,255,0,0.32))",
-      }}
-    />
+    <span style={{
+      position: "relative",
+      display: "inline-flex", alignItems: "center", justifyContent: "center",
+    }}>
+      {/* Pulsing radial halo behind the logo — the "candle flame" glow */}
+      <m.span
+        aria-hidden
+        animate={{ opacity: [0.55, 0.95, 0.55], scale: [0.88, 1.18, 0.88] }}
+        transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+        className="group-hover:!opacity-0 transition-opacity duration-300"
+        style={{
+          position: "absolute",
+          inset: "-55%",
+          background:
+            "radial-gradient(ellipse at center, rgba(203,255,0,0.65) 0%, rgba(203,255,0,0.35) 32%, transparent 68%)",
+          filter: "blur(22px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Logo image — uniform max size, gently breathes; multi-stop drop-shadow
+          glow attached directly to the silhouette */}
+      <m.img
+        src={meta.logo}
+        alt=""
+        draggable={false}
+        animate={{ scale: [1, 1.045, 1], y: [0, -3, 0], opacity: [0.95, 1, 0.95] }}
+        transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+        className="relative transition-[filter] duration-300 group-hover:[filter:brightness(0)_drop-shadow(0_0_10px_rgba(0,0,0,0.55))]"
+        style={{
+          maxHeight: LOGO_MAX_H,
+          maxWidth:  LOGO_MAX_W,
+          width:  "auto",
+          height: "auto",
+          objectFit: "contain",
+          filter:
+            "drop-shadow(0 0 12px rgba(203,255,0,0.70)) " +
+            "drop-shadow(0 0 28px rgba(203,255,0,0.45)) " +
+            "drop-shadow(0 0 56px rgba(203,255,0,0.22))",
+        }}
+      />
+    </span>
   );
 }
 
