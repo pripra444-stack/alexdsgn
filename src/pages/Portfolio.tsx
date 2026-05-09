@@ -1007,6 +1007,261 @@ const SWIM_SLIDES: SlideEntry[] = [
   { component: GogglesSlide4, label: "Дополнительные слайды" },
 ];
 
+// ─── Generic subsection slide (used in product/hero/AI subsection decks) ────
+type SubsectionSlideData = {
+  titleA: string;
+  titleB: string;
+  subtitle: string;
+  points: { icon: string; title: string; desc: string }[];
+  img: string;
+  imgAlt: string;
+};
+
+function SubsectionSlide({ data }: { data: SubsectionSlideData }) {
+  const E = [0.22, 1, 0.36, 1] as const;
+  const fly = (delay: number, x = 0, y = 0) => ({
+    initial: { opacity: 0, x, y },
+    animate: { opacity: 1, x: 0, y: 0 },
+    transition: { duration: 0.5, ease: E, delay },
+  });
+
+  return (
+    <div
+      className="relative flex flex-col md:flex-row gap-6 md:gap-10 w-full items-start md:items-center"
+      style={{ padding: "8px 4px 12px" }}
+    >
+      {/* LEFT: text */}
+      <div style={{ flex: "0 0 46%", minWidth: 0 }}>
+        <m.div {...fly(0.06, -32)}>
+          <p style={{ fontSize: "clamp(22px,3vw,38px)", fontWeight: 900, color: "white",   margin: 0,           lineHeight: 1.04 }}>
+            {data.titleA}
+          </p>
+          <p style={{ fontSize: "clamp(22px,3vw,38px)", fontWeight: 900, color: "#CBFF00", margin: "0 0 8px 0", lineHeight: 1.04 }}>
+            {data.titleB}
+          </p>
+        </m.div>
+
+        <m.p {...fly(0.18, -16)} style={{
+          fontSize: "clamp(10px,1.2vw,13px)", color: "rgba(255,255,255,0.45)",
+          margin: "0 0 16px 0", lineHeight: 1.5,
+        }}>
+          {data.subtitle}
+        </m.p>
+
+        <m.div {...fly(0.26, -12)} style={{
+          height: 1, background: "rgba(203,255,0,0.20)", margin: "0 0 16px 0",
+        }}/>
+
+        {data.points.map((p, i) => (
+          <m.div key={i} {...fly(0.32 + i * 0.12, 0, 16)} style={{
+            display: "flex", gap: 12, marginBottom: 14, alignItems: "flex-start",
+          }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+              background: "rgba(203,255,0,0.08)", border: "1px solid rgba(203,255,0,0.30)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#CBFF00", fontSize: 15, fontWeight: 700,
+            }}>{p.icon}</div>
+            <div>
+              <p style={{ fontSize: "clamp(10px,1.15vw,13px)", fontWeight: 700, color: "rgba(255,255,255,0.92)", margin: 0, letterSpacing: "0.04em" }}>
+                {p.title}
+              </p>
+              <p style={{ fontSize: "clamp(9px,1.05vw,12px)", color: "#71717a", margin: "3px 0 0 0", lineHeight: 1.45 }}>
+                {p.desc}
+              </p>
+            </div>
+          </m.div>
+        ))}
+      </div>
+
+      {/* RIGHT: 3D-entrance image card */}
+      <div style={{ flex: "1 1 auto", position: "relative", display: "flex", justifyContent: "center", alignItems: "center", minHeight: 360 }}>
+        {/* Acid glow */}
+        <m.div
+          initial={{ opacity: 0, scale: 0.55 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.0, delay: 0.4, ease: E }}
+          style={{
+            position: "absolute", inset: "-15%", borderRadius: "50%",
+            background: "radial-gradient(ellipse at center, rgba(203,255,0,0.22) 0%, transparent 62%)",
+            filter: "blur(34px)", pointerEvents: "none",
+          }}
+        />
+
+        {/* The image card with 3D fly-in from the right */}
+        <div style={{ perspective: "1200px", perspectiveOrigin: "30% 50%", width: "100%", display: "flex", justifyContent: "center" }}>
+          <m.div
+            initial={{ opacity: 0, x: 110, rotateY: 36, scale: 0.82 }}
+            animate={{ opacity: 1, x: 0,   rotateY: 0,  scale: 1 }}
+            transition={{ duration: 0.85, delay: 0.30, ease: E }}
+            style={{
+              transformStyle: "preserve-3d",
+              maxWidth: "100%",
+              borderRadius: 14,
+              overflow: "hidden",
+              border: "1.5px solid rgba(203,255,0,0.30)",
+              boxShadow:
+                "0 0 0 1px rgba(203,255,0,0.06), 0 0 40px rgba(203,255,0,0.20), 0 26px 64px rgba(0,0,0,0.80)",
+            }}
+          >
+            <img
+              src={data.img}
+              alt={data.imgAlt}
+              draggable={false}
+              style={{ display: "block", maxWidth: "100%", maxHeight: 500, height: "auto", width: "auto" }}
+            />
+          </m.div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Subsection decks: product cards, HERO screens, AI visuals ─────────────
+const PRODUCT_DECK_DATA: SubsectionSlideData[] = [
+  {
+    titleA: "ГЛАВНАЯ",
+    titleB: "КАРТОЧКА",
+    subtitle: "Первое, что видит покупатель в выдаче — крупный товар и три ключевых УТП без лишнего шума",
+    points: [
+      { icon: "★", title: "СИЛЬНЫЙ ВИЗУАЛ",     desc: "товар занимает 60% площади, бренд узнаваем сразу" },
+      { icon: "✓", title: "3 ГЛАВНЫХ УТП",      desc: "супермягкий, не скользит, быстро сохнет" },
+      { icon: "◑", title: "ЯСНЫЙ РАЗМЕР",       desc: "40×60 см вынесен прямо под заголовок" },
+    ],
+    img: "/hero/card%2001.png",
+    imgAlt: "Главная карточка товара",
+  },
+  {
+    titleA: "ЭФФЕКТ",
+    titleB: "ПАМЯТИ",
+    subtitle: "Второй слайд раскрывает фишку товара — пену памяти и анатомическую поддержку, через крупный план фактуры",
+    points: [
+      { icon: "✦", title: "АНАТОМИЯ НАГЛЯДНО", desc: "след стопы показывает мягкость без слов" },
+      { icon: "♡", title: "ТАКТИЛЬНОСТЬ",      desc: "крупный план фактуры — хочется потрогать" },
+      { icon: "◆", title: "ЭМОЦИЯ КОМФОРТА",   desc: "тёплый свет и шоколадный оттенок продают уют" },
+    ],
+    img: "/hero/card%2002.png",
+    imgAlt: "Слайд про эффект памяти",
+  },
+  {
+    titleA: "ТЕХНИЧЕСКИЕ",
+    titleB: "ХАРАКТЕРИСТИКИ",
+    subtitle: "Закрываем возражения — точные размеры и нескользящая основа из ПВХ показаны прямо на товаре",
+    points: [
+      { icon: "▢", title: "РАЗМЕРЫ КРУПНО",   desc: "40×60 — главная цифра поверх товара" },
+      { icon: "▼", title: "БЕЗОПАСНОСТЬ",     desc: "ПВХ-основа — не скользит даже на мокром полу" },
+      { icon: "◉", title: "КОНТЕКСТ ПРИМЕНЕНИЯ", desc: "интерьер ванной задаёт сценарий использования" },
+    ],
+    img: "/hero/card%2003.png",
+    imgAlt: "Слайд с размерами товара",
+  },
+];
+
+const HERO_DECK_DATA: SubsectionSlideData[] = [
+  {
+    titleA: "РОБОТ",
+    titleB: "МОЙЩИК ОКОН",
+    subtitle: "HERO для умной техники — фокус на эмоции от чистоты и драматичной композиции",
+    points: [
+      { icon: "⚡", title: "ВЫСОКИЙ КОНТРАСТ", desc: "белый текст на тёмном фоне — глаз цепляется мгновенно" },
+      { icon: "✦", title: "ДРАМАТИЧНЫЙ КАДР", desc: "лицо за окном создаёт WOW-эффект" },
+      { icon: "◇", title: "БРЕНД-АКЦЕНТ",     desc: "Cleanbot вынесен в верхний правый угол" },
+    ],
+    img: "/hero/hero%20001.png",
+    imgAlt: "HERO-экран робота-мойщика",
+  },
+  {
+    titleA: "АППЛИКАТОР",
+    titleB: "КУЗНЕЦОВА",
+    subtitle: "Health & wellness — показываем результат и легитимность бренда через сцену использования",
+    points: [
+      { icon: "♡", title: "СЦЕНАРИЙ ИСПОЛЬЗОВАНИЯ", desc: "девушка лежит на аппликаторе — готовая ассоциация" },
+      { icon: "✓", title: "ИКОНКИ-ПРЕИМУЩЕСТВА",     desc: "три главные пользы понятны без чтения" },
+      { icon: "◎", title: "ИСТОРИЯ БРЕНДА",          desc: "«с 1998 года» = доверие и проверенность" },
+    ],
+    img: "/hero/hero%20002.png",
+    imgAlt: "HERO-экран аппликатора Кузнецова",
+  },
+  {
+    titleA: "МАШИНКА",
+    titleB: "ДЛЯ СТРИЖКИ",
+    subtitle: "Барбершоп-эстетика — премиум-визуал даже для масс-маркета через свет и фактуру",
+    points: [
+      { icon: "⚡", title: "СТУДИЙНОЕ ФОТО",  desc: "продукт в идеальном свете на фактурном фоне" },
+      { icon: "★", title: "ИКОНКИ ФУНКЦИЙ",   desc: "комплектация показана сразу — снимаем возражения" },
+      { icon: "✦", title: "МУЖСКОЙ КОД",      desc: "тёмные цвета и металл говорят с целевой аудиторией" },
+    ],
+    img: "/hero/hero%20003.png",
+    imgAlt: "HERO-экран машинки для стрижки",
+  },
+  {
+    titleA: "БЕСПРОВОДНЫЕ",
+    titleB: "НАУШНИКИ",
+    subtitle: "Lifestyle-визуал, который продаёт ощущение, а не функции",
+    points: [
+      { icon: "♪", title: "АТМОСФЕРА",         desc: "градиент и блики работают на премиальность" },
+      { icon: "◐", title: "ЧИСТАЯ ТИПОГРАФИКА", desc: "лаконичный текст не отвлекает от продукта" },
+      { icon: "✓", title: "ФОКУС НА ПРОДУКТЕ",  desc: "наушники в центре, всё остальное вторично" },
+    ],
+    img: "/hero/hero%20004.png",
+    imgAlt: "HERO-экран беспроводных наушников",
+  },
+];
+
+const AI_DECK_DATA: SubsectionSlideData[] = [
+  {
+    titleA: "ROBOT ×",
+    titleB: "COCA-COLA",
+    subtitle: "AI-визуал, который попадает в инфоповод бренда без бюджета на студийную съёмку",
+    points: [
+      { icon: "✦", title: "MIDJOURNEY V6",  desc: "детализация металла и брызг недоступна стоку" },
+      { icon: "⚡", title: "СКОРОСТЬ",      desc: "финальный кадр за 3 часа вместо недели студии" },
+      { icon: "◇", title: "ГИБРИД БРЕНДА",  desc: "узнаваемая Coca-Cola в неожиданном контексте" },
+    ],
+    img: "/hero/ai%20visual%20001.png",
+    imgAlt: "AI-визуал Coca-Cola с роботом",
+  },
+  {
+    titleA: "CINEMATIC",
+    titleB: "PET FOOD",
+    subtitle: "AI закрывает задачу food-съёмки с участием животных — без логистики и рисков",
+    points: [
+      { icon: "♡", title: "ЭМОЦИЯ ВНЕ ВРЕМЕНИ", desc: "идеальный кадр без часов на площадке" },
+      { icon: "★", title: "АППЕТИТНОСТЬ",       desc: "фактура корма выглядит свежей и крупной" },
+      { icon: "✓", title: "БРЕНД В ФОКУСЕ",     desc: "упаковка читается с первого взгляда" },
+    ],
+    img: "/hero/ai%20visual%20002.png",
+    imgAlt: "AI-визуал собачьего корма",
+  },
+  {
+    titleA: "FRESHNESS",
+    titleB: "AI-VISUAL",
+    subtitle: "Эстетика чистоты и мяты — концептуальный кадр для рекламной кампании зубной пасты",
+    points: [
+      { icon: "✦", title: "АБСТРАКЦИЯ",      desc: "брызги и листья создают метафору свежести" },
+      { icon: "◑", title: "ЦВЕТОВОЙ КОД",    desc: "холодная палитра ассоциируется с чистотой" },
+      { icon: "✓", title: "FOCUS ON PRODUCT", desc: "тюбик в центре кадра, всё остальное декор" },
+    ],
+    img: "/hero/ai%20visual%20003.png",
+    imgAlt: "AI-визуал зубной пасты",
+  },
+];
+
+const PRODUCT_DECK_SLIDES: SlideEntry[] = PRODUCT_DECK_DATA.map((d) => ({
+  component: () => <SubsectionSlide data={d} />,
+  label: `${d.titleA} ${d.titleB}`,
+}));
+
+const HERO_DECK_SLIDES: SlideEntry[] = HERO_DECK_DATA.map((d) => ({
+  component: () => <SubsectionSlide data={d} />,
+  label: `${d.titleA} ${d.titleB}`,
+}));
+
+const AI_DECK_SLIDES: SlideEntry[] = AI_DECK_DATA.map((d) => ({
+  component: () => <SubsectionSlide data={d} />,
+  label: `${d.titleA} ${d.titleB}`,
+}));
+
 // ─── Swim Goggles card constants ─────────────────────────────────────────────
 const SWIM_BADGES = [
   { text: "ANTI-FOG",      col: "#22d3ee" },
@@ -1133,21 +1388,14 @@ function ServiceCard({
   );
 }
 
-type Slide = { img: string; label: string };
-
 function Services() {
-  const [activeSlides, setActiveSlides] = useState<Slide[] | null>(null);
-  const [active, setActive] = useState(0);
+  const [deck, setDeck] = useState<{ slides: SlideEntry[]; title: string } | null>(null);
   const [hovSvc, setHovSvc] = useState<number | null>(null);
 
-  function openSlideshow(slides: Slide[]) {
-    setActive(0);
-    setActiveSlides(slides);
-  }
-
-  function closeSlideshow() {
-    setActiveSlides(null);
-  }
+  // Voronka stays as image-only carousel (no per-slide story yet)
+  const VORONKA_DECK_SLIDES: SlideEntry[] = VORONKA_SLIDES.map((s) => ({
+    img: s.img, label: s.label,
+  }));
 
   const SVC_COLS = 2;
   function svcStyle(idx: number): React.CSSProperties {
@@ -1205,10 +1453,10 @@ function Services() {
                     undefined
                   }
                   onOpen={
-                    idx === 0 ? () => openSlideshow(SHOWCASE_SLIDES) :
-                    idx === 1 ? () => openSlideshow(HERO_SLIDES) :
-                    idx === 2 ? () => openSlideshow(AI_SLIDES) :
-                    idx === 3 ? () => openSlideshow(VORONKA_SLIDES) :
+                    idx === 0 ? () => setDeck({ slides: PRODUCT_DECK_SLIDES, title: "Карточки товаров" }) :
+                    idx === 1 ? () => setDeck({ slides: HERO_DECK_SLIDES,    title: "HERO-экраны"      }) :
+                    idx === 2 ? () => setDeck({ slides: AI_DECK_SLIDES,      title: "AI-визуалы"        }) :
+                    idx === 3 ? () => setDeck({ slides: VORONKA_DECK_SLIDES, title: "Анализ воронки продаж" }) :
                     undefined
                   }
                 />
@@ -1218,181 +1466,14 @@ function Services() {
         </div>
       </div>
 
-      {/* ── Full-screen product slideshow modal ── */}
+      {/* Unified deck modal — same component used by Cases section */}
       <AnimatePresence>
-        {activeSlides && (
-          <m.div
-            key="slideshow-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.28 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center px-6 overflow-hidden"
-            style={{
-              background: "rgba(8,8,8,0.94)",
-              backdropFilter: "blur(18px)",
-              WebkitBackdropFilter: "blur(18px)",
-            }}
-            onClick={(e) => { if (e.target === e.currentTarget) closeSlideshow(); }}
-          >
-            {/* Close button */}
-            <button
-              onClick={closeSlideshow}
-              className="absolute top-6 right-7 w-10 h-10 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-500 hover:text-white hover:border-white/25 transition-all duration-200"
-              aria-label="Закрыть"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </button>
-
-            {/* Top label */}
-            <m.p
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.08 }}
-              className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-10"
-            >
-              {activeSlides === HERO_SLIDES    ? "Примеры HERO-экранов"        :
-               activeSlides === AI_SLIDES     ? "Примеры AI-визуалов"          :
-               activeSlides === VORONKA_SLIDES ? "Анализ воронки продаж"       :
-                                                 "Примеры карточек товаров"}
-            </m.p>
-
-            {/* ── MOBILE: single card + prev/next arrows ── */}
-            <m.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.06 }}
-              className="flex md:hidden items-center gap-4 w-full justify-center"
-            >
-              {/* Prev */}
-              <button
-                onClick={() => setActive((active + activeSlides.length - 1) % activeSlides.length)}
-                className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/25 transition-all duration-200"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
-
-              {/* Active card */}
-              <AnimatePresence mode="wait">
-                <m.div
-                  key={active}
-                  initial={{ opacity: 0, scale: 0.94 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.94 }}
-                  transition={{ duration: 0.22 }}
-                  style={{
-                    width: "min(72vw, 300px)",
-                    flexShrink: 0,
-                    borderRadius: 20,
-                    overflow: "hidden",
-                    border: "1.5px solid rgba(203,255,0,0.65)",
-                    boxShadow: [
-                      "0 0 0 1px rgba(203,255,0,0.12)",
-                      "0 0 36px rgba(203,255,0,0.20)",
-                      "0 20px 50px rgba(0,0,0,0.75)",
-                    ].join(", "),
-                  }}
-                >
-                  <img
-                    src={activeSlides[active].img}
-                    alt={activeSlides[active].label}
-                    draggable={false}
-                    className="block w-full h-auto select-none"
-                  />
-                </m.div>
-              </AnimatePresence>
-
-              {/* Next */}
-              <button
-                onClick={() => setActive((active + 1) % activeSlides.length)}
-                className="flex-shrink-0 w-9 h-9 rounded-full border border-white/10 bg-white/[0.04] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/25 transition-all duration-200"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
-              </button>
-            </m.div>
-
-            {/* ── DESKTOP: 3D coverflow ── */}
-            <m.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
-              className="hidden md:block relative w-full"
-              style={{ height: "min(62vh, 620px)", perspective: "1400px", perspectiveOrigin: "50% 50%" }}
-            >
-              {activeSlides.map((slide, i) => {
-                const off = i - active;
-                const abs = Math.abs(off);
-                if (abs > 2) return null;
-                const spreadX = off === 0 ? 0 : Math.sign(off) * (abs === 1 ? 255 : 460);
-                const rotY    = off * -44;
-                const depth   = -abs * 210;
-                const scl     = [1, 0.87, 0.70][abs];
-                const bright  = [1, 0.52, 0.28][abs];
-                return (
-                  <div
-                    key={i}
-                    onMouseEnter={() => setActive(i)}
-                    onClick={() => setActive(i)}
-                    style={{
-                      position: "absolute",
-                      left: "50%", top: "50%",
-                      width: "min(24vw, 400px)",
-                      borderRadius: 18,
-                      overflow: "hidden",
-                      cursor: abs > 0 ? "pointer" : "default",
-                      zIndex: 10 - abs,
-                      transform: `translateX(calc(-50% + ${spreadX}px)) translateY(-50%) rotateY(${rotY}deg) translateZ(${depth}px) scale(${scl})`,
-                      filter: `brightness(${bright})`,
-                      transition: "transform 0.58s cubic-bezier(0.22,1,0.36,1), filter 0.48s ease, border-color 0.3s ease, box-shadow 0.48s ease",
-                      border: abs === 0 ? "2px solid rgba(203,255,0,0.65)" : "1.5px solid rgba(255,255,255,0.07)",
-                      boxShadow: abs === 0
-                        ? "0 0 0 1px rgba(203,255,0,0.10), 0 0 48px rgba(203,255,0,0.22), 0 32px 80px rgba(0,0,0,0.85)"
-                        : "0 10px 40px rgba(0,0,0,0.65)",
-                    }}
-                  >
-                    <img src={slide.img} alt={slide.label} draggable={false} className="block w-full h-auto select-none" />
-                  </div>
-                );
-              })}
-            </m.div>
-
-            {/* Active label */}
-            <AnimatePresence mode="wait">
-              <m.p
-                key={active}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.18 }}
-                className="mt-8 text-sm font-mono text-zinc-400 uppercase tracking-[0.18em]"
-              >
-                {activeSlides[active].label}
-              </m.p>
-            </AnimatePresence>
-
-            {/* Dot indicators */}
-            <div className="flex items-center gap-2 mt-3">
-              {activeSlides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActive(i)}
-                  aria-label={activeSlides[i].label}
-                  style={{
-                    padding: 0,
-                    border: "none",
-                    borderRadius: 3,
-                    background: i === active ? "#CBFF00" : "rgba(255,255,255,0.18)",
-                    width: i === active ? 22 : 6,
-                    height: 6,
-                    transition: "all 0.3s ease",
-                    cursor: "pointer",
-                  }}
-                />
-              ))}
-            </div>
-          </m.div>
+        {deck && (
+          <CaseDeckModal
+            slides={deck.slides}
+            title={deck.title}
+            onClose={() => setDeck(null)}
+          />
         )}
       </AnimatePresence>
     </section>
