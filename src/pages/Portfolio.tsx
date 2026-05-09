@@ -932,7 +932,17 @@ function Marquee() {
 }
 
 // ─── SERVICES ────────────────────────────────────────────────────────────────
-const SERVICES = [
+type BrandKey = "wb" | "ozon" | "yandex" | "avito";
+
+const SERVICES: Array<{
+  num: string;
+  icon: string;
+  title: string;
+  subtitle: string;
+  desc: string;
+  tags: string[];
+  marketplace: BrandKey;
+}> = [
   {
     num: "01",
     icon: "🟡",
@@ -940,8 +950,7 @@ const SERVICES = [
     subtitle: "WB / Ozon",
     desc: "Фото + инфографика + А+ контент. Дизайн, который работает на выдаче — тестирую гипотезы по CTR и конверсии.",
     tags: ["WB", "Ozon", "Инфографика", "А+ контент"],
-    marketplace: "WB",
-    marketplaceFull: "WILDBERRIES",
+    marketplace: "wb",
   },
   {
     num: "02",
@@ -950,8 +959,7 @@ const SERVICES = [
     subtitle: "Первый слайд",
     desc: "Главный экран, который останавливает прокрутку. Сильный визуал + читаемое УТП = больше кликов в карточку.",
     tags: ["HERO", "CTR", "Конверсия"],
-    marketplace: "OZON",
-    marketplaceFull: "OZON",
+    marketplace: "ozon",
   },
   {
     num: "03",
@@ -960,8 +968,7 @@ const SERVICES = [
     subtitle: "Midjourney · Flux",
     desc: "Генерирую уникальный визуал за часы. Без фотостудии, без долгих согласований — готово к публикации.",
     tags: ["AI", "Midjourney", "Flux", "Быстро"],
-    marketplace: "ЯНДЕКС",
-    marketplaceFull: "ЯНДЕКС.МАРКЕТ",
+    marketplace: "yandex",
   },
   {
     num: "04",
@@ -970,8 +977,7 @@ const SERVICES = [
     subtitle: "WB · Ozon · Unit-экономика",
     desc: "Разбираю, где теряются покупатели: CTR, конверсия, корзина. Нахожу точки роста и даю конкретные рекомендации по дизайну.",
     tags: ["CTR", "Конверсия", "Аналитика", "Рост"],
-    marketplace: "AVITO",
-    marketplaceFull: "AVITO",
+    marketplace: "avito",
   },
 ];
 
@@ -1301,24 +1307,100 @@ const SWIM_BUBBLES = Array.from({ length: 16 }, (_, i) => ({
   opa: 0.2 + (i * 0.08) % 0.45,
 }));
 
-/* Marketplace name as oversized animated typography inside ServiceCard.
-   One huge centerpiece word + several smaller copies floating around it.
-   Inverts color on parent group hover so it stays legible on the acid bg. */
-function MarketplaceFlair({
-  short,
-  full,
-}: {
-  short: string;   // short variant for floating copies (WB, OZON, AVITO…)
-  full: string;    // full variant for the giant centerpiece
-}) {
-  // Fixed pseudo-random positions/timings so SSR matches CSR + no jitter on re-render
+/* Brand-coloured typographic wordmarks (stylized text — NOT trademark logos).
+   Each variant uses fonts/colours associated with the marketplace as a creative
+   homage. The mini floating copies repeat the brand's short name. */
+const BRAND_META: Record<BrandKey, {
+  short: string;
+  long:  string;
+  color: string;       // primary brand colour
+  accent: string;      // small dot/decor colour
+  longSize: number;    // font-size hint for centerpiece
+  weight: number;
+}> = {
+  wb:     { short: "WB",     long: "wildberries",   color: "#E8338A", accent: "#FFFFFF", longSize: 46, weight: 900 },
+  ozon:   { short: "OZON",   long: "ozon",          color: "#0079FF", accent: "#FFCC00", longSize: 76, weight: 900 },
+  yandex: { short: "ЯНДЕКС", long: "Я.Маркет",      color: "#FFCC00", accent: "#FC3F1D", longSize: 56, weight: 900 },
+  avito:  { short: "AVITO",  long: "Avito",         color: "#00AAFF", accent: "#97CF26", longSize: 70, weight: 900 },
+};
+
+function BrandWordmark({ brand }: { brand: BrandKey }) {
+  const meta = BRAND_META[brand];
+  // Small visual quirks per brand to make each wordmark distinctive
+  const decor = (() => {
+    switch (brand) {
+      case "wb":
+        return (
+          <span style={{
+            display: "inline-block", width: 14, height: 14, marginRight: 8,
+            borderRadius: 4, background: meta.color,
+            boxShadow: `0 0 18px ${meta.color}80`,
+            verticalAlign: "middle",
+          }}/>
+        );
+      case "ozon":
+        // bullet over the "o"
+        return (
+          <span style={{
+            position: "absolute", top: -6, left: 10,
+            width: 10, height: 10, borderRadius: "50%",
+            background: meta.accent, boxShadow: `0 0 10px ${meta.accent}aa`,
+          }}/>
+        );
+      case "yandex":
+        return (
+          <span style={{
+            display: "inline-block", marginRight: 6,
+            color: meta.accent, fontWeight: 900,
+            textShadow: `0 0 14px ${meta.accent}77`,
+          }}>›</span>
+        );
+      case "avito":
+        return (
+          <span style={{
+            display: "inline-block", width: 8, height: 8, marginRight: 8,
+            borderRadius: "50%", background: meta.accent,
+            boxShadow: `0 0 14px ${meta.accent}aa`,
+            verticalAlign: "middle",
+          }}/>
+        );
+    }
+  })();
+
+  return (
+    <span
+      className="group-hover:!text-black transition-colors duration-300"
+      style={{
+        position: "relative",
+        display: "inline-flex", alignItems: "center",
+        fontSize: meta.longSize,
+        fontWeight: meta.weight,
+        letterSpacing: brand === "yandex" ? "-0.01em" : "-0.03em",
+        color: meta.color,
+        whiteSpace: "nowrap",
+        textShadow: `0 0 28px ${meta.color}55`,
+        fontFamily: "Geist, system-ui, sans-serif",
+      }}
+    >
+      {decor}
+      <span style={{ position: "relative" }}>{meta.long}</span>
+    </span>
+  );
+}
+
+/* Marketplace flair: stylized brand wordmark in centre + small floating
+   short-name copies in same brand colour, all subtly animated. Inverts to
+   black on parent group-hover so it stays legible on the acid bg. */
+function MarketplaceFlair({ brand }: { brand: BrandKey }) {
+  const meta = BRAND_META[brand];
+  // Fixed pseudo-random positions/timings so SSR matches CSR + no jitter
   const blobs = [
-    { x: "-2%",  y: "12%", size: 16, dur: 7.2, delay: 0,    op: 0.32, dx: 22, dy: -14 },
-    { x: "85%",  y: "8%",  size: 14, dur: 8.5, delay: 1.1,  op: 0.26, dx: -28, dy: 18 },
-    { x: "10%",  y: "78%", size: 18, dur: 6.4, delay: 0.6,  op: 0.36, dx: 32, dy: -22 },
-    { x: "72%",  y: "82%", size: 13, dur: 9.1, delay: 1.8,  op: 0.22, dx: -20, dy: -14 },
-    { x: "42%",  y: "-5%", size: 12, dur: 7.8, delay: 0.3,  op: 0.20, dx: 18, dy: 26 },
-    { x: "55%",  y: "92%", size: 15, dur: 8.0, delay: 2.2,  op: 0.30, dx: -24, dy: -28 },
+    { x: "-2%",  y: "12%", size: 15, dur: 7.2, delay: 0,    op: 0.40, dx: 22,  dy: -14 },
+    { x: "82%",  y: "8%",  size: 13, dur: 8.5, delay: 1.1,  op: 0.34, dx: -28, dy: 18  },
+    { x: "8%",   y: "78%", size: 17, dur: 6.4, delay: 0.6,  op: 0.42, dx: 32,  dy: -22 },
+    { x: "70%",  y: "82%", size: 12, dur: 9.1, delay: 1.8,  op: 0.30, dx: -20, dy: -14 },
+    { x: "42%",  y: "-5%", size: 11, dur: 7.8, delay: 0.3,  op: 0.26, dx: 18,  dy: 26  },
+    { x: "55%",  y: "92%", size: 14, dur: 8.0, delay: 2.2,  op: 0.36, dx: -24, dy: -28 },
   ];
 
   return (
@@ -1328,22 +1410,21 @@ function MarketplaceFlair({
         marginTop: 18, overflow: "hidden",
         borderRadius: 12,
         background:
-          "linear-gradient(135deg, rgba(203,255,0,0.04) 0%, rgba(255,255,255,0.02) 50%, rgba(203,255,0,0.04) 100%)",
-        border: "1px solid rgba(255,255,255,0.05)",
+          `linear-gradient(135deg, ${meta.color}08 0%, rgba(255,255,255,0.02) 50%, ${meta.color}08 100%)`,
+        border: `1px solid ${meta.color}15`,
       }}
     >
-      {/* Subtle radial glow that intensifies on hover */}
+      {/* Brand-coloured radial glow */}
       <div
         className="absolute inset-0 transition-opacity duration-500"
         style={{
-          background: "radial-gradient(ellipse at center, rgba(203,255,0,0.10) 0%, transparent 70%)",
-          opacity: 0.6,
+          background: `radial-gradient(ellipse at center, ${meta.color}1F 0%, transparent 70%)`,
         }}
       />
 
-      {/* Giant centerpiece word — pulses in scale + opacity */}
+      {/* Centerpiece stylized wordmark — pulses subtly */}
       <m.div
-        animate={{ scale: [1, 1.04, 1], opacity: [0.18, 0.30, 0.18] }}
+        animate={{ scale: [1, 1.03, 1], opacity: [0.85, 1, 0.85] }}
         transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
         style={{
           position: "absolute", inset: 0,
@@ -1351,41 +1432,29 @@ function MarketplaceFlair({
           pointerEvents: "none",
         }}
       >
-        <span
-          className="font-luna group-hover:!text-black/40 transition-colors duration-300"
-          style={{
-            fontSize: full.length > 6 ? "clamp(28px, 5vw, 56px)" : "clamp(38px, 6.5vw, 78px)",
-            fontWeight: 900,
-            letterSpacing: "-0.02em",
-            color: "#CBFF00",
-            whiteSpace: "nowrap",
-            textShadow: "0 0 32px rgba(203,255,0,0.30)",
-          }}
-        >
-          {full}
-        </span>
+        <BrandWordmark brand={brand} />
       </m.div>
 
-      {/* Small floating copies of the short name */}
+      {/* Small floating copies of short name in brand colour */}
       {blobs.map((b, i) => (
         <m.span
           key={i}
           animate={{ x: [0, b.dx, 0], y: [0, b.dy, 0], opacity: [b.op * 0.6, b.op, b.op * 0.6] }}
           transition={{ duration: b.dur, repeat: Infinity, ease: "easeInOut", delay: b.delay }}
-          className="font-mono group-hover:!text-black/45 transition-colors duration-300"
+          className="font-mono group-hover:!text-black/55 transition-colors duration-300"
           style={{
             position: "absolute",
             left: b.x, top: b.y,
             fontSize: b.size,
             fontWeight: 700,
             letterSpacing: "0.08em",
-            color: "#CBFF00",
+            color: meta.color,
             opacity: b.op,
             pointerEvents: "none",
             whiteSpace: "nowrap",
           }}
         >
-          {short}
+          {meta.short}
         </m.span>
       ))}
     </div>
@@ -1406,24 +1475,24 @@ function ServiceCard({
     <Reveal>
       <m.div
         variants={fadeUp}
-        className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:bg-[#658000] hover:border-[#7a9900] transition-colors duration-300"
+        className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:bg-accent hover:border-accent transition-colors duration-300"
         style={{ cursor: hasSlideshow ? "pointer" : "default" }}
         onClick={hasSlideshow ? onOpen : undefined}
       >
-        <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700 group-hover:text-black/55 transition-colors duration-300">{s.num}</span>
+        <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700 group-hover:text-black/40 transition-colors duration-300">{s.num}</span>
         <h3 className="text-lg font-semibold text-white group-hover:text-black transition-colors duration-300 mt-2 mb-2">{s.title}</h3>
-        <p className="text-sm text-accent/70 font-mono mb-3 group-hover:text-black/70 transition-colors duration-300">{s.subtitle}</p>
-        <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-black/80 transition-colors duration-300">{s.desc}</p>
+        <p className="text-sm text-accent/70 font-mono mb-3 group-hover:text-black/55 transition-colors duration-300">{s.subtitle}</p>
+        <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-black/65 transition-colors duration-300">{s.desc}</p>
         <div className="flex flex-wrap gap-1.5 mt-5">
           {s.tags.map((t) => (
-            <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500 group-hover:bg-black/15 group-hover:text-black/70 transition-colors duration-300">
+            <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500 group-hover:bg-black/10 group-hover:text-black/55 transition-colors duration-300">
               {t}
             </span>
           ))}
         </div>
-        <MarketplaceFlair short={s.marketplace} full={s.marketplaceFull} />
+        <MarketplaceFlair brand={s.marketplace} />
         {hasSlideshow && (
-          <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/55 transition-colors duration-200">
+          <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/45 transition-colors duration-200">
             смотреть примеры →
           </span>
         )}
@@ -1464,8 +1533,29 @@ function Services() {
   }
 
   return (
-    <section id="services" className="py-28 md:py-36">
-      <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <section id="services" className="relative py-28 md:py-36 overflow-hidden">
+      {/* 3D acid sculpture — sits behind the cards, top-right */}
+      <m.img
+        src="/hero/bg-3d.png"
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        initial={{ opacity: 0, x: 80, rotate: -12 }}
+        whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "absolute",
+          right: "-6%", top: "8%",
+          width: "min(38vw, 520px)",
+          height: "auto",
+          pointerEvents: "none",
+          zIndex: 0,
+          filter: "drop-shadow(0 30px 80px rgba(203,255,0,0.18))",
+        }}
+      />
+      {/* Slow rotating wrapper for the 3D figure */}
+      <div className="relative max-w-[1280px] mx-auto px-5 md:px-10" style={{ zIndex: 1 }}>
         <Reveal>
           <Label>Услуги</Label>
           <m.h2
