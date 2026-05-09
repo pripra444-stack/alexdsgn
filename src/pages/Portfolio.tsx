@@ -52,64 +52,39 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ─── Acid wavy grid background — SVG, scales with section ─────────────────
-   Generates ~90 sine-wave lines that fan across the section. Inspired by the
-   user's reference PNG (acid-green wavy grid on dark background). Pure SVG,
-   no image asset, color & opacity tweakable in one place. */
+/* ─── Acid wavy grid background — uses user-provided PNG ───────────────────
+   Renders /hero/bg-lines.png at full section coverage with adjustable opacity
+   and optional flip for variation between sections. */
 function AcidGridBg({
-  opacity = 0.16,
-  variant = "top",
+  opacity = 0.18,
+  flip = false,
+  position = "center",
 }: {
   opacity?: number;
-  variant?: "top" | "center" | "bottom";
+  flip?: boolean;
+  position?: "top" | "center" | "bottom";
 }) {
-  const lines = Array.from({ length: 90 }, (_, i) => {
-    const t = i / 89;                                    // 0..1 progress
-    const baseY = variant === "top"    ? 80  + t * 380
-                : variant === "bottom" ? 320 + t * 380
-                                       : 200 + t * 320;
-    const amp   = 70 + t * 110;                          // wave amplitude
-    const phase = t * Math.PI * 1.2;                     // phase offset per line
-    const skew  = (t - 0.5) * 80;                        // slight Y-skew
-    const pts: string[] = [];
-    for (let j = 0; j <= 90; j++) {
-      const x = (j / 90) * 1500;
-      const k = (x / 1500 - 0.5) * Math.PI * 2.4;
-      const y = baseY + Math.sin(k + phase) * amp * Math.cos(k * 0.7) - skew;
-      pts.push(`${j === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`);
-    }
-    return pts.join(" ");
-  });
-
+  const objectPosition = position === "top" ? "center top" : position === "bottom" ? "center bottom" : "center";
   return (
-    <svg
+    <div
       aria-hidden="true"
-      viewBox="0 0 1500 800"
-      preserveAspectRatio="xMidYMid slice"
       style={{
-        position: "absolute", inset: 0, width: "100%", height: "100%",
-        pointerEvents: "none", opacity, zIndex: 0,
+        position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0,
+        opacity, overflow: "hidden",
       }}
     >
-      <defs>
-        <linearGradient id="acidLineFade" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stopColor="#CBFF00" stopOpacity="0.0" />
-          <stop offset="35%"  stopColor="#CBFF00" stopOpacity="1.0" />
-          <stop offset="65%"  stopColor="#CBFF00" stopOpacity="1.0" />
-          <stop offset="100%" stopColor="#CBFF00" stopOpacity="0.0" />
-        </linearGradient>
-      </defs>
-      {lines.map((d, i) => (
-        <path
-          key={i}
-          d={d}
-          fill="none"
-          stroke="url(#acidLineFade)"
-          strokeWidth={0.6 + (i % 3) * 0.15}
-          strokeLinecap="round"
-        />
-      ))}
-    </svg>
+      <img
+        src="/hero/bg-lines.png"
+        alt=""
+        draggable={false}
+        style={{
+          position: "absolute", inset: 0, width: "100%", height: "100%",
+          objectFit: "cover", objectPosition,
+          transform: flip ? "scaleX(-1)" : "none",
+          mixBlendMode: "screen",      /* keeps lines glowing on dark bg */
+        }}
+      />
+    </div>
   );
 }
 
@@ -1049,14 +1024,81 @@ const SWIM_BUBBLES = Array.from({ length: 16 }, (_, i) => ({
   opa: 0.2 + (i * 0.08) % 0.45,
 }));
 
+/* Mini coverflow preview shown inside each ServiceCard.
+   Auto-rotates through 3 thumbnails so user sees there's content inside. */
+function ServiceCardPreview({ imgs }: { imgs: string[] }) {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    if (imgs.length < 2) return;
+    const id = setInterval(() => setActive((a) => (a + 1) % imgs.length), 2400);
+    return () => clearInterval(id);
+  }, [imgs.length]);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: 120,
+        marginTop: 18,
+        perspective: "800px",
+        perspectiveOrigin: "50% 50%",
+      }}
+    >
+      {imgs.map((src, i) => {
+        const off = i - active;
+        const abs = Math.abs(off);
+        if (abs > 1 && imgs.length > 2) return null;
+        const x = off === 0 ? 0 : Math.sign(off) * 44;
+        const rotY = off * -22;
+        const z = -abs * 60;
+        const scale = abs === 0 ? 1 : 0.78;
+        const bright = abs === 0 ? 1 : 0.45;
+        return (
+          <div
+            key={src}
+            style={{
+              position: "absolute",
+              left: "50%", top: "50%",
+              width: 92, height: 92,
+              borderRadius: 10,
+              overflow: "hidden",
+              border: abs === 0
+                ? "1.5px solid rgba(203,255,0,0.55)"
+                : "1px solid rgba(255,255,255,0.08)",
+              boxShadow: abs === 0
+                ? "0 0 18px rgba(203,255,0,0.20), 0 8px 22px rgba(0,0,0,0.55)"
+                : "0 4px 14px rgba(0,0,0,0.45)",
+              transform: `translateX(calc(-50% + ${x}px)) translateY(-50%) rotateY(${rotY}deg) translateZ(${z}px) scale(${scale})`,
+              filter: `brightness(${bright})`,
+              transition: "transform 0.55s cubic-bezier(0.22,1,0.36,1), filter 0.42s ease, border-color 0.32s ease, box-shadow 0.42s ease",
+              zIndex: 10 - abs,
+              background: "#0a0a0a",
+            }}
+          >
+            <img
+              src={src}
+              alt=""
+              draggable={false}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function ServiceCard({
   s,
   idx,
   onOpen,
+  previewImgs,
 }: {
   s: (typeof SERVICES)[0];
   idx: number;
   onOpen?: () => void;
+  previewImgs?: string[];
 }) {
   const hasSlideshow = idx === 0 || idx === 1 || idx === 2 || idx === 3;
   return (
@@ -1078,6 +1120,9 @@ function ServiceCard({
             </span>
           ))}
         </div>
+        {previewImgs && previewImgs.length > 0 && (
+          <ServiceCardPreview imgs={previewImgs} />
+        )}
         {hasSlideshow && (
           <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/55 transition-colors duration-200">
             смотреть примеры →
@@ -1128,7 +1173,7 @@ function Services() {
 
   return (
     <section id="services" className="relative py-28 md:py-36 overflow-hidden">
-      <AcidGridBg opacity={0.14} variant="top" />
+      <AcidGridBg opacity={0.20} position="top" />
       <div className="relative max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Услуги</Label>
@@ -1152,6 +1197,13 @@ function Services() {
                 <ServiceCard
                   s={s}
                   idx={idx}
+                  previewImgs={
+                    idx === 0 ? SHOWCASE_SLIDES.map(s => s.img) :
+                    idx === 1 ? HERO_SLIDES.slice(0, 3).map(s => s.img) :
+                    idx === 2 ? AI_SLIDES.map(s => s.img) :
+                    idx === 3 ? VORONKA_SLIDES.map(s => s.img) :
+                    undefined
+                  }
                   onOpen={
                     idx === 0 ? () => openSlideshow(SHOWCASE_SLIDES) :
                     idx === 1 ? () => openSlideshow(HERO_SLIDES) :
@@ -3068,7 +3120,7 @@ function Cases() {
 
   return (
     <section id="cases" className="relative py-28 md:py-36 bg-surface/30 overflow-hidden">
-      <AcidGridBg opacity={0.12} variant="bottom" />
+      <AcidGridBg opacity={0.18} position="bottom" flip />
       <AnimatePresence>
         {caseModal && (
           <CaseDeckModal
