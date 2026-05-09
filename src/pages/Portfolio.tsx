@@ -52,6 +52,67 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ─── Acid wavy grid background — SVG, scales with section ─────────────────
+   Generates ~90 sine-wave lines that fan across the section. Inspired by the
+   user's reference PNG (acid-green wavy grid on dark background). Pure SVG,
+   no image asset, color & opacity tweakable in one place. */
+function AcidGridBg({
+  opacity = 0.16,
+  variant = "top",
+}: {
+  opacity?: number;
+  variant?: "top" | "center" | "bottom";
+}) {
+  const lines = Array.from({ length: 90 }, (_, i) => {
+    const t = i / 89;                                    // 0..1 progress
+    const baseY = variant === "top"    ? 80  + t * 380
+                : variant === "bottom" ? 320 + t * 380
+                                       : 200 + t * 320;
+    const amp   = 70 + t * 110;                          // wave amplitude
+    const phase = t * Math.PI * 1.2;                     // phase offset per line
+    const skew  = (t - 0.5) * 80;                        // slight Y-skew
+    const pts: string[] = [];
+    for (let j = 0; j <= 90; j++) {
+      const x = (j / 90) * 1500;
+      const k = (x / 1500 - 0.5) * Math.PI * 2.4;
+      const y = baseY + Math.sin(k + phase) * amp * Math.cos(k * 0.7) - skew;
+      pts.push(`${j === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`);
+    }
+    return pts.join(" ");
+  });
+
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 1500 800"
+      preserveAspectRatio="xMidYMid slice"
+      style={{
+        position: "absolute", inset: 0, width: "100%", height: "100%",
+        pointerEvents: "none", opacity, zIndex: 0,
+      }}
+    >
+      <defs>
+        <linearGradient id="acidLineFade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stopColor="#CBFF00" stopOpacity="0.0" />
+          <stop offset="35%"  stopColor="#CBFF00" stopOpacity="1.0" />
+          <stop offset="65%"  stopColor="#CBFF00" stopOpacity="1.0" />
+          <stop offset="100%" stopColor="#CBFF00" stopOpacity="0.0" />
+        </linearGradient>
+      </defs>
+      {lines.map((d, i) => (
+        <path
+          key={i}
+          d={d}
+          fill="none"
+          stroke="url(#acidLineFade)"
+          strokeWidth={0.6 + (i % 3) * 0.15}
+          strokeLinecap="round"
+        />
+      ))}
+    </svg>
+  );
+}
+
 // ─── Count-up animation ───────────────────────────────────────────────────────
 // Continuous ping-pong: counts 0 → N → 0 → N … at medium speed
 function CountUp({
@@ -1002,23 +1063,23 @@ function ServiceCard({
     <Reveal>
       <m.div
         variants={fadeUp}
-        className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:bg-accent hover:border-accent transition-colors duration-300"
+        className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-7 hover:bg-[#658000] hover:border-[#7a9900] transition-colors duration-300"
         style={{ cursor: hasSlideshow ? "pointer" : "default" }}
         onClick={hasSlideshow ? onOpen : undefined}
       >
-        <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700 group-hover:text-black/40 transition-colors duration-300">{s.num}</span>
+        <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700 group-hover:text-black/55 transition-colors duration-300">{s.num}</span>
         <h3 className="text-lg font-semibold text-white group-hover:text-black transition-colors duration-300 mt-2 mb-2">{s.title}</h3>
-        <p className="text-sm text-accent/70 font-mono mb-3 group-hover:text-black/55 transition-colors duration-300">{s.subtitle}</p>
-        <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-black/65 transition-colors duration-300">{s.desc}</p>
+        <p className="text-sm text-accent/70 font-mono mb-3 group-hover:text-black/70 transition-colors duration-300">{s.subtitle}</p>
+        <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-black/80 transition-colors duration-300">{s.desc}</p>
         <div className="flex flex-wrap gap-1.5 mt-5">
           {s.tags.map((t) => (
-            <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500 group-hover:bg-black/10 group-hover:text-black/55 transition-colors duration-300">
+            <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500 group-hover:bg-black/15 group-hover:text-black/70 transition-colors duration-300">
               {t}
             </span>
           ))}
         </div>
         {hasSlideshow && (
-          <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/45 transition-colors duration-200">
+          <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/55 transition-colors duration-200">
             смотреть примеры →
           </span>
         )}
@@ -1066,8 +1127,9 @@ function Services() {
   }
 
   return (
-    <section id="services" className="py-28 md:py-36">
-      <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <section id="services" className="relative py-28 md:py-36 overflow-hidden">
+      <AcidGridBg opacity={0.14} variant="top" />
+      <div className="relative max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Услуги</Label>
           <m.h2
@@ -3005,7 +3067,8 @@ function Cases() {
   }
 
   return (
-    <section id="cases" className="py-28 md:py-36 bg-surface/30">
+    <section id="cases" className="relative py-28 md:py-36 bg-surface/30 overflow-hidden">
+      <AcidGridBg opacity={0.12} variant="bottom" />
       <AnimatePresence>
         {caseModal && (
           <CaseDeckModal
@@ -3015,7 +3078,7 @@ function Cases() {
           />
         )}
       </AnimatePresence>
-      <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+      <div className="relative max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Кейсы</Label>
           <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-[0.06em] text-white mb-3">
