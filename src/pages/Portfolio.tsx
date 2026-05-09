@@ -1340,7 +1340,9 @@ function BrandWordmark({ brand }: { brand: BrandKey }) {
   const size = BRAND_LOGO_SIZE[brand];
   const [logoFailed, setLogoFailed] = useState(false);
 
-  // ── Logo found: render <img> with brand-tinted glow on hover ──
+  // ── Logo found: render <img> through SVG filter (white-bg knockout +
+  //    acid-green outline only). On parent group hover, swap to black outline
+  //    so it stays legible on the bright acid card background. ──
   if (!logoFailed) {
     return (
       <img
@@ -1348,14 +1350,13 @@ function BrandWordmark({ brand }: { brand: BrandKey }) {
         alt=""
         draggable={false}
         onError={() => setLogoFailed(true)}
-        className="transition-all duration-300 group-hover:brightness-0"
+        className="[filter:url(#acid-outline)] group-hover:[filter:url(#black-outline)] transition-[filter] duration-300"
         style={{
           maxHeight: size.maxH,
           maxWidth: size.maxW,
           width: "auto",
           height: "auto",
           objectFit: "contain",
-          filter: `drop-shadow(0 0 22px ${meta.color}55)`,
         }}
       />
     );
@@ -3545,6 +3546,58 @@ function ArrowDownIcon() {
 }
 
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
+/* Reusable SVG filter defs that turn any opaque-with-white-bg image into an
+   outline silhouette. Mounted once globally; referenced by className filter
+   url(#acid-outline) / url(#black-outline). Pure display-time transformation —
+   doesn't modify source image files. */
+function GlobalSvgFilters() {
+  return (
+    <svg
+      width="0" height="0"
+      style={{ position: "absolute", width: 0, height: 0, pointerEvents: "none" }}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        {/* ── Acid green outline ── */}
+        <filter id="acid-outline" x="-3%" y="-3%" width="106%" height="106%" colorInterpolationFilters="sRGB">
+          {/* 1. Knock out near-white pixels, paint the rest acid green (#CBFF00) */}
+          <feColorMatrix
+            type="matrix"
+            values="
+              0 0 0 0 0.796
+              0 0 0 0 1
+              0 0 0 0 0
+              -3 -3 -3 0 8
+            "
+            result="filled"
+          />
+          {/* 2. Erode silhouette inward by 2px */}
+          <feMorphology in="filled" operator="erode" radius="2" result="eroded" />
+          {/* 3. filled MINUS eroded = outline ring only */}
+          <feComposite in="filled" in2="eroded" operator="out" />
+        </filter>
+
+        {/* ── Black outline (used on hover when card bg is acid green) ── */}
+        <filter id="black-outline" x="-3%" y="-3%" width="106%" height="106%" colorInterpolationFilters="sRGB">
+          <feColorMatrix
+            type="matrix"
+            values="
+              0 0 0 0 0
+              0 0 0 0 0
+              0 0 0 0 0
+              -3 -3 -3 0 8
+            "
+            result="filled"
+          />
+          <feMorphology in="filled" operator="erode" radius="2" result="eroded" />
+          <feComposite in="filled" in2="eroded" operator="out" />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
 /* Decorative interlude between Services and Cases — a slowly rotating + floating
    3D acid sculpture, dimmed so it reads as background ambience, not focus. */
 function Bg3DInterlude() {
@@ -3586,6 +3639,7 @@ function Bg3DInterlude() {
 export default function Portfolio() {
   return (
     <div className="grain bg-canvas text-white min-h-[100dvh]">
+      <GlobalSvgFilters />
       <Nav />
       <Hero />
       <Marquee />
