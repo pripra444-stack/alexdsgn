@@ -1053,6 +1053,21 @@ function SubsectionSlide({ data }: { data: SubsectionSlideData }) {
     transition: { duration: 0.5, ease: E, delay },
   });
 
+  // Click-to-fullscreen for the right-side card image
+  const [zoom, setZoom] = useState(false);
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setZoom(false); };
+    window.addEventListener("keydown", onKey);
+    // freeze background scroll while lightbox is open
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [zoom]);
+
   return (
     <div
       className="relative flex flex-col md:flex-row gap-6 md:gap-10 w-full items-start md:items-center"
@@ -1116,12 +1131,18 @@ function SubsectionSlide({ data }: { data: SubsectionSlideData }) {
           }}
         />
 
-        {/* The image card with 3D fly-in from the right */}
+        {/* The image card with 3D fly-in from the right — clickable to zoom */}
         <div style={{ perspective: "1200px", perspectiveOrigin: "30% 50%", width: "100%", display: "flex", justifyContent: "center" }}>
           <m.div
             initial={{ opacity: 0, x: 110, rotateY: 36, scale: 0.82 }}
             animate={{ opacity: 1, x: 0,   rotateY: 0,  scale: 1 }}
             transition={{ duration: 0.85, delay: 0.30, ease: E }}
+            whileHover={{ scale: 1.015 }}
+            onClick={() => setZoom(true)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setZoom(true); } }}
+            aria-label="Открыть карточку на весь экран"
             style={{
               transformStyle: "preserve-3d",
               maxWidth: "100%",
@@ -1130,6 +1151,7 @@ function SubsectionSlide({ data }: { data: SubsectionSlideData }) {
               border: "1.5px solid rgba(203,255,0,0.30)",
               boxShadow:
                 "0 0 0 1px rgba(203,255,0,0.06), 0 0 40px rgba(203,255,0,0.20), 0 26px 64px rgba(0,0,0,0.80)",
+              cursor: "zoom-in",
             }}
           >
             <img
@@ -1138,9 +1160,103 @@ function SubsectionSlide({ data }: { data: SubsectionSlideData }) {
               draggable={false}
               style={{ display: "block", maxWidth: "100%", maxHeight: 500, height: "auto", width: "auto" }}
             />
+            {/* Subtle "click to enlarge" hint at top-right of card */}
+            <span style={{
+              position: "absolute", top: 10, right: 10,
+              fontSize: 10, fontFamily: "ui-monospace, monospace",
+              padding: "4px 8px", borderRadius: 999,
+              background: "rgba(0,0,0,0.55)", color: "rgba(203,255,0,0.85)",
+              border: "1px solid rgba(203,255,0,0.30)",
+              backdropFilter: "blur(6px)",
+              letterSpacing: "0.08em", pointerEvents: "none",
+              textTransform: "uppercase",
+            }}>
+              ⛶ увеличить
+            </span>
           </m.div>
         </div>
       </div>
+
+      {/* ── Fullscreen lightbox overlay (sits above case modal at z-[200]) ── */}
+      <AnimatePresence>
+        {zoom && (
+          <m.div
+            key="lightbox"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            onClick={() => setZoom(false)}
+            className="fixed inset-0 z-[200] flex items-center justify-center px-4 py-12"
+            style={{
+              background: "rgba(4,4,4,0.96)",
+              backdropFilter: "blur(22px)",
+              WebkitBackdropFilter: "blur(22px)",
+              cursor: "zoom-out",
+            }}
+            aria-modal="true"
+            role="dialog"
+          >
+            {/* Close button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setZoom(false); }}
+              aria-label="Закрыть"
+              style={{
+                position: "fixed", top: 22, right: 22,
+                width: 44, height: 44, borderRadius: "50%",
+                border: "1px solid rgba(255,255,255,0.18)",
+                background: "rgba(20,20,20,0.85)",
+                color: "rgba(255,255,255,0.9)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", zIndex: 1,
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+
+            {/* Caption above image */}
+            <p style={{
+              position: "fixed", top: 28, left: "50%", transform: "translateX(-50%)",
+              fontSize: 11, fontFamily: "ui-monospace, monospace", letterSpacing: "0.22em",
+              color: "#CBFF00", textTransform: "uppercase", pointerEvents: "none",
+            }}>
+              {data.titleA} {data.titleB}
+            </p>
+
+            {/* Enlarged image */}
+            <m.img
+              src={data.img}
+              alt={data.imgAlt}
+              draggable={false}
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.30, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                maxWidth: "min(94vw, 1400px)",
+                maxHeight: "calc(100vh - 96px)",
+                width: "auto", height: "auto",
+                objectFit: "contain", display: "block",
+                borderRadius: 14,
+                border: "1.5px solid rgba(203,255,0,0.30)",
+                boxShadow:
+                  "0 0 0 1px rgba(203,255,0,0.08), 0 0 80px rgba(203,255,0,0.22), 0 40px 100px rgba(0,0,0,0.90)",
+                cursor: "default",
+              }}
+            />
+
+            {/* Hint at bottom */}
+            <p style={{
+              position: "fixed", bottom: 22, left: "50%", transform: "translateX(-50%)",
+              fontSize: 10, fontFamily: "ui-monospace, monospace", letterSpacing: "0.18em",
+              color: "rgba(255,255,255,0.40)", textTransform: "uppercase", pointerEvents: "none",
+            }}>
+              esc · клик вне карточки — закрыть
+            </p>
+          </m.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1524,13 +1640,13 @@ function Services() {
       {/* 3D acid sphere — top-right, behind cards */}
       <m.div
         animate={{
-          x:       [0, 22, -10, 28, -18, 0],
-          y:       [0, -14, 18, -8, 12, 0],
+          x:       ["0vw", "-22vw", "-44vw", "-58vw", "-40vw", "-15vw", "0vw"],
+          y:       ["0vh",  "12vh",  "26vh",  "38vh",  "24vh",   "8vh", "0vh"],
           opacity: [0.55, 0, 0.55],
         }}
         transition={{
-          x:       { duration: 32, repeat: Infinity, ease: "easeInOut" },
-          y:       { duration: 32, repeat: Infinity, ease: "easeInOut" },
+          x:       { duration: 90, repeat: Infinity, ease: "easeInOut" },
+          y:       { duration: 90, repeat: Infinity, ease: "easeInOut" },
           opacity: { duration: 16, repeat: Infinity, ease: "easeInOut" },
         }}
         style={{
@@ -1554,16 +1670,17 @@ function Services() {
         />
       </m.div>
 
-      {/* 3D acid spiral — bottom-left, behind cards, counter-rotating */}
+      {/* 3D acid spiral — bottom-left, big counter-orbital path. Same duration
+          as sphere but offset by half-cycle delay → permanent opposite phase. */}
       <m.div
         animate={{
-          x:       [0, -18, 14, -24, 8, 0],
-          y:       [0, 16, -12, 6, -10, 0],
+          x:       ["0vw",  "22vw",  "44vw",  "58vw",  "40vw",  "15vw", "0vw"],
+          y:       ["0vh", "-12vh", "-26vh", "-38vh", "-24vh",  "-8vh", "0vh"],
           opacity: [0.50, 0, 0.50],
         }}
         transition={{
-          x:       { duration: 38, repeat: Infinity, ease: "easeInOut" },
-          y:       { duration: 38, repeat: Infinity, ease: "easeInOut" },
+          x:       { duration: 90, repeat: Infinity, ease: "easeInOut", delay: -45 },
+          y:       { duration: 90, repeat: Infinity, ease: "easeInOut", delay: -45 },
           opacity: { duration: 19, repeat: Infinity, ease: "easeInOut", delay: 3 },
         }}
         style={{
