@@ -1523,14 +1523,21 @@ function Services() {
     <section id="services" className="relative py-28 md:py-36 overflow-hidden">
       {/* 3D acid sphere — top-right, behind cards */}
       <m.div
-        animate={{ x: [0, 18, -14, 0], y: [0, -12, 8, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        animate={{
+          x:       [0, 22, -10, 28, -18, 0],
+          y:       [0, -14, 18, -8, 12, 0],
+          opacity: [0.55, 0, 0.55],
+        }}
+        transition={{
+          x:       { duration: 32, repeat: Infinity, ease: "easeInOut" },
+          y:       { duration: 32, repeat: Infinity, ease: "easeInOut" },
+          opacity: { duration: 16, repeat: Infinity, ease: "easeInOut" },
+        }}
         style={{
           position: "absolute",
           right: "-4%", top: "5%",
           width: "min(34vw, 460px)",
           aspectRatio: "1 / 1",
-          opacity: 0.55,
           filter: "drop-shadow(0 30px 70px rgba(203,255,0,0.18))",
           pointerEvents: "none",
           zIndex: 0,
@@ -1549,14 +1556,21 @@ function Services() {
 
       {/* 3D acid spiral — bottom-left, behind cards, counter-rotating */}
       <m.div
-        animate={{ x: [0, -16, 12, 0], y: [0, 14, -10, 0] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        animate={{
+          x:       [0, -18, 14, -24, 8, 0],
+          y:       [0, 16, -12, 6, -10, 0],
+          opacity: [0.50, 0, 0.50],
+        }}
+        transition={{
+          x:       { duration: 38, repeat: Infinity, ease: "easeInOut" },
+          y:       { duration: 38, repeat: Infinity, ease: "easeInOut" },
+          opacity: { duration: 19, repeat: Infinity, ease: "easeInOut", delay: 3 },
+        }}
         style={{
           position: "absolute",
           left: "-6%", bottom: "2%",
           width: "min(30vw, 420px)",
           aspectRatio: "3 / 4",
-          opacity: 0.50,
           filter: "drop-shadow(0 30px 70px rgba(203,255,0,0.18))",
           pointerEvents: "none",
           zIndex: 0,
