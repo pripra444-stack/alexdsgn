@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  // Mobile fix: hover styles only fire on devices that actually have hover
+  // (matches @media (hover: hover)). Without this, tapping a card on mobile
+  // gets stuck in :hover state until the next tap elsewhere.
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     extend: {
       fontFamily: {

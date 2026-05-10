@@ -55,18 +55,15 @@ function Label({ children }: { children: React.ReactNode }) {
 
 /* Reusable fullscreen image lightbox. Rendered via React portal at
    document.body so it escapes any transformed parent's stacking context.
-   Closes on: × button (top-right + bottom-centre on mobile), backdrop tap,
-   Escape key, or browser back gesture / hardware back button. Locks body
-   scroll while open. Close buttons use env(safe-area-inset-*) so they stay
-   below the iOS Safari URL bar / above the home indicator. */
+   Closes on: × button, backdrop tap, Escape, or browser back gesture.
+   Uses a STATE-AWARE popstate check so closing via the × button does NOT
+   cascade to close any parent modal that also pushed a history entry. */
 function ImageLightbox({ src, alt, open, onClose }: {
   src: string;
   alt: string;
   open: boolean;
   onClose: () => void;
 }) {
-  // Track whether close was triggered by browser back (popstate) so cleanup
-  // doesn't call history.back() again and double-pop the entry
   const popstateClosingRef = useRef(false);
 
   useEffect(() => {
@@ -74,9 +71,16 @@ function ImageLightbox({ src, alt, open, onClose }: {
     popstateClosingRef.current = false;
 
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    const onPop = () => {
-      popstateClosingRef.current = true;
-      onClose();
+    // Only close if the popped state is no longer the lightbox layer.
+    // This way, when a parent modal pushes its own state and we pushState on
+    // top, history.back() restores the parent's state — our handler sees no
+    // __lightbox flag and closes; the parent sees its own flag and stays.
+    const onPop = (e: PopStateEvent) => {
+      const st = e.state as { __lightbox?: boolean } | null;
+      if (!st?.__lightbox) {
+        popstateClosingRef.current = true;
+        onClose();
+      }
     };
 
     window.addEventListener("keydown", onKey);
@@ -85,9 +89,9 @@ function ImageLightbox({ src, alt, open, onClose }: {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // Push a history entry so mobile back gesture / hardware back button
-    // closes the lightbox instead of leaving the site
-    window.history.pushState({ __lightbox: true }, "");
+    // Push a state with __lightbox flag — preserves any parent flag merging
+    const prevState = (window.history.state as object | null) ?? {};
+    window.history.pushState({ ...prevState, __lightbox: true }, "");
 
     return () => {
       window.removeEventListener("keydown", onKey);
@@ -96,7 +100,6 @@ function ImageLightbox({ src, alt, open, onClose }: {
       // Pop our pushed entry only if close was NOT via popstate
       if (
         !popstateClosingRef.current &&
-        typeof window !== "undefined" &&
         (window.history.state as { __lightbox?: boolean } | null)?.__lightbox
       ) {
         window.history.back();
@@ -105,22 +108,6 @@ function ImageLightbox({ src, alt, open, onClose }: {
   }, [open, onClose]);
 
   if (typeof document === "undefined") return null;
-
-  // Shared close-button styling
-  const closeBtnBase: React.CSSProperties = {
-    position: "fixed",
-    width: 56, height: 56, borderRadius: "50%",
-    border: "1.5px solid rgba(203,255,0,0.65)",
-    background: "rgba(15,15,15,0.92)",
-    color: "#CBFF00",
-    display: "flex", alignItems: "center", justifyContent: "center",
-    cursor: "pointer",
-    backdropFilter: "blur(10px)",
-    WebkitBackdropFilter: "blur(10px)",
-    boxShadow: "0 0 22px rgba(203,255,0,0.35), 0 8px 24px rgba(0,0,0,0.6)",
-    zIndex: 10,
-    touchAction: "manipulation",
-  };
 
   return createPortal(
     <AnimatePresence>
@@ -152,7 +139,7 @@ function ImageLightbox({ src, alt, open, onClose }: {
             transition={{ duration: 0.30, ease: [0.22, 1, 0.36, 1] }}
             style={{
               maxWidth: "98vw",
-              maxHeight: "92vh",
+              maxHeight: "98vh",
               width:  "auto",
               height: "auto",
               objectFit: "contain",
@@ -161,43 +148,27 @@ function ImageLightbox({ src, alt, open, onClose }: {
             }}
           />
 
-          {/* Close button — top-right, safe-area aware so iOS Safari URL bar
-              never hides it; acid-bordered + glow so it can't be missed */}
+          {/* Single small close button — minimal acid ring, safe-area aware */}
           <button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
             aria-label="Закрыть"
             style={{
-              ...closeBtnBase,
-              top:   "max(20px, calc(env(safe-area-inset-top, 0px) + 14px))",
-              right: "max(20px, calc(env(safe-area-inset-right, 0px) + 14px))",
+              position: "fixed",
+              top:   "max(14px, calc(env(safe-area-inset-top, 0px) + 10px))",
+              right: "max(14px, calc(env(safe-area-inset-right, 0px) + 10px))",
+              width: 36, height: 36, borderRadius: "50%",
+              border: "1px solid rgba(203,255,0,0.40)",
+              background: "rgba(0,0,0,0.55)",
+              color: "rgba(255,255,255,0.92)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              zIndex: 10,
+              touchAction: "manipulation",
             }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-          </button>
-
-          {/* Mobile-only second close button at bottom-centre — within thumb
-              reach + always visible above the home indicator / Safari toolbar */}
-          <button
-            onClick={(e) => { e.stopPropagation(); onClose(); }}
-            aria-label="Закрыть"
-            className="md:hidden"
-            style={{
-              ...closeBtnBase,
-              bottom: "max(24px, calc(env(safe-area-inset-bottom, 0px) + 18px))",
-              left: "50%",
-              transform: "translateX(-50%)",
-              top: "auto", right: "auto",
-              width: "auto", height: 52,
-              padding: "0 22px 0 18px",
-              borderRadius: 999,
-              gap: 8,
-              fontSize: 13, fontWeight: 700,
-              fontFamily: "ui-monospace, monospace",
-              letterSpacing: "0.10em",
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-            ЗАКРЫТЬ
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
         </m.div>
       )}
@@ -3032,17 +3003,26 @@ function CaseDeckModal({ slides, title, onClose }: {
   const n = slides.length;
 
   // Modal lifecycle: lock body scroll, close on Escape, close on browser back
-  // gesture / hardware back so the user doesn't get kicked off the site
+  // gesture. State-aware popstate: only close if popped state no longer carries
+  // the __caseModal flag — so when nested lightbox does history.back(),
+  // the restored state still has __caseModal=true → this modal stays open.
   const popstateClosingRef = useRef(false);
   useEffect(() => {
     popstateClosingRef.current = false;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    const onPop = () => { popstateClosingRef.current = true; onClose(); };
+    const onPop = (e: PopStateEvent) => {
+      const st = e.state as { __caseModal?: boolean } | null;
+      if (!st?.__caseModal) {
+        popstateClosingRef.current = true;
+        onClose();
+      }
+    };
     window.addEventListener("keydown", onKey);
     window.addEventListener("popstate", onPop);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    window.history.pushState({ __caseModal: true }, "");
+    const prevState = (window.history.state as object | null) ?? {};
+    window.history.pushState({ ...prevState, __caseModal: true }, "");
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("popstate", onPop);
@@ -3075,28 +3055,28 @@ function CaseDeckModal({ slides, title, onClose }: {
         onClick={e => e.stopPropagation()}
       >
         {/* Close — fixed to viewport so it stays visible even when slide
-            content overflows past the top of the screen on mobile */}
+            content overflows past the top of the screen on mobile. Small,
+            unobtrusive but clear. */}
         <button
           onClick={(e) => { e.stopPropagation(); onClose(); }}
           aria-label="Закрыть"
           style={{
             position: "fixed",
-            top:   "max(16px, calc(env(safe-area-inset-top, 0px) + 12px))",
-            right: "max(16px, calc(env(safe-area-inset-right, 0px) + 12px))",
-            width: 52, height: 52, borderRadius: "50%",
-            border: "1.5px solid rgba(203,255,0,0.55)",
-            background: "rgba(15,15,15,0.92)",
-            color: "#CBFF00",
+            top:   "max(14px, calc(env(safe-area-inset-top, 0px) + 10px))",
+            right: "max(14px, calc(env(safe-area-inset-right, 0px) + 10px))",
+            width: 36, height: 36, borderRadius: "50%",
+            border: "1px solid rgba(203,255,0,0.40)",
+            background: "rgba(0,0,0,0.55)",
+            color: "rgba(255,255,255,0.92)",
             display: "flex", alignItems: "center", justifyContent: "center",
             cursor: "pointer",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
-            boxShadow: "0 0 18px rgba(203,255,0,0.30), 0 6px 20px rgba(0,0,0,0.6)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
             zIndex: 9999,
             touchAction: "manipulation",
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
 
         {/* Title */}
