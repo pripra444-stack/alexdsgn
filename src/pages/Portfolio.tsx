@@ -55,28 +55,72 @@ function Label({ children }: { children: React.ReactNode }) {
 
 /* Reusable fullscreen image lightbox. Rendered via React portal at
    document.body so it escapes any transformed parent's stacking context.
-   Pure black backdrop, image at 98vw × 98vh, only the × close button is
-   visible. Closes on backdrop click, × button, or Escape; locks body
-   scroll while open. */
+   Closes on: × button (top-right + bottom-centre on mobile), backdrop tap,
+   Escape key, or browser back gesture / hardware back button. Locks body
+   scroll while open. Close buttons use env(safe-area-inset-*) so they stay
+   below the iOS Safari URL bar / above the home indicator. */
 function ImageLightbox({ src, alt, open, onClose }: {
   src: string;
   alt: string;
   open: boolean;
   onClose: () => void;
 }) {
+  // Track whether close was triggered by browser back (popstate) so cleanup
+  // doesn't call history.back() again and double-pop the entry
+  const popstateClosingRef = useRef(false);
+
   useEffect(() => {
     if (!open) return;
+    popstateClosingRef.current = false;
+
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onPop = () => {
+      popstateClosingRef.current = true;
+      onClose();
+    };
+
     window.addEventListener("keydown", onKey);
+    window.addEventListener("popstate", onPop);
+
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    // Push a history entry so mobile back gesture / hardware back button
+    // closes the lightbox instead of leaving the site
+    window.history.pushState({ __lightbox: true }, "");
+
     return () => {
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("popstate", onPop);
       document.body.style.overflow = prevOverflow;
+      // Pop our pushed entry only if close was NOT via popstate
+      if (
+        !popstateClosingRef.current &&
+        typeof window !== "undefined" &&
+        (window.history.state as { __lightbox?: boolean } | null)?.__lightbox
+      ) {
+        window.history.back();
+      }
     };
   }, [open, onClose]);
 
   if (typeof document === "undefined") return null;
+
+  // Shared close-button styling
+  const closeBtnBase: React.CSSProperties = {
+    position: "fixed",
+    width: 56, height: 56, borderRadius: "50%",
+    border: "1.5px solid rgba(203,255,0,0.65)",
+    background: "rgba(15,15,15,0.92)",
+    color: "#CBFF00",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    cursor: "pointer",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    boxShadow: "0 0 22px rgba(203,255,0,0.35), 0 8px 24px rgba(0,0,0,0.6)",
+    zIndex: 10,
+    touchAction: "manipulation",
+  };
 
   return createPortal(
     <AnimatePresence>
@@ -108,7 +152,7 @@ function ImageLightbox({ src, alt, open, onClose }: {
             transition={{ duration: 0.30, ease: [0.22, 1, 0.36, 1] }}
             style={{
               maxWidth: "98vw",
-              maxHeight: "98vh",
+              maxHeight: "92vh",
               width:  "auto",
               height: "auto",
               objectFit: "contain",
@@ -116,22 +160,44 @@ function ImageLightbox({ src, alt, open, onClose }: {
               cursor: "default",
             }}
           />
+
+          {/* Close button — top-right, safe-area aware so iOS Safari URL bar
+              never hides it; acid-bordered + glow so it can't be missed */}
           <button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
             aria-label="Закрыть"
             style={{
-              position: "fixed", top: 22, right: 22,
-              width: 46, height: 46, borderRadius: "50%",
-              border: "1px solid rgba(255,255,255,0.20)",
-              background: "rgba(20,20,20,0.85)",
-              color: "rgba(255,255,255,0.95)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
+              ...closeBtnBase,
+              top:   "max(20px, calc(env(safe-area-inset-top, 0px) + 14px))",
+              right: "max(20px, calc(env(safe-area-inset-right, 0px) + 14px))",
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+
+          {/* Mobile-only second close button at bottom-centre — within thumb
+              reach + always visible above the home indicator / Safari toolbar */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onClose(); }}
+            aria-label="Закрыть"
+            className="md:hidden"
+            style={{
+              ...closeBtnBase,
+              bottom: "max(24px, calc(env(safe-area-inset-bottom, 0px) + 18px))",
+              left: "50%",
+              transform: "translateX(-50%)",
+              top: "auto", right: "auto",
+              width: "auto", height: 52,
+              padding: "0 22px 0 18px",
+              borderRadius: 999,
+              gap: 8,
+              fontSize: 13, fontWeight: 700,
+              fontFamily: "ui-monospace, monospace",
+              letterSpacing: "0.10em",
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            ЗАКРЫТЬ
           </button>
         </m.div>
       )}
