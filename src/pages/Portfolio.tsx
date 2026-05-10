@@ -3031,6 +3031,31 @@ function CaseDeckModal({ slides, title, onClose }: {
   const [zoom, setZoom] = useState<{ src: string; alt: string } | null>(null);
   const n = slides.length;
 
+  // Modal lifecycle: lock body scroll, close on Escape, close on browser back
+  // gesture / hardware back so the user doesn't get kicked off the site
+  const popstateClosingRef = useRef(false);
+  useEffect(() => {
+    popstateClosingRef.current = false;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onPop = () => { popstateClosingRef.current = true; onClose(); };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("popstate", onPop);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.history.pushState({ __caseModal: true }, "");
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("popstate", onPop);
+      document.body.style.overflow = prevOverflow;
+      if (
+        !popstateClosingRef.current &&
+        (window.history.state as { __caseModal?: boolean } | null)?.__caseModal
+      ) {
+        window.history.back();
+      }
+    };
+  }, [onClose]);
+
   return (
     <m.div
       initial={{ opacity: 0 }}
@@ -3049,12 +3074,29 @@ function CaseDeckModal({ slides, title, onClose }: {
         className="relative flex flex-col items-center w-full px-5"
         onClick={e => e.stopPropagation()}
       >
-        {/* Close */}
+        {/* Close — fixed to viewport so it stays visible even when slide
+            content overflows past the top of the screen on mobile */}
         <button
-          onClick={onClose}
-          className="absolute top-0 right-4 md:right-8 w-9 h-9 rounded-full border border-white/10 bg-white/[0.05] flex items-center justify-center text-zinc-400 hover:text-white hover:border-white/25 transition-all duration-200"
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          aria-label="Закрыть"
+          style={{
+            position: "fixed",
+            top:   "max(16px, calc(env(safe-area-inset-top, 0px) + 12px))",
+            right: "max(16px, calc(env(safe-area-inset-right, 0px) + 12px))",
+            width: 52, height: 52, borderRadius: "50%",
+            border: "1.5px solid rgba(203,255,0,0.55)",
+            background: "rgba(15,15,15,0.92)",
+            color: "#CBFF00",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            boxShadow: "0 0 18px rgba(203,255,0,0.30), 0 6px 20px rgba(0,0,0,0.6)",
+            zIndex: 9999,
+            touchAction: "manipulation",
+          }}
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
 
         {/* Title */}
