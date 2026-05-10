@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { m, useInView, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
 
 // ─── Links ───────────────────────────────────────────────────────────────────
@@ -52,55 +53,6 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ─── Acid wavy "wings" background ─────────────────────────────────────────
-   Two copies of the user-provided PNG: one anchored to the LEFT edge fading
-   toward center, one mirrored on the RIGHT edge also fading toward center.
-   They overlap in the lower-center, "embracing" the cards from both sides. */
-function CasesWingsBg({ opacity = 0.32 }: { opacity?: number }) {
-  const wing: React.CSSProperties = {
-    position: "absolute",
-    width: "62%",
-    height: "85%",
-    objectFit: "cover",
-    pointerEvents: "none",
-    mixBlendMode: "screen",
-    opacity,
-  };
-  return (
-    <div
-      aria-hidden="true"
-      style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}
-    >
-      {/* LEFT wing — wide on left, fades right toward center */}
-      <img
-        src="/hero/bg-lines.png"
-        alt=""
-        draggable={false}
-        style={{
-          ...wing,
-          left: 0, top: "4%",
-          objectPosition: "left center",
-          maskImage: "linear-gradient(to right, black 5%, black 35%, transparent 95%)",
-          WebkitMaskImage: "linear-gradient(to right, black 5%, black 35%, transparent 95%)",
-        }}
-      />
-      {/* RIGHT wing — mirror of left, anchored right */}
-      <img
-        src="/hero/bg-lines.png"
-        alt=""
-        draggable={false}
-        style={{
-          ...wing,
-          right: 0, bottom: "4%",
-          transform: "scaleX(-1)",
-          objectPosition: "left center",
-          maskImage: "linear-gradient(to right, black 5%, black 35%, transparent 95%)",
-          WebkitMaskImage: "linear-gradient(to right, black 5%, black 35%, transparent 95%)",
-        }}
-      />
-    </div>
-  );
-}
 
 // ─── Count-up animation ───────────────────────────────────────────────────────
 // Continuous ping-pong: counts 0 → N → 0 → N … at medium speed
@@ -1177,86 +1129,72 @@ function SubsectionSlide({ data }: { data: SubsectionSlideData }) {
         </div>
       </div>
 
-      {/* ── Fullscreen lightbox overlay (sits above case modal at z-[200]) ── */}
-      <AnimatePresence>
-        {zoom && (
-          <m.div
-            key="lightbox"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
-            onClick={() => setZoom(false)}
-            className="fixed inset-0 z-[200] flex items-center justify-center px-4 py-12"
-            style={{
-              background: "rgba(4,4,4,0.96)",
-              backdropFilter: "blur(22px)",
-              WebkitBackdropFilter: "blur(22px)",
-              cursor: "zoom-out",
-            }}
-            aria-modal="true"
-            role="dialog"
-          >
-            {/* Close button */}
-            <button
-              onClick={(e) => { e.stopPropagation(); setZoom(false); }}
-              aria-label="Закрыть"
+      {/* ── Fullscreen lightbox: rendered via portal at document.body so it
+            escapes the case-modal's transformed stacking context. Pure black
+            background, image fills viewport, only the × button is visible. ── */}
+      {typeof document !== "undefined" && createPortal(
+        <AnimatePresence>
+          {zoom && (
+            <m.div
+              key="lightbox"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              onClick={() => setZoom(false)}
+              className="fixed inset-0 flex items-center justify-center"
               style={{
-                position: "fixed", top: 22, right: 22,
-                width: 44, height: 44, borderRadius: "50%",
-                border: "1px solid rgba(255,255,255,0.18)",
-                background: "rgba(20,20,20,0.85)",
-                color: "rgba(255,255,255,0.9)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", zIndex: 1,
+                background: "#000",
+                zIndex: 2147483600,    // top of any stacking context
+                cursor: "zoom-out",
               }}
+              aria-modal="true"
+              role="dialog"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-            </button>
+              {/* Enlarged image — fills the viewport with tiny breathing room */}
+              <m.img
+                src={data.img}
+                alt={data.imgAlt}
+                draggable={false}
+                onClick={(e) => e.stopPropagation()}
+                initial={{ scale: 0.94, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
+                transition={{ duration: 0.30, ease: [0.22, 1, 0.36, 1] }}
+                style={{
+                  maxWidth: "98vw",
+                  maxHeight: "98vh",
+                  width:  "auto",
+                  height: "auto",
+                  objectFit: "contain",
+                  display: "block",
+                  cursor: "default",
+                }}
+              />
 
-            {/* Caption above image */}
-            <p style={{
-              position: "fixed", top: 28, left: "50%", transform: "translateX(-50%)",
-              fontSize: 11, fontFamily: "ui-monospace, monospace", letterSpacing: "0.22em",
-              color: "#CBFF00", textTransform: "uppercase", pointerEvents: "none",
-            }}>
-              {data.titleA} {data.titleB}
-            </p>
-
-            {/* Enlarged image */}
-            <m.img
-              src={data.img}
-              alt={data.imgAlt}
-              draggable={false}
-              onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.30, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                maxWidth: "min(94vw, 1400px)",
-                maxHeight: "calc(100vh - 96px)",
-                width: "auto", height: "auto",
-                objectFit: "contain", display: "block",
-                borderRadius: 14,
-                border: "1.5px solid rgba(203,255,0,0.30)",
-                boxShadow:
-                  "0 0 0 1px rgba(203,255,0,0.08), 0 0 80px rgba(203,255,0,0.22), 0 40px 100px rgba(0,0,0,0.90)",
-                cursor: "default",
-              }}
-            />
-
-            {/* Hint at bottom */}
-            <p style={{
-              position: "fixed", bottom: 22, left: "50%", transform: "translateX(-50%)",
-              fontSize: 10, fontFamily: "ui-monospace, monospace", letterSpacing: "0.18em",
-              color: "rgba(255,255,255,0.40)", textTransform: "uppercase", pointerEvents: "none",
-            }}>
-              esc · клик вне карточки — закрыть
-            </p>
-          </m.div>
-        )}
-      </AnimatePresence>
+              {/* Only on-screen control: close button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); setZoom(false); }}
+                aria-label="Закрыть"
+                style={{
+                  position: "fixed", top: 22, right: 22,
+                  width: 46, height: 46, borderRadius: "50%",
+                  border: "1px solid rgba(255,255,255,0.20)",
+                  background: "rgba(20,20,20,0.85)",
+                  color: "rgba(255,255,255,0.95)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  cursor: "pointer",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+            </m.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }
@@ -1666,40 +1604,6 @@ function Services() {
           draggable={false}
           animate={{ rotate: 360 }}
           transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-        />
-      </m.div>
-
-      {/* 3D acid spiral — bottom-left, big counter-orbital path. Same duration
-          as sphere but offset by half-cycle delay → permanent opposite phase. */}
-      <m.div
-        animate={{
-          x:       ["0vw",  "22vw",  "44vw",  "58vw",  "40vw",  "15vw", "0vw"],
-          y:       ["0vh", "-12vh", "-26vh", "-38vh", "-24vh",  "-8vh", "0vh"],
-          opacity: [0.50, 0, 0.50],
-        }}
-        transition={{
-          x:       { duration: 90, repeat: Infinity, ease: "easeInOut", delay: -45 },
-          y:       { duration: 90, repeat: Infinity, ease: "easeInOut", delay: -45 },
-          opacity: { duration: 19, repeat: Infinity, ease: "easeInOut", delay: 3 },
-        }}
-        style={{
-          position: "absolute",
-          left: "-6%", bottom: "2%",
-          width: "min(30vw, 420px)",
-          aspectRatio: "3 / 4",
-          filter: "drop-shadow(0 30px 70px rgba(203,255,0,0.18))",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      >
-        <m.img
-          src="/hero/bg-3d-spiral.png"
-          alt=""
-          aria-hidden="true"
-          draggable={false}
-          animate={{ rotate: -360 }}
-          transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
           style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
         />
       </m.div>
@@ -3476,7 +3380,40 @@ function Cases() {
 
   return (
     <section id="cases" className="relative py-28 md:py-36 bg-surface/30 overflow-hidden">
-      <CasesWingsBg opacity={0.34} />
+      {/* 3D acid spiral — anti-orbit to the sphere in Services: starts
+          top-left, drifts right-down; opposite phase via -45s delay so the
+          two figures are always at opposite ends of their parallel paths. */}
+      <m.div
+        animate={{
+          x:       ["0vw",  "22vw",  "44vw",  "58vw",  "40vw",  "15vw", "0vw"],
+          y:       ["0vh",  "12vh",  "26vh",  "38vh",  "24vh",   "8vh", "0vh"],
+          opacity: [0.50, 0, 0.50],
+        }}
+        transition={{
+          x:       { duration: 90, repeat: Infinity, ease: "easeInOut", delay: -45 },
+          y:       { duration: 90, repeat: Infinity, ease: "easeInOut", delay: -45 },
+          opacity: { duration: 19, repeat: Infinity, ease: "easeInOut", delay: 3 },
+        }}
+        style={{
+          position: "absolute",
+          left: "-6%", top: "4%",
+          width: "min(30vw, 420px)",
+          aspectRatio: "3 / 4",
+          filter: "drop-shadow(0 30px 70px rgba(203,255,0,0.18))",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      >
+        <m.img
+          src="/hero/bg-3d-spiral.png"
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          animate={{ rotate: -360 }}
+          transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+        />
+      </m.div>
       <AnimatePresence>
         {caseModal && (
           <CaseDeckModal
