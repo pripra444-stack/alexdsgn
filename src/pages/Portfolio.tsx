@@ -53,6 +53,93 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* Reusable fullscreen image lightbox. Rendered via React portal at
+   document.body so it escapes any transformed parent's stacking context.
+   Pure black backdrop, image at 98vw × 98vh, only the × close button is
+   visible. Closes on backdrop click, × button, or Escape; locks body
+   scroll while open. */
+function ImageLightbox({ src, alt, open, onClose }: {
+  src: string;
+  alt: string;
+  open: boolean;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open, onClose]);
+
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <m.div
+          key="lightbox"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.22 }}
+          onClick={onClose}
+          className="fixed inset-0 flex items-center justify-center"
+          style={{
+            background: "#000",
+            zIndex: 2147483600,
+            cursor: "zoom-out",
+          }}
+          aria-modal="true"
+          role="dialog"
+        >
+          <m.img
+            src={src}
+            alt={alt}
+            draggable={false}
+            onClick={(e) => e.stopPropagation()}
+            initial={{ scale: 0.94, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.96, opacity: 0 }}
+            transition={{ duration: 0.30, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              maxWidth: "98vw",
+              maxHeight: "98vh",
+              width:  "auto",
+              height: "auto",
+              objectFit: "contain",
+              display: "block",
+              cursor: "default",
+            }}
+          />
+          <button
+            onClick={(e) => { e.stopPropagation(); onClose(); }}
+            aria-label="Закрыть"
+            style={{
+              position: "fixed", top: 22, right: 22,
+              width: 46, height: 46, borderRadius: "50%",
+              border: "1px solid rgba(255,255,255,0.20)",
+              background: "rgba(20,20,20,0.85)",
+              color: "rgba(255,255,255,0.95)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </m.div>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+}
+
 
 // ─── Count-up animation ───────────────────────────────────────────────────────
 // Continuous ping-pong: counts 0 → N → 0 → N … at medium speed
@@ -1007,18 +1094,6 @@ function SubsectionSlide({ data }: { data: SubsectionSlideData }) {
 
   // Click-to-fullscreen for the right-side card image
   const [zoom, setZoom] = useState(false);
-  useEffect(() => {
-    if (!zoom) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setZoom(false); };
-    window.addEventListener("keydown", onKey);
-    // freeze background scroll while lightbox is open
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [zoom]);
 
   return (
     <div
@@ -1129,72 +1204,7 @@ function SubsectionSlide({ data }: { data: SubsectionSlideData }) {
         </div>
       </div>
 
-      {/* ── Fullscreen lightbox: rendered via portal at document.body so it
-            escapes the case-modal's transformed stacking context. Pure black
-            background, image fills viewport, only the × button is visible. ── */}
-      {typeof document !== "undefined" && createPortal(
-        <AnimatePresence>
-          {zoom && (
-            <m.div
-              key="lightbox"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.22 }}
-              onClick={() => setZoom(false)}
-              className="fixed inset-0 flex items-center justify-center"
-              style={{
-                background: "#000",
-                zIndex: 2147483600,    // top of any stacking context
-                cursor: "zoom-out",
-              }}
-              aria-modal="true"
-              role="dialog"
-            >
-              {/* Enlarged image — fills the viewport with tiny breathing room */}
-              <m.img
-                src={data.img}
-                alt={data.imgAlt}
-                draggable={false}
-                onClick={(e) => e.stopPropagation()}
-                initial={{ scale: 0.94, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
-                transition={{ duration: 0.30, ease: [0.22, 1, 0.36, 1] }}
-                style={{
-                  maxWidth: "98vw",
-                  maxHeight: "98vh",
-                  width:  "auto",
-                  height: "auto",
-                  objectFit: "contain",
-                  display: "block",
-                  cursor: "default",
-                }}
-              />
-
-              {/* Only on-screen control: close button */}
-              <button
-                onClick={(e) => { e.stopPropagation(); setZoom(false); }}
-                aria-label="Закрыть"
-                style={{
-                  position: "fixed", top: 22, right: 22,
-                  width: 46, height: 46, borderRadius: "50%",
-                  border: "1px solid rgba(255,255,255,0.20)",
-                  background: "rgba(20,20,20,0.85)",
-                  color: "rgba(255,255,255,0.95)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  cursor: "pointer",
-                  backdropFilter: "blur(8px)",
-                  WebkitBackdropFilter: "blur(8px)",
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-              </button>
-            </m.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      <ImageLightbox open={zoom} src={data.img} alt={data.imgAlt} onClose={() => setZoom(false)} />
     </div>
   );
 }
@@ -2952,6 +2962,7 @@ function CaseDeckModal({ slides, title, onClose }: {
   onClose: () => void;
 }) {
   const [active, setActive] = useState(0);
+  const [zoom, setZoom] = useState<{ src: string; alt: string } | null>(null);
   const n = slides.length;
 
   return (
@@ -3009,7 +3020,14 @@ function CaseDeckModal({ slides, title, onClose }: {
                   >
                     {MSlide
                       ? <MSlide />
-                      : <img src={slides[active].img} alt={slides[active].label} draggable={false} className="block w-full h-auto select-none" />
+                      : <img
+                          src={slides[active].img!}
+                          alt={slides[active].label}
+                          draggable={false}
+                          onClick={() => setZoom({ src: slides[active].img!, alt: slides[active].label })}
+                          className="block w-full h-auto select-none"
+                          style={{ cursor: "zoom-in" }}
+                        />
                     }
                   </m.div>
                 );
@@ -3066,14 +3084,17 @@ function CaseDeckModal({ slides, title, onClose }: {
               return (
                 <div
                   key={i}
-                  onClick={() => abs > 0 && setActive(i)}
+                  onClick={() => {
+                    if (abs > 0) setActive(i);
+                    else setZoom({ src: slide.img!, alt: slide.label });
+                  }}
                   style={{
                     position: "absolute",
                     left: "50%", top: "50%",
                     width: "min(28vw, 480px)",
                     borderRadius: 20,
                     overflow: "hidden",
-                    cursor: abs > 0 ? "pointer" : "default",
+                    cursor: abs === 0 ? "zoom-in" : "pointer",
                     zIndex: 10 - abs,
                     transform: `translateX(calc(-50% + ${spreadX}px)) translateY(-50%) rotateY(${rotY}deg) translateZ(${depth}px) scale(${scl})`,
                     filter: `brightness(${bright})`,
@@ -3178,6 +3199,14 @@ function CaseDeckModal({ slides, title, onClose }: {
         </button>
       </div>
 
+      {/* Fullscreen lightbox for the active image — portal-rendered, escapes
+          modal stacking, only the × button is visible on screen */}
+      <ImageLightbox
+        open={!!zoom}
+        src={zoom?.src ?? ""}
+        alt={zoom?.alt ?? ""}
+        onClose={() => setZoom(null)}
+      />
     </m.div>
   );
 }
