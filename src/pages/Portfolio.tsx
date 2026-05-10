@@ -65,12 +65,14 @@ function ImageLightbox({ src, alt, open, onClose }: {
   onClose: () => void;
 }) {
   const popstateClosingRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!open) return;
     popstateClosingRef.current = false;
 
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onCloseRef.current(); };
     // Only close if the popped state is no longer the lightbox layer.
     // This way, when a parent modal pushes its own state and we pushState on
     // top, history.back() restores the parent's state — our handler sees no
@@ -79,15 +81,16 @@ function ImageLightbox({ src, alt, open, onClose }: {
       const st = e.state as { __lightbox?: boolean } | null;
       if (!st?.__lightbox) {
         popstateClosingRef.current = true;
-        onClose();
+        onCloseRef.current();
       }
     };
 
     window.addEventListener("keydown", onKey);
     window.addEventListener("popstate", onPop);
 
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // NOTE: no body scroll-lock — the dark backdrop covers the page visually,
+    // and touching body styles risks leaving overflow stuck on mobile when
+    // cleanup races with React unmount or onClose ref churn.
 
     // Push a state with __lightbox flag — preserves any parent flag merging
     const prevState = (window.history.state as object | null) ?? {};
@@ -96,7 +99,6 @@ function ImageLightbox({ src, alt, open, onClose }: {
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("popstate", onPop);
-      document.body.style.overflow = prevOverflow;
       // Pop our pushed entry only if close was NOT via popstate
       if (
         !popstateClosingRef.current &&
@@ -105,7 +107,7 @@ function ImageLightbox({ src, alt, open, onClose }: {
         window.history.back();
       }
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (typeof document === "undefined") return null;
 
@@ -3002,31 +3004,31 @@ function CaseDeckModal({ slides, title, onClose }: {
   const [zoom, setZoom] = useState<{ src: string; alt: string } | null>(null);
   const n = slides.length;
 
-  // Modal lifecycle: lock body scroll, close on Escape, close on browser back
-  // gesture. State-aware popstate: only close if popped state no longer carries
-  // the __caseModal flag — so when nested lightbox does history.back(),
-  // the restored state still has __caseModal=true → this modal stays open.
+  // Modal lifecycle: close on Escape + back gesture. State-aware popstate so
+  // nested lightbox closing (history.back()) doesn't bubble up and close us.
+  // No body scroll-lock: backdrop covers the page visually, and touching body
+  // styles caused overflow to stick on mobile when cleanup raced unmount.
   const popstateClosingRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     popstateClosingRef.current = false;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onCloseRef.current(); };
     const onPop = (e: PopStateEvent) => {
       const st = e.state as { __caseModal?: boolean } | null;
       if (!st?.__caseModal) {
         popstateClosingRef.current = true;
-        onClose();
+        onCloseRef.current();
       }
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("popstate", onPop);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const prevState = (window.history.state as object | null) ?? {};
     window.history.pushState({ ...prevState, __caseModal: true }, "");
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("popstate", onPop);
-      document.body.style.overflow = prevOverflow;
       if (
         !popstateClosingRef.current &&
         (window.history.state as { __caseModal?: boolean } | null)?.__caseModal
@@ -3034,7 +3036,7 @@ function CaseDeckModal({ slides, title, onClose }: {
         window.history.back();
       }
     };
-  }, [onClose]);
+  }, []);
 
   return (
     <m.div
