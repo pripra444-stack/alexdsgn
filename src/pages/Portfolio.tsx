@@ -3582,11 +3582,11 @@ function Cases() {
 
 // ─── WHY ME ───────────────────────────────────────────────────────────────────
 const WHY = [
-  { n: "01", title: "Работа на результат", desc: "Не «красиво» — а CTR и продажи. Дизайн — это инструмент, а не искусство." },
-  { n: "02", title: "Знаю маркетплейсы изнутри", desc: "Понимаю алгоритмы, конкурентный анализ, логику выдачи WB и Ozon." },
-  { n: "03", title: "AI как конкурентное преимущество", desc: "Midjourney, Flux, ControlNet — генерирую уникальный визуал за часы, а не дни." },
-  { n: "04", title: "Коммерческий уровень", desc: "Дизайн как у топ-продавцов. Без стоков, без шаблонов, без «просто красиво»." },
-  { n: "05", title: "Скорость без потери качества", desc: "Первые концепции — за 24–48 часов. Правки — в тот же день." },
+  { n: "01", title: "Работа на результат",            desc: "Не «красиво» — а CTR и продажи. Дизайн — это инструмент, а не искусство.",          img: "/hero/avatar.png" },
+  { n: "02", title: "Знаю маркетплейсы изнутри",      desc: "Понимаю алгоритмы, конкурентный анализ, логику выдачи WB и Ozon.",                 img: "/hero/avatar.png" },
+  { n: "03", title: "AI как конкурентное преимущество", desc: "Midjourney, Flux, ControlNet — генерирую уникальный визуал за часы, а не дни.",   img: "/hero/avatar.png" },
+  { n: "04", title: "Коммерческий уровень",           desc: "Дизайн как у топ-продавцов. Без стоков, без шаблонов, без «просто красиво».",      img: "/hero/avatar.png" },
+  { n: "05", title: "Скорость без потери качества",   desc: "Первые концепции — за 24–48 часов. Правки — в тот же день.",                       img: "/hero/avatar.png" },
 ];
 
 function WhyMe() {
@@ -3599,18 +3599,63 @@ function WhyMe() {
             Как я работаю
           </m.h2>
         </Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.05]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {WHY.map((item) => (
             <Reveal key={item.n}>
               <m.div
                 variants={fadeUp}
-                className="relative bg-canvas p-8 group hover:bg-surface transition-colors duration-300"
+                whileHover={{ y: -6 }}
+                transition={{ type: "tween", duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="group relative h-[320px] overflow-hidden rounded-2xl border border-white/[0.05] bg-canvas"
+                style={{ willChange: "transform" }}
               >
-                <span className="block text-[42px] font-bold text-white/[0.06] font-mono mb-5 leading-none group-hover:text-accent/15 transition-colors duration-300">
-                  {item.n}
-                </span>
-                <h3 className="text-base font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
+                {/* PHOTO LAYER — full card, slight zoom on hover, behind text card */}
+                <img
+                  src={item.img}
+                  alt=""
+                  draggable={false}
+                  className="absolute inset-0 w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-[1100ms] ease-out"
+                />
+                {/* Soft acid wash over photo so it ties into the brand */}
+                <div
+                  aria-hidden
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(203,255,0,0.32) 0%, rgba(0,0,0,0.10) 60%, rgba(0,0,0,0.45) 100%)",
+                    mixBlendMode: "multiply",
+                  }}
+                />
+
+                {/* TEXT CARD LAYER — covers full card by default; on hover
+                    shrinks to top ~55% and turns acid green, exposing the
+                    photo from below */}
+                <div
+                  className="absolute top-0 left-0 right-0 bottom-0 group-hover:bottom-[55%] bg-canvas group-hover:bg-accent transition-[background-color,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-7 flex flex-col"
+                  style={{ willChange: "background-color" }}
+                >
+                  <span className="block text-[42px] font-bold text-white/[0.06] group-hover:text-black/35 font-mono mb-3 leading-none transition-colors duration-300">
+                    {item.n}
+                  </span>
+                  <h3 className="text-base font-semibold text-white group-hover:text-black transition-colors duration-300 mb-1.5">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-zinc-500 group-hover:text-black/75 transition-colors duration-300 leading-relaxed">
+                    {item.desc}
+                  </p>
+
+                  {/* Tiny ↑ hint at top-right of card content */}
+                  <span className="absolute top-4 right-5 text-[9px] font-mono tracking-[0.18em] text-accent/30 group-hover:text-black/45 transition-colors duration-300 uppercase pointer-events-none">
+                    ↑ навести
+                  </span>
+                </div>
+
+                {/* Acid glow ring on hover */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ boxShadow: "0 0 0 1.5px rgba(203,255,0,0.55), 0 18px 48px rgba(203,255,0,0.18)" }}
+                />
               </m.div>
             </Reveal>
           ))}
@@ -3630,6 +3675,39 @@ const PROCESS = [
 ];
 
 function Process() {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  // Per-card flag: true while the wave pulse is "passing through" that card
+  const [waveActive, setWaveActive] = useState<boolean[]>(() => new Array(PROCESS.length).fill(false));
+
+  // When hovered card changes, schedule the wave: each card after the hovered
+  // one briefly turns active (acid + scale) with a delay = (i - hoveredIdx) *
+  // STEP_MS, then deactivates after PULSE_MS. Cleanup cancels in-flight
+  // timeouts so moving between cards restarts the wave from the new origin.
+  useEffect(() => {
+    if (hoveredIdx === null) {
+      setWaveActive(new Array(PROCESS.length).fill(false));
+      return;
+    }
+    const STEP_MS  = 170;   // delay between successive cards in the wave
+    const PULSE_MS = 420;   // how long each card stays in the active state
+    const timeouts: number[] = [];
+
+    for (let i = hoveredIdx + 1; i < PROCESS.length; i++) {
+      const start = (i - hoveredIdx) * STEP_MS;
+      timeouts.push(window.setTimeout(() => {
+        setWaveActive(prev => { const next = [...prev]; next[i] = true; return next; });
+      }, start));
+      timeouts.push(window.setTimeout(() => {
+        setWaveActive(prev => { const next = [...prev]; next[i] = false; return next; });
+      }, start + PULSE_MS));
+    }
+
+    return () => {
+      timeouts.forEach(clearTimeout);
+      setWaveActive(new Array(PROCESS.length).fill(false));
+    };
+  }, [hoveredIdx]);
+
   return (
     <section id="process" className="py-28 md:py-36 bg-surface/20">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
@@ -3646,22 +3724,64 @@ function Process() {
             style={{ background: "linear-gradient(to right, transparent, rgba(203,255,0,0.2) 15%, rgba(203,255,0,0.2) 85%, transparent)" }}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {PROCESS.map((step) => (
-              <Reveal key={step.n}>
-                <m.div
-                  variants={fadeUp}
-                  className="relative flex flex-col gap-4 rounded-2xl border border-white/[0.07] bg-canvas p-6 hover:border-accent/25 hover:bg-surface transition-all duration-300"
-                >
-                  <div className="w-10 h-10 rounded-full border border-accent/30 bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-mono font-bold text-accent">{step.n}</span>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white mb-1.5">{step.title}</h3>
-                    <p className="text-sm text-zinc-500 leading-relaxed">{step.desc}</p>
-                  </div>
-                </m.div>
-              </Reveal>
-            ))}
+            {PROCESS.map((step, idx) => {
+              const isHovered = hoveredIdx === idx;
+              const isWaving  = waveActive[idx];
+              const isActive  = isHovered || isWaving;
+              return (
+                <Reveal key={step.n}>
+                  <m.div
+                    variants={fadeUp}
+                    onMouseEnter={() => setHoveredIdx(idx)}
+                    onMouseLeave={() => setHoveredIdx(prev => (prev === idx ? null : prev))}
+                    animate={{
+                      scale: isActive ? 1.06 : 1,
+                      backgroundColor: isActive ? "#CBFF00" : "rgba(10,10,10,1)",
+                      borderColor:     isActive ? "rgba(203,255,0,1)" : "rgba(255,255,255,0.07)",
+                    }}
+                    transition={{
+                      duration: isHovered ? 0.30 : 0.22,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="relative flex flex-col gap-4 rounded-2xl border p-6"
+                    style={{ willChange: "transform, background-color" }}
+                  >
+                    <m.div
+                      animate={{
+                        backgroundColor: isActive ? "rgba(0,0,0,0.12)" : "rgba(203,255,0,0.10)",
+                        borderColor:     isActive ? "rgba(0,0,0,0.55)" : "rgba(203,255,0,0.30)",
+                      }}
+                      transition={{ duration: 0.22 }}
+                      className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0"
+                    >
+                      <m.span
+                        animate={{ color: isActive ? "#000" : "#CBFF00" }}
+                        transition={{ duration: 0.22 }}
+                        className="text-xs font-mono font-bold"
+                      >
+                        {step.n}
+                      </m.span>
+                    </m.div>
+                    <div>
+                      <m.h3
+                        animate={{ color: isActive ? "#000" : "#FFF" }}
+                        transition={{ duration: 0.22 }}
+                        className="font-semibold mb-1.5"
+                      >
+                        {step.title}
+                      </m.h3>
+                      <m.p
+                        animate={{ color: isActive ? "rgba(0,0,0,0.70)" : "#71717a" }}
+                        transition={{ duration: 0.22 }}
+                        className="text-sm leading-relaxed"
+                      >
+                        {step.desc}
+                      </m.p>
+                    </div>
+                  </m.div>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </div>
