@@ -3582,12 +3582,22 @@ function Cases() {
 
 // ─── WHY ME ───────────────────────────────────────────────────────────────────
 const WHY = [
-  { n: "01", title: "Работа на результат",            desc: "Не «красиво» — а CTR и продажи. Дизайн — это инструмент, а не искусство.",          img: "/hero/avatar.png" },
-  { n: "02", title: "Знаю маркетплейсы изнутри",      desc: "Понимаю алгоритмы, конкурентный анализ, логику выдачи WB и Ozon.",                 img: "/hero/avatar.png" },
-  { n: "03", title: "AI как конкурентное преимущество", desc: "Midjourney, Flux, ControlNet — генерирую уникальный визуал за часы, а не дни.",   img: "/hero/avatar.png" },
-  { n: "04", title: "Коммерческий уровень",           desc: "Дизайн как у топ-продавцов. Без стоков, без шаблонов, без «просто красиво».",      img: "/hero/avatar.png" },
-  { n: "05", title: "Скорость без потери качества",   desc: "Первые концепции — за 24–48 часов. Правки — в тот же день.",                       img: "/hero/avatar.png" },
+  { n: "01", title: "Работа на результат",              desc: "Не «красиво» — а CTR и продажи. Дизайн — это инструмент, а не искусство.",        img: "/hero/why-01.png" },
+  { n: "02", title: "Знаю маркетплейсы изнутри",        desc: "Понимаю алгоритмы, конкурентный анализ, логику выдачи WB и Ozon.",               img: "/hero/why-02.png" },
+  { n: "03", title: "AI как конкурентное преимущество", desc: "Midjourney, Flux, ControlNet — генерирую уникальный визуал за часы, а не дни.",  img: "/hero/why-03.png" },
+  { n: "04", title: "Коммерческий уровень",             desc: "Дизайн как у топ-продавцов. Без стоков, без шаблонов, без «просто красиво».",    img: "/hero/why-04.png" },
+  { n: "05", title: "Скорость без потери качества",     desc: "Первые концепции — за 24–48 часов. Правки — в тот же день.",                     img: "/hero/why-05.png" },
 ];
+
+/* Card uses two fixed regions:
+   - top: text content (always present, becomes acid on hover)
+   - bottom: image region exactly matching the image aspect ratio (370×171),
+     so the full image is visible without crop. A dark "cover" overlay sits
+     on top of the image area and slides away on hover. */
+const WHY_IMG_W = 370;
+const WHY_IMG_H = 171;
+const WHY_TEXT_H = 200;
+const WHY_CARD_H = WHY_TEXT_H + WHY_IMG_H + 16; // text + image + breathing room
 
 function WhyMe() {
   return (
@@ -3606,33 +3616,35 @@ function WhyMe() {
                 variants={fadeUp}
                 whileHover={{ y: -6 }}
                 transition={{ type: "tween", duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative h-[320px] overflow-hidden rounded-2xl border border-white/[0.05] bg-canvas"
-                style={{ willChange: "transform" }}
+                className="group relative overflow-hidden rounded-2xl border border-white/[0.05] bg-canvas"
+                style={{ height: WHY_CARD_H, willChange: "transform" }}
               >
-                {/* PHOTO LAYER — full card, slight zoom on hover, behind text card */}
-                <img
-                  src={item.img}
-                  alt=""
-                  draggable={false}
-                  className="absolute inset-0 w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-[1100ms] ease-out"
-                />
-                {/* Soft acid wash over photo so it ties into the brand */}
+                {/* IMAGE REGION — fixed at the bottom of the card. The image
+                    is shown at full natural aspect (object-contain), so 100%
+                    of the picture is always visible from underneath. */}
                 <div
-                  aria-hidden
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, rgba(203,255,0,0.32) 0%, rgba(0,0,0,0.10) 60%, rgba(0,0,0,0.45) 100%)",
-                    mixBlendMode: "multiply",
-                  }}
-                />
+                  className="absolute inset-x-0 bottom-0 overflow-hidden"
+                  style={{ height: WHY_IMG_H + 8 }}
+                >
+                  <img
+                    src={item.img}
+                    alt=""
+                    draggable={false}
+                    width={WHY_IMG_W}
+                    height={WHY_IMG_H}
+                    className="block w-full h-full object-contain scale-[1.04] group-hover:scale-100 transition-transform duration-[1100ms] ease-out"
+                  />
+                </div>
 
-                {/* TEXT CARD LAYER — covers full card by default; on hover
-                    shrinks to top ~55% and turns acid green, exposing the
-                    photo from below */}
+                {/* COVER LAYER — sits over the image and the text area by
+                    default (full card). On hover it slides up to expose the
+                    full image, and its background turns acid green. */}
                 <div
-                  className="absolute top-0 left-0 right-0 bottom-0 group-hover:bottom-[55%] bg-canvas group-hover:bg-accent transition-[background-color,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-7 flex flex-col"
-                  style={{ willChange: "background-color" }}
+                  className="absolute top-0 left-0 right-0 bottom-0 bg-canvas group-hover:bottom-[var(--why-img-h)] group-hover:bg-accent transition-[background-color,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-7 flex flex-col"
+                  style={{
+                    ["--why-img-h" as never]: `${WHY_IMG_H + 8}px`,
+                    willChange: "background-color",
+                  }}
                 >
                   <span className="block text-[42px] font-bold text-white/[0.06] group-hover:text-black/35 font-mono mb-3 leading-none transition-colors duration-300">
                     {item.n}
