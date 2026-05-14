@@ -3860,14 +3860,42 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
   // useTransform clamps at last value → text = 1.0 for entire peak, fades when intensity<0.18
   const textOp = useTransform(intensity, [0.13, 0.19], [0.0, 1.0]);
   return (
-    <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+
+      {/* ── Outer acid rings ──────────────────────────────────────────────────
+          Live OUTSIDE the clipped sphere. Gated by textOp (proven to work).
+          Start at max-sphere visual size (scale 1.28) and expand into space. */}
+      <m.div style={{
+        position: "absolute",
+        width: PROC_BALL, height: PROC_BALL,
+        opacity: textOp,
+        pointerEvents: "none",
+        zIndex: 0,
+      }}>
+        {([
+          { delay: 0,    duration: 1.9 },
+          { delay: 0.63, duration: 2.1 },
+          { delay: 1.26, duration: 1.7 },
+        ] as const).map(({ delay, duration }, i) => (
+          <m.div
+            key={i}
+            style={{
+              position: "absolute", inset: 0,
+              borderRadius: "50%",
+              border: "2px solid #CBFF00",
+            }}
+            animate={{ scale: [1.28, 2.50], opacity: [0.70, 0] }}
+            transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
+          />
+        ))}
+      </m.div>
+
+      {/* ── Sphere with inner content ─────────────────────────────────────── */}
       <m.div
         style={{
           position: "relative",
           width: PROC_BALL,
           height: PROC_BALL,
-          // clip-path clips the painted result of children (incl. CSS transforms)
-          // more reliable than overflow:hidden alone when children use scale transform
           clipPath: `circle(${PROC_BALL / 2}px at 50% 50%)`,
           overflow: "hidden",
           scale: scaleV,
@@ -3875,9 +3903,10 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
           flexShrink: 0,
           pointerEvents: "none",
           userSelect: "none",
+          zIndex: 1,
         }}
       >
-        {/* Number: counter-scaled → constant visual size; brightens then fades before sphere grows */}
+        {/* Number */}
         <m.div style={{
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -3894,13 +3923,13 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
             {proc.n}
           </span>
         </m.div>
-        {/* Title + desc: appear once sphere is acid-green, always black */}
+
+        {/* Title + desc */}
         <m.div style={{
           position: "absolute", inset: 0,
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
-          gap: 8,
-          padding: "22px",
+          gap: 8, padding: "22px",
           opacity: textOp,
           textAlign: "center",
         }}>
@@ -3911,22 +3940,23 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
             {proc.desc}
           </p>
         </m.div>
-        {/* Sonar rings: rgba(0,0,0,0.28) is invisible on dark (#0C1500) but visible
-            on acid green (#CBFF00) — no explicit opacity gate needed */}
+
+        {/* ── Inner sonar rings ──────────────────────────────────────────────
+            rgba(0,0,0,0.55) invisible on dark bg, expressive on acid green */}
         {([
-          { delay: 0,    duration: 1.8 },
-          { delay: 0.60, duration: 2.0 },
-          { delay: 1.20, duration: 1.6 },
+          { delay: 0,    duration: 1.6 },
+          { delay: 0.53, duration: 1.9 },
+          { delay: 1.06, duration: 1.4 },
         ] as const).map(({ delay, duration }, i) => (
           <m.div
             key={i}
             style={{
               position: "absolute", inset: 0,
               borderRadius: "50%",
-              border: "2px solid rgba(0, 0, 0, 0.28)",
+              border: "3px solid rgba(0, 0, 0, 0.55)",
               pointerEvents: "none",
             }}
-            animate={{ scale: [0.18, 1.02], opacity: [0.85, 0] }}
+            animate={{ scale: [0.15, 1.0], opacity: [0.90, 0] }}
             transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
           />
         ))}
