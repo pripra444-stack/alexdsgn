@@ -3886,8 +3886,8 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
     <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
 
       {/* ── Outer acid rings ──────────────────────────────────────────────────
-          Live OUTSIDE the clipped sphere. Gated by textOp (proven to work).
-          Start at max-sphere visual size (scale 1.28) and expand into space. */}
+          Live OUTSIDE the clipped sphere. Very thin — they cross the boundary
+          and dissolve into space. Start exactly at sphere edge (scale 1.0). */}
       <m.div style={{
         position: "absolute",
         width: PROC_BALL, height: PROC_BALL,
@@ -3905,9 +3905,9 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
             style={{
               position: "absolute", inset: 0,
               borderRadius: "50%",
-              border: "2px solid #CBFF00",
+              border: "0.75px solid #CBFF00",
             }}
-            animate={{ scale: [1.28, 2.50], opacity: [0.70, 0] }}
+            animate={{ scale: [1.0, 2.60], opacity: [0.55, 0] }}
             transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
           />
         ))}
@@ -3965,7 +3965,7 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
         </m.div>
 
         {/* ── Inner sonar rings ──────────────────────────────────────────────
-            rgba(0,0,0,0.55) invisible on dark bg, expressive on acid green */}
+            Thick dark rings expand from centre — highly visible on acid green */}
         {([
           { delay: 0,    duration: 1.6 },
           { delay: 0.53, duration: 1.9 },
@@ -3976,10 +3976,10 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
             style={{
               position: "absolute", inset: 0,
               borderRadius: "50%",
-              border: "3px solid rgba(0, 0, 0, 0.55)",
+              border: "5px solid rgba(0, 0, 0, 0.75)",
               pointerEvents: "none",
             }}
-            animate={{ scale: [0.15, 1.0], opacity: [0.90, 0] }}
+            animate={{ scale: [0.10, 1.0], opacity: [1.0, 0] }}
             transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
           />
         ))}
