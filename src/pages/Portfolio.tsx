@@ -3854,10 +3854,11 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
   const scaleV    = useTransform(intensity, [0, 1], [0.88, 1.28]);
   // Counter-scale keeps number the same visual size regardless of sphere scale
   const antiScale = useTransform(scaleV, (s: number) => 1 / s);
-  // dim → bright → fade: number glows before the sphere expands, then disappears
-  const numOp  = useTransform(intensity, [0, 0.28, 0.52, 0.66], [0.45, 1.0, 1.0, 0.0]);
-  // text fades in only when sphere is nearly fully acid
-  const textOp = useTransform(intensity, [0.60, 0.72, 1.0], [0.0, 0.0, 1.0]);
+  // Number: constant dim (0.45) → instant disappear the moment sphere starts growing
+  const numOp  = useTransform(intensity, [0.0, 0.08, 0.16], [0.45, 0.45, 0.0]);
+  // Text: appears almost instantly after number gone, stays until sphere fully returns to rest
+  // useTransform clamps at last value → text = 1.0 for entire peak, fades when intensity<0.18
+  const textOp = useTransform(intensity, [0.13, 0.19], [0.0, 1.0]);
   return (
     <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <m.div
@@ -3910,6 +3911,25 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
             {proc.desc}
           </p>
         </m.div>
+        {/* Sonar rings: rgba(0,0,0,0.28) is invisible on dark (#0C1500) but visible
+            on acid green (#CBFF00) — no explicit opacity gate needed */}
+        {([
+          { delay: 0,    duration: 1.8 },
+          { delay: 0.60, duration: 2.0 },
+          { delay: 1.20, duration: 1.6 },
+        ] as const).map(({ delay, duration }, i) => (
+          <m.div
+            key={i}
+            style={{
+              position: "absolute", inset: 0,
+              borderRadius: "50%",
+              border: "2px solid rgba(0, 0, 0, 0.28)",
+              pointerEvents: "none",
+            }}
+            animate={{ scale: [0.18, 1.02], opacity: [0.85, 0] }}
+            transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
+          />
+        ))}
       </m.div>
     </div>
   );
