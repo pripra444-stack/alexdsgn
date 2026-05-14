@@ -3811,28 +3811,51 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Decorative acid-green wave lines behind the sphere chain.
-   SVG, preserveAspectRatio="none" so lines always span full row width. */
+/* Animated wave ribbons behind sphere chain.
+   Three layers at different speeds create organic flowing depth.
+   All wave paths tile at period=1200 (matches animateTransform range).
+   Bézier control points computed from sine approximation c≈0.552*(P/4). */
 function ProcessWaves() {
+  // Main wave: yc=160, amp=35  →  peaks at y=125, troughs at y=195
+  const W1 = "M0,160 C166,160 134,125 300,125 C466,125 434,160 600,160 C766,160 734,195 900,195 C1066,195 1034,160 1200,160 C1366,160 1334,125 1500,125 C1666,125 1634,160 1800,160 C1966,160 1934,195 2100,195 C2266,195 2234,160 2400,160";
+  // Upper ribbon: yc=153, amp=28
+  const W2 = "M0,153 C166,153 134,125 300,125 C466,125 434,153 600,153 C766,153 734,181 900,181 C1066,181 1034,153 1200,153 C1366,153 1334,125 1500,125 C1666,125 1634,153 1800,153 C1966,153 1934,181 2100,181 C2266,181 2234,153 2400,153";
+  // Lower ribbon: yc=167, amp=30
+  const W3 = "M0,167 C166,167 134,137 300,137 C466,137 434,167 600,167 C766,167 734,197 900,197 C1066,197 1034,167 1200,167 C1366,167 1334,137 1500,137 C1666,137 1634,167 1800,167 C1966,167 1934,197 2100,197 C2266,197 2234,167 2400,167";
+  // Inverse-phase wave: peaks and troughs flipped relative to W1
+  const W4 = "M0,160 C166,160 134,195 300,195 C466,195 434,160 600,160 C766,160 734,125 900,125 C1066,125 1034,160 1200,160 C1366,160 1334,195 1500,195 C1666,195 1634,160 1800,160 C1966,160 1934,125 2100,125 C2266,125 2234,160 2400,160";
+
   return (
     <svg
       aria-hidden="true"
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        opacity: 0.10,
-        pointerEvents: "none",
-      }}
+      style={{ position: "absolute", inset: 0, width: "100%", height: "100%",
+               opacity: 0.10, pointerEvents: "none", overflow: "hidden" }}
       viewBox="0 0 1200 320"
       preserveAspectRatio="none"
       fill="none"
     >
-      <path d="M0,112 C200,86 400,138 600,112 C800,86 1000,138 1200,112" stroke="#CBFF00" strokeWidth="1.5"/>
-      <path d="M0,145 C150,172 350,118 500,145 C650,172 820,118 950,145 C1060,165 1140,132 1200,145" stroke="#CBFF00" strokeWidth="1.5"/>
-      <path d="M0,170 C120,192 280,148 440,170 C600,192 760,148 920,170 C1040,186 1130,158 1200,170" stroke="#CBFF00" strokeWidth="1"/>
-      <path d="M0,200 C180,218 360,182 540,200 C720,218 900,182 1080,200 C1140,208 1175,196 1200,200" stroke="#CBFF00" strokeWidth="0.75"/>
+      {/* Layer 1 — main ribbon, moderate speed 14s */}
+      <g stroke="#CBFF00">
+        <path d={W1} strokeWidth="1.4" />
+        <path d={W2} strokeWidth="1.0" />
+        <path d={W3} strokeWidth="0.8" />
+        <animateTransform attributeName="transform" type="translate"
+          from="0,0" to="-1200,0" dur="14s" repeatCount="indefinite" />
+      </g>
+      {/* Layer 2 — counter-phase, slower 20s, offset start */}
+      <g stroke="#CBFF00">
+        <path d={W4} strokeWidth="1.1" />
+        <path d={W2} strokeWidth="0.7" opacity="0.7" />
+        <animateTransform attributeName="transform" type="translate"
+          from="-600,0" to="-1800,0" dur="20s" repeatCount="indefinite" />
+      </g>
+      {/* Layer 3 — thin accents, fastest 9s, different offset */}
+      <g stroke="#b8e800">
+        <path d={W1} strokeWidth="0.5" />
+        <path d={W4} strokeWidth="0.5" />
+        <animateTransform attributeName="transform" type="translate"
+          from="-300,0" to="-1500,0" dur="9s" repeatCount="indefinite" />
+      </g>
     </svg>
   );
 }
