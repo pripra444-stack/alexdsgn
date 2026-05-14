@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, Fragment } from "react";
 import { createPortal } from "react-dom";
 import { m, useInView, useMotionValue, useTransform, animate, AnimatePresence, useAnimationFrame, MotionValue, useMotionTemplate } from "framer-motion";
 
@@ -3743,7 +3743,49 @@ function ProcIcon({ name }: { name: string }) {
 }
 
 const BALL = 164;       // sphere base diameter (px)
-const BALL_SLOT = 138;  // slot narrower than BALL — inflated balls overlap neighbors
+const CONN_W = 72;      // connector (dipole bond) width between spheres
+
+/* Dipole bond connecting two adjacent spheres — glows when either neighbor is active */
+function ProcessConnector({
+  leftIdx,
+  rightIdx,
+  progressMV,
+}: {
+  leftIdx: number;
+  rightIdx: number;
+  progressMV: MotionValue<number>;
+}) {
+  const N = PROCESS.length;
+  const intensity = useTransform(progressMV, (p) => {
+    const d = (i: number) => {
+      let dist = p - i;
+      if (dist < -N / 2) dist += N;
+      if (dist > N / 2)  dist -= N;
+      const raw = Math.max(0, 1 - Math.abs(dist));
+      return raw * raw;
+    };
+    return Math.max(d(leftIdx), d(rightIdx));
+  });
+  const pillH   = useTransform(intensity, [0, 1], [10, 22]);
+  const opacity = useTransform(intensity, [0, 1], [0.18, 0.72]);
+  const glowR   = useTransform(intensity, [0, 0.5, 1], [0, 0, 12]);
+  const glowA   = useTransform(intensity, [0, 0.5, 1], [0, 0, 0.40]);
+  const filter  = useMotionTemplate`drop-shadow(0 0 ${glowR}px rgba(203,255,0,${glowA}))`;
+  return (
+    <div style={{ flex: `0 0 ${CONN_W}px`, height: BALL, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <m.div
+        style={{
+          width: CONN_W,
+          height: pillH,
+          borderRadius: "50%",
+          opacity,
+          filter,
+          background: "radial-gradient(ellipse 100% 100% at 50% 50%, rgba(68,100,4,1) 0%, rgba(100,145,10,0.9) 28%, rgba(145,188,12,0.55) 56%, rgba(14,21,2,0.2) 80%, transparent 100%)",
+        }}
+      />
+    </div>
+  );
+}
 
 /* Sphere and text live on SEPARATE layers so the balloon scales independently
    of the text. Text gets only a mild scale of its own. */
@@ -3776,6 +3818,9 @@ function ProcessBall({
   // Active ball pops forward
   const zIdx = useTransform(intensity, (v) => Math.round(1 + v * 14));
 
+  // Inactive spheres at ~50% brightness, active at 100%
+  const sphereOpacity = useTransform(intensity, [0, 1], [0.45, 1.0]);
+
   // Glow via drop-shadow
   const glowR = useTransform(intensity, [0, 0.45, 1], [0, 0, 22]);
   const glowA = useTransform(intensity, [0, 0.45, 1], [0, 0, 0.50]);
@@ -3791,13 +3836,13 @@ function ProcessBall({
     <m.div
       style={{
         position: "relative",
-        width: BALL_SLOT,
-        height: BALL_SLOT,
-        flexShrink: 0,
+        flex: "1 1 0",
+        height: BALL,
+        minWidth: BALL,
         zIndex: zIdx,
       }}
     >
-      {/* SPHERE: scales freely */}
+      {/* SPHERE: scales freely, centered in flex slot */}
       <m.div
         style={{
           position: "absolute",
@@ -3807,11 +3852,12 @@ function ProcessBall({
           translateY: "-50%",
           scaleX,
           scaleY,
+          opacity: sphereOpacity,
           filter: filterStyle,
           width: BALL,
           height: BALL,
           borderRadius: "50%",
-          willChange: "transform, filter",
+          willChange: "transform, filter, opacity",
           background: "radial-gradient(circle at 28% 23%, rgba(190,228,35,0.38) 0%, transparent 34%), radial-gradient(circle at 50% 50%, rgba(4,5,3,0.98) 0%, rgba(4,5,3,0.96) 24%, rgba(58,86,4,0.84) 50%, rgba(145,188,12,0.91) 68%, rgba(78,112,6,0.79) 80%, rgba(14,21,2,0.93) 92%, rgba(5,7,3,0.97) 100%)",
         }}
       />
@@ -3855,6 +3901,8 @@ function Process() {
     progressMV.set((time / 1800) % PROCESS.length);
   });
 
+  const minW = PROCESS.length * BALL + (PROCESS.length - 1) * CONN_W;
+
   return (
     <section id="process" className="py-28 md:py-36 bg-surface/20">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
@@ -3866,11 +3914,16 @@ function Process() {
         </Reveal>
         <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0 pb-4">
           <div
-            className="flex items-center justify-center"
-            style={{ minWidth: `${PROCESS.length * BALL_SLOT + 60}px` }}
+            className="flex items-center"
+            style={{ minWidth: `${minW}px` }}
           >
             {PROCESS.map((proc, idx) => (
-              <ProcessBall key={proc.n} proc={proc} idx={idx} progressMV={progressMV} />
+              <Fragment key={proc.n}>
+                {idx > 0 && (
+                  <ProcessConnector leftIdx={idx - 1} rightIdx={idx} progressMV={progressMV} />
+                )}
+                <ProcessBall proc={proc} idx={idx} progressMV={progressMV} />
+              </Fragment>
             ))}
           </div>
         </div>
