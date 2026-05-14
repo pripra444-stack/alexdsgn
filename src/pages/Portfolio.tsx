@@ -3742,8 +3742,13 @@ function ProcIcon({ name }: { name: string }) {
   return null;
 }
 
-const BALL = 120; // sphere base diameter (px)
+const BALL = 130;        // sphere base diameter (px)
+const BALL_SLOT = 202;  // fixed slot width per ball — inflated state fits inside
 
+/* 3D sphere that swells (scale up) when active, deflates when idle.
+   Organic liquid feel via squash-stretch: ball squashes slightly while
+   filling, then pops taller at peak — like a water balloon under pressure.
+   ALL text (number, icon, title) lives INSIDE the sphere. */
 function ProcessBall({
   proc,
   idx,
@@ -3760,120 +3765,111 @@ function ProcessBall({
     if (dist < -N / 2) dist += N;
     if (dist > N / 2)  dist -= N;
     const raw = Math.max(0, 1 - Math.abs(dist));
-    return raw * raw;
+    return raw * raw; // quadratic — slow fill, slow drain
   });
 
-  const waterY     = useTransform(intensity, [0, 1], [BALL * 0.93, -2]);
-  const glowOp     = useTransform(intensity, [0, 0.25, 1], [0, 0, 0.7]);
-  const ballScale  = useTransform(intensity, [0, 1], [1, 1.08]);
-  const numColor   = useTransform(intensity, [0.25, 0.85], ["#CBFF00", "#060606"]);
-  const iconColor  = useTransform(intensity, [0.25, 0.85], ["rgba(203,255,0,0.75)", "rgba(0,0,0,0.65)"]);
-  const titleColor = useTransform(intensity, [0, 0.6, 1], ["rgba(180,180,180,0.8)", "#ffffff", "#CBFF00"]);
-  const descOp     = useTransform(intensity, [0, 0.35, 1], [0.35, 0.35, 1]);
+  // Overall size: small/deflated → large/inflated
+  const mainScale = useTransform(intensity, [0, 1], [0.60, 1.38]);
+
+  // Organic squash-stretch: wide while filling → tall at peak (water-balloon pressure)
+  const sX = useTransform(intensity, [0, 0.40, 0.75, 1], [1, 1.08, 0.95, 1.00]);
+  const sY = useTransform(intensity, [0, 0.40, 0.75, 1], [1, 0.92, 1.05, 1.00]);
+
+  // Combine: final scaleX/Y = main * squash component
+  const scaleX = useTransform([mainScale, sX], ([s, sx]: number[]) => s * sx);
+  const scaleY = useTransform([mainScale, sY], ([s, sy]: number[]) => s * sy);
+
+  // Subtle glow at peak
+  const glowOp = useTransform(intensity, [0, 0.4, 1], [0, 0, 0.5]);
+
+  // Content fades in as ball inflates
+  const numOp   = useTransform(intensity, [0, 0.25, 1], [0.25, 0.55, 1]);
+  const iconOp  = useTransform(intensity, [0, 0.25, 1], [0.20, 0.50, 0.85]);
+  const titleOp = useTransform(intensity, [0, 0.35, 1], [0,    0.45, 1]);
 
   return (
-    <div className="flex flex-col items-center gap-3 flex-shrink-0" style={{ width: BALL }}>
-      {/* sphere + glow wrapper */}
-      <m.div style={{ scale: ballScale, position: "relative", width: BALL, height: BALL }}>
-        {/* acid glow halo */}
-        <m.div
+    <div
+      className="flex-shrink-0 flex items-center justify-center relative"
+      style={{ width: BALL_SLOT, height: BALL_SLOT }}
+    >
+      {/* glow halo — visible only at peak */}
+      <m.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          width: BALL * 1.9,
+          height: BALL * 1.9,
+          borderRadius: "50%",
+          opacity: glowOp,
+          background: "radial-gradient(circle, rgba(203,255,0,0.20) 0%, transparent 62%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* the sphere itself — scale via scaleX/scaleY for organic blob feel */}
+      <m.div
+        style={{
+          scaleX,
+          scaleY,
+          width: BALL,
+          height: BALL,
+          borderRadius: "50%",
+          flexShrink: 0,
+          position: "relative",
+          background: "radial-gradient(circle at 36% 27%, rgba(62,62,55,1) 0%, rgba(10,10,9,1) 100%)",
+          boxShadow: "inset 0 -10px 26px rgba(0,0,0,0.78), inset 0 5px 14px rgba(255,255,255,0.06), 0 14px 36px rgba(0,0,0,0.65)",
+          overflow: "hidden",
+          willChange: "transform",
+        }}
+      >
+        {/* inner specular sheen */}
+        <div
           aria-hidden
           style={{
-            position: "absolute",
-            inset: -16,
-            borderRadius: "50%",
-            opacity: glowOp,
-            background: "radial-gradient(circle, rgba(203,255,0,0.40) 0%, transparent 68%)",
+            position: "absolute", inset: 0, borderRadius: "50%",
+            background: "radial-gradient(circle at 30% 21%, rgba(255,255,255,0.17) 0%, transparent 50%)",
             pointerEvents: "none",
           }}
         />
-        {/* sphere shell with overflow clip */}
+
+        {/* content: number + icon + title — all inside the sphere */}
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "50%",
-            overflow: "hidden",
-            background: "radial-gradient(circle at 38% 28%, rgba(54,54,48,1) 0%, rgba(9,9,8,1) 100%)",
-            boxShadow: "inset 0 -8px 20px rgba(0,0,0,0.75), inset 0 5px 12px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.55)",
+            position: "absolute", inset: 0,
+            display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center",
+            gap: 6, padding: 16,
+            pointerEvents: "none", userSelect: "none",
           }}
         >
-          {/* rising water */}
-          <m.div
-            aria-hidden
-            style={{
-              position: "absolute",
-              left: -4,
-              right: -4,
-              bottom: 0,
-              height: BALL + 10,
-              y: waterY,
-              background: "linear-gradient(180deg, rgba(203,255,0,0.93) 0%, rgba(148,204,0,0.87) 100%)",
-              borderRadius: "52% 52% 0 0 / 18% 18% 0 0",
-            }}
-          />
-          {/* inner shine */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: 0,
-              borderRadius: "50%",
-              background: "radial-gradient(circle at 30% 22%, rgba(255,255,255,0.16) 0%, transparent 52%)",
-              pointerEvents: "none",
-            }}
-          />
-        </div>
-        {/* number + icon overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "50%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 5,
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          <m.span style={{ color: numColor, fontSize: 11, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
+          <m.span style={{ color: "#CBFF00", opacity: numOp, fontSize: 10, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
             {proc.n}
           </m.span>
-          <m.div style={{ color: iconColor }}>
+          <m.div style={{ opacity: iconOp, color: "rgba(255,255,255,0.82)" }}>
             <ProcIcon name={proc.icon} />
           </m.div>
+          <m.p style={{ opacity: titleOp, color: "#ffffff", fontSize: 11, fontWeight: 600, textAlign: "center", lineHeight: 1.25, margin: 0 }}>
+            {proc.title}
+          </m.p>
         </div>
-        {/* specular highlight */}
+
+        {/* specular highlight dot */}
         <div
           aria-hidden
           style={{
-            position: "absolute",
-            width: 24,
-            height: 14,
-            top: "18%",
-            left: "19%",
-            background: "rgba(255,255,255,0.24)",
-            borderRadius: "50%",
-            filter: "blur(5px)",
+            position: "absolute", width: 24, height: 13,
+            top: "17%", left: "18%",
+            background: "rgba(255,255,255,0.24)", borderRadius: "50%", filter: "blur(5px)",
             pointerEvents: "none",
           }}
         />
       </m.div>
-      {/* title */}
-      <m.p style={{ color: titleColor, maxWidth: BALL + 20 }} className="text-sm font-semibold text-center leading-tight">
-        {proc.title}
-      </m.p>
-      {/* description — always rendered, opacity-driven */}
-      <m.p style={{ opacity: descOp, maxWidth: 136 }} className="text-[11px] text-zinc-400 text-center leading-snug">
-        {proc.desc}
-      </m.p>
     </div>
   );
 }
 
+/* Connector between two balls: thin line + tiny flowing dot.
+   Brightens during the hand-off moment when source drains into next ball. */
 function FlowConnector({
   fromIdx,
   progressMV,
@@ -3883,7 +3879,13 @@ function FlowConnector({
 }) {
   const N = PROCESS.length;
 
-  /* dotProgress: 0 when source ball is filling, 1 when it drains into next */
+  const lineOp = useTransform(progressMV, (p) => {
+    let dist = p - (fromIdx + 0.5);
+    if (dist < -(N / 2)) dist += N;
+    if (dist > N / 2)    dist -= N;
+    return 0.08 + 0.42 * Math.max(0, 1 - Math.abs(dist) * 1.8);
+  });
+
   const dotProgress = useTransform(progressMV, (p) => {
     let local = p - fromIdx;
     if (local < -(N / 2)) local += N;
@@ -3891,46 +3893,29 @@ function FlowConnector({
     return Math.max(0, Math.min(1, local));
   });
 
-  const dotLeft   = useTransform(dotProgress, [0, 1], ["3%", "97%"]);
-  const dotOp     = useTransform(dotProgress, [0, 0.12, 0.88, 1], [0, 1, 1, 0]);
-  const lineOp    = useTransform(progressMV, (p) => {
-    let dist = p - (fromIdx + 0.5);
-    if (dist < -(N / 2)) dist += N;
-    if (dist > N / 2)    dist -= N;
-    return 0.12 + 0.55 * Math.max(0, 1 - Math.abs(dist) * 1.6);
-  });
+  const dotLeft = useTransform(dotProgress, [0, 1], ["5%", "95%"]);
+  const dotOp   = useTransform(dotProgress, [0, 0.10, 0.90, 1], [0, 0.85, 0.85, 0]);
 
   return (
-    <div className="flex-1 relative" style={{ height: BALL + 60, minWidth: 20 }}>
-      {/* line */}
+    <div className="flex-1 relative" style={{ height: BALL_SLOT, minWidth: 16 }}>
       <m.div
         aria-hidden
         style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          top: BALL / 2,
-          height: 2,
-          translateY: "-50%",
+          position: "absolute", left: 0, right: 0,
+          top: "50%", height: 1.5, translateY: "-50%",
           opacity: lineOp,
-          background: "linear-gradient(90deg, rgba(203,255,0,0.25), rgba(203,255,0,0.7), rgba(203,255,0,0.25))",
+          background: "linear-gradient(90deg, rgba(203,255,0,0.18), rgba(203,255,0,0.55), rgba(203,255,0,0.18))",
         }}
       />
-      {/* flowing droplet */}
       <m.div
         aria-hidden
         style={{
           position: "absolute",
-          width: 9,
-          height: 9,
-          top: BALL / 2,
-          translateY: "-50%",
-          translateX: "-50%",
-          left: dotLeft,
-          opacity: dotOp,
-          borderRadius: "50%",
+          width: 7, height: 7, borderRadius: "50%",
+          top: "50%", translateY: "-50%", translateX: "-50%",
+          left: dotLeft, opacity: dotOp,
           background: "rgba(203,255,0,1)",
-          boxShadow: "0 0 12px 4px rgba(203,255,0,0.75)",
+          boxShadow: "0 0 8px 3px rgba(203,255,0,0.6)",
         }}
       />
     </div>
@@ -3962,7 +3947,10 @@ function Process() {
           </m.h2>
         </Reveal>
         <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0 pb-4">
-          <div className="flex items-start" style={{ minWidth: `${PROCESS.length * (BALL + 48) + (PROCESS.length - 1) * 20}px` }}>
+          <div
+            className="flex items-center"
+            style={{ minWidth: `${PROCESS.length * BALL_SLOT + (PROCESS.length - 1) * 16}px` }}
+          >
             {items}
           </div>
         </div>
