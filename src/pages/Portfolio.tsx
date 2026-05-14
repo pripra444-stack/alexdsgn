@@ -3766,7 +3766,7 @@ function GooFilter() {
   );
 }
 
-/* One blob circle inside the gooey layer — scales with intensity */
+/* One blob circle inside the gooey layer — scales and dims with intensity */
 function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<number> }) {
   const N = PROCESS.length;
   const intensity = useTransform(progressMV, (p) => {
@@ -3776,7 +3776,8 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
     const raw = Math.max(0, 1 - Math.abs(dist));
     return raw * raw;
   });
-  const scale = useTransform(intensity, [0, 1], [0.88, 1.28]);
+  const scale   = useTransform(intensity, [0, 1], [0.88, 1.28]);
+  const opacity = useTransform(intensity, [0, 1], [0.50, 1.0]);
   return (
     <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <m.div
@@ -3788,7 +3789,8 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
             "radial-gradient(circle at 32% 27%, rgba(203,255,0,0.22) 0%, transparent 42%), " +
             "radial-gradient(circle at 50% 50%, #070D00 0%, #1A2D00 18%, #324F00 40%, #507A00 56%, #324F00 72%, #0D1500 88%, #060900 100%)",
           scale,
-          willChange: "transform",
+          opacity,
+          willChange: "transform, opacity",
           flexShrink: 0,
         }}
       />
@@ -3796,7 +3798,8 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Text label for each sphere — separate layer, no goo filter, stays crisp */
+/* Text label — number is large (≈30% of sphere) in neutral state, shrinks+rises
+   when active to reveal title and description. Separate layer, no goo filter. */
 function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: number; progressMV: MotionValue<number> }) {
   const N = PROCESS.length;
   const intensity = useTransform(progressMV, (p) => {
@@ -3806,36 +3809,46 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
     const raw = Math.max(0, 1 - Math.abs(dist));
     return raw * raw;
   });
-  const numOp   = useTransform(intensity, [0, 0.25, 1], [0.35, 0.65, 1.0]);
-  const labelOp = useTransform(intensity, [0, 0.45, 1], [0.00, 0.45, 1.0]);
+  // Number: large and centered in neutral; shrinks and rises when active
+  const numSize    = useTransform(intensity, [0, 0.55, 1], [58, 38, 22]);
+  const numTranslY = useTransform(intensity, [0, 1], [0, -20]);
+  const numOp      = useTransform(intensity, [0, 1], [0.65, 1.0]);
+  // Title and desc appear only when active
+  const labelOp = useTransform(intensity, [0, 0.40, 1], [0.00, 0.30, 1.0]);
   const descOp  = useTransform(intensity, [0, 0.60, 1], [0.00, 0.00, 0.78]);
-  const textScale = useTransform(intensity, [0, 1], [0.82, 1.0]);
   return (
-    <m.div
+    <div
       style={{
         flex: "1 1 0",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 5,
-        scale: textScale,
+        gap: 6,
         pointerEvents: "none",
         userSelect: "none",
         textAlign: "center",
         padding: "16px",
       }}
     >
-      <m.span style={{ opacity: numOp, color: "#CBFF00", fontSize: 20, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
+      <m.span style={{
+        opacity: numOp,
+        color: "#CBFF00",
+        fontSize: numSize,
+        fontFamily: "monospace",
+        fontWeight: 700,
+        lineHeight: 1,
+        translateY: numTranslY,
+      }}>
         {proc.n}
       </m.span>
-      <m.p style={{ opacity: labelOp, color: "#ffffff", fontSize: 12, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
+      <m.p style={{ opacity: labelOp, color: "#ffffff", fontSize: 15, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
         {proc.title}
       </m.p>
-      <m.p style={{ opacity: descOp, color: "rgba(255,255,255,0.52)", fontSize: 9.5, lineHeight: 1.4, margin: 0 }}>
+      <m.p style={{ opacity: descOp, color: "rgba(255,255,255,0.55)", fontSize: 11, lineHeight: 1.4, margin: 0 }}>
         {proc.desc}
       </m.p>
-    </m.div>
+    </div>
   );
 }
 
@@ -3847,7 +3860,7 @@ function Process() {
   });
 
   return (
-    <section id="process" className="py-28 md:py-36 bg-surface/20">
+    <section id="process" className="py-28 md:py-36 bg-surface/20" style={{ overflowX: "clip" }}>
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <Label>Процесс</Label>
@@ -3856,7 +3869,7 @@ function Process() {
           </m.h2>
         </Reveal>
         <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
-          <div style={{ position: "relative", height: PROC_ROW_H, minWidth: `${PROCESS.length * 180}px`, overflow: "hidden" }}>
+          <div style={{ position: "relative", height: PROC_ROW_H, minWidth: `${PROCESS.length * 180}px` }}>
             <GooFilter />
             {/* Layer 1: gooey organic chain — circles merge via SVG filter */}
             <div
