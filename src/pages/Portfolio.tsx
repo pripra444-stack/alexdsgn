@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { m, useInView, useMotionValue, useTransform, animate, AnimatePresence, useAnimationFrame, MotionValue } from "framer-motion";
+import { m, useInView, useMotionValue, useTransform, animate, AnimatePresence, useAnimationFrame, MotionValue, useMotionTemplate } from "framer-motion";
 
 // ─── Links ───────────────────────────────────────────────────────────────────
 const TG_LINK = "https://t.me/AlexanderPanurin";
@@ -3742,13 +3742,9 @@ function ProcIcon({ name }: { name: string }) {
   return null;
 }
 
-const BALL = 130;        // sphere base diameter (px)
-const BALL_SLOT = 202;  // fixed slot width per ball — inflated state fits inside
+const BALL = 156;       // sphere base diameter (px)
+const BALL_SLOT = 164;  // layout slot per ball
 
-/* 3D sphere that swells (scale up) when active, deflates when idle.
-   Organic liquid feel via squash-stretch: ball squashes slightly while
-   filling, then pops taller at peak — like a water balloon under pressure.
-   ALL text (number, icon, title) lives INSIDE the sphere. */
 function ProcessBall({
   proc,
   idx,
@@ -3765,111 +3761,89 @@ function ProcessBall({
     if (dist < -N / 2) dist += N;
     if (dist > N / 2)  dist -= N;
     const raw = Math.max(0, 1 - Math.abs(dist));
-    return raw * raw; // quadratic — slow fill, slow drain
+    return raw * raw;
   });
 
-  // Overall size: small/deflated → large/inflated
-  const mainScale = useTransform(intensity, [0, 1], [0.60, 1.38]);
-
-  // Organic squash-stretch: wide while filling → tall at peak (water-balloon pressure)
-  const sX = useTransform(intensity, [0, 0.40, 0.75, 1], [1, 1.08, 0.95, 1.00]);
-  const sY = useTransform(intensity, [0, 0.40, 0.75, 1], [1, 0.92, 1.05, 1.00]);
-
-  // Combine: final scaleX/Y = main * squash component
+  const mainScale = useTransform(intensity, [0, 1], [0.50, 1.24]);
+  const sX = useTransform(intensity, [0, 0.42, 0.80, 1], [1, 1.08, 0.94, 1.00]);
+  const sY = useTransform(intensity, [0, 0.42, 0.80, 1], [1, 0.92, 1.06, 1.00]);
   const scaleX = useTransform([mainScale, sX], ([s, sx]: number[]) => s * sx);
   const scaleY = useTransform([mainScale, sY], ([s, sy]: number[]) => s * sy);
 
-  // Subtle glow at peak
-  const glowOp = useTransform(intensity, [0, 0.4, 1], [0, 0, 0.5]);
+  // Acid green stroke: near-invisible when idle, vivid at peak
+  const borderColor = useTransform(
+    intensity,
+    [0, 1],
+    ["rgba(203,255,0,0.08)", "rgba(203,255,0,0.92)"]
+  );
 
-  // Content fades in as ball inflates
-  const numOp   = useTransform(intensity, [0, 0.25, 1], [0.25, 0.55, 1]);
-  const iconOp  = useTransform(intensity, [0, 0.25, 1], [0.20, 0.50, 0.85]);
-  const titleOp = useTransform(intensity, [0, 0.35, 1], [0,    0.45, 1]);
+  // Outer glow via drop-shadow on the scaling element
+  const glowR = useTransform(intensity, [0, 0.45, 1], [0, 0, 22]);
+  const glowA = useTransform(intensity, [0, 0.45, 1], [0, 0, 0.52]);
+  const filterStyle = useMotionTemplate`drop-shadow(0 0 ${glowR}px rgba(203,255,0,${glowA})) drop-shadow(0 0 ${glowR}px rgba(203,255,0,${glowA}))`;
+
+  const numOp  = useTransform(intensity, [0, 0.22, 1], [0.28, 0.60, 1.00]);
+  const textOp = useTransform(intensity, [0, 0.38, 1], [0.00, 0.42, 1.00]);
 
   return (
     <div
-      className="flex-shrink-0 flex items-center justify-center relative"
+      className="flex-shrink-0 flex items-center justify-center"
       style={{ width: BALL_SLOT, height: BALL_SLOT }}
     >
-      {/* glow halo — visible only at peak */}
-      <m.div
-        aria-hidden
-        style={{
-          position: "absolute",
-          width: BALL * 1.9,
-          height: BALL * 1.9,
-          borderRadius: "50%",
-          opacity: glowOp,
-          background: "radial-gradient(circle, rgba(203,255,0,0.20) 0%, transparent 62%)",
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* the sphere itself — scale via scaleX/scaleY for organic blob feel */}
       <m.div
         style={{
           scaleX,
           scaleY,
+          filter: filterStyle,
           width: BALL,
           height: BALL,
           borderRadius: "50%",
-          flexShrink: 0,
+          borderStyle: "solid",
+          borderWidth: 3,
+          borderColor,
+          background: "radial-gradient(circle at 64% 28%, rgba(203,255,0,0.15) 0%, rgba(16,19,13,0.93) 48%, rgba(8,9,7,0.97) 100%)",
+          boxShadow: "inset 0 -10px 28px rgba(0,0,0,0.70), inset 0 4px 14px rgba(255,255,255,0.04)",
           position: "relative",
-          background: "radial-gradient(circle at 36% 27%, rgba(62,62,55,1) 0%, rgba(10,10,9,1) 100%)",
-          boxShadow: "inset 0 -10px 26px rgba(0,0,0,0.78), inset 0 5px 14px rgba(255,255,255,0.06), 0 14px 36px rgba(0,0,0,0.65)",
           overflow: "hidden",
-          willChange: "transform",
+          willChange: "transform, filter",
+          flexShrink: 0,
         }}
       >
-        {/* inner specular sheen */}
         <div
           aria-hidden
           style={{
             position: "absolute", inset: 0, borderRadius: "50%",
-            background: "radial-gradient(circle at 30% 21%, rgba(255,255,255,0.17) 0%, transparent 50%)",
+            background: "radial-gradient(circle at 32% 22%, rgba(255,255,255,0.10) 0%, transparent 46%)",
             pointerEvents: "none",
           }}
         />
-
-        {/* content: number + icon + title — all inside the sphere */}
         <div
           style={{
             position: "absolute", inset: 0,
             display: "flex", flexDirection: "column",
             alignItems: "center", justifyContent: "center",
-            gap: 6, padding: 16,
+            gap: 5, padding: "18px",
             pointerEvents: "none", userSelect: "none",
+            textAlign: "center",
           }}
         >
-          <m.span style={{ color: "#CBFF00", opacity: numOp, fontSize: 10, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
+          <m.span style={{ opacity: numOp, color: "#CBFF00", fontSize: 30, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
             {proc.n}
           </m.span>
-          <m.div style={{ opacity: iconOp, color: "rgba(255,255,255,0.82)" }}>
-            <ProcIcon name={proc.icon} />
-          </m.div>
-          <m.p style={{ opacity: titleOp, color: "#ffffff", fontSize: 11, fontWeight: 600, textAlign: "center", lineHeight: 1.25, margin: 0 }}>
+          <m.p style={{ opacity: textOp, color: "#ffffff", fontSize: 13, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
             {proc.title}
           </m.p>
+          <m.p style={{ opacity: textOp, color: "rgba(255,255,255,0.50)", fontSize: 10, lineHeight: 1.45, margin: 0 }}>
+            {proc.desc}
+          </m.p>
         </div>
-
-        {/* specular highlight dot */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute", width: 24, height: 13,
-            top: "17%", left: "18%",
-            background: "rgba(255,255,255,0.24)", borderRadius: "50%", filter: "blur(5px)",
-            pointerEvents: "none",
-          }}
-        />
       </m.div>
     </div>
   );
 }
 
-/* Connector between two balls: thin line + tiny flowing dot.
-   Brightens during the hand-off moment when source drains into next ball. */
+/* Connector: 3px acid line same thickness as sphere border — the stroke
+   "continues" between spheres, brightens during the hand-off, dot travels along. */
 function FlowConnector({
   fromIdx,
   progressMV,
@@ -3879,12 +3853,14 @@ function FlowConnector({
 }) {
   const N = PROCESS.length;
 
-  const lineOp = useTransform(progressMV, (p) => {
+  const lineIntensity = useTransform(progressMV, (p) => {
     let dist = p - (fromIdx + 0.5);
     if (dist < -(N / 2)) dist += N;
     if (dist > N / 2)    dist -= N;
-    return 0.08 + 0.42 * Math.max(0, 1 - Math.abs(dist) * 1.8);
+    return Math.max(0, 1 - Math.abs(dist) * 1.7);
   });
+
+  const lineOp = useTransform(lineIntensity, [0, 1], [0.07, 0.85]);
 
   const dotProgress = useTransform(progressMV, (p) => {
     let local = p - fromIdx;
@@ -3893,29 +3869,30 @@ function FlowConnector({
     return Math.max(0, Math.min(1, local));
   });
 
-  const dotLeft = useTransform(dotProgress, [0, 1], ["5%", "95%"]);
-  const dotOp   = useTransform(dotProgress, [0, 0.10, 0.90, 1], [0, 0.85, 0.85, 0]);
+  const dotLeft = useTransform(dotProgress, [0, 1], ["0%", "100%"]);
+  const dotOp   = useTransform(dotProgress, [0, 0.08, 0.92, 1], [0, 1, 1, 0]);
 
   return (
-    <div className="flex-1 relative" style={{ height: BALL_SLOT, minWidth: 16 }}>
+    <div className="flex-1 relative" style={{ height: BALL_SLOT, minWidth: 12 }}>
       <m.div
         aria-hidden
         style={{
           position: "absolute", left: 0, right: 0,
-          top: "50%", height: 1.5, translateY: "-50%",
+          top: "50%", height: 3, translateY: "-50%",
           opacity: lineOp,
-          background: "linear-gradient(90deg, rgba(203,255,0,0.18), rgba(203,255,0,0.55), rgba(203,255,0,0.18))",
+          background: "rgba(203,255,0,1)",
+          boxShadow: "0 0 8px 2px rgba(203,255,0,0.55)",
         }}
       />
       <m.div
         aria-hidden
         style={{
           position: "absolute",
-          width: 7, height: 7, borderRadius: "50%",
+          width: 10, height: 10, borderRadius: "50%",
           top: "50%", translateY: "-50%", translateX: "-50%",
           left: dotLeft, opacity: dotOp,
-          background: "rgba(203,255,0,1)",
-          boxShadow: "0 0 8px 3px rgba(203,255,0,0.6)",
+          background: "#ffffff",
+          boxShadow: "0 0 12px 4px rgba(203,255,0,0.85)",
         }}
       />
     </div>
@@ -3949,7 +3926,7 @@ function Process() {
         <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0 pb-4">
           <div
             className="flex items-center"
-            style={{ minWidth: `${PROCESS.length * BALL_SLOT + (PROCESS.length - 1) * 16}px` }}
+            style={{ minWidth: `${PROCESS.length * BALL_SLOT}px` }}
           >
             {items}
           </div>
