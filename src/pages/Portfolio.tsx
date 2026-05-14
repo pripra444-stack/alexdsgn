@@ -3811,8 +3811,37 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Text label — number is large (≈30% of sphere) in neutral state, shrinks+rises
-   when active to reveal title and description. Separate layer, no goo filter. */
+/* Decorative acid-green wave lines behind the sphere chain.
+   SVG, preserveAspectRatio="none" so lines always span full row width. */
+function ProcessWaves() {
+  return (
+    <svg
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        opacity: 0.10,
+        pointerEvents: "none",
+      }}
+      viewBox="0 0 1200 320"
+      preserveAspectRatio="none"
+      fill="none"
+    >
+      <path d="M0,112 C200,86 400,138 600,112 C800,86 1000,138 1200,112" stroke="#CBFF00" strokeWidth="1.5"/>
+      <path d="M0,145 C150,172 350,118 500,145 C650,172 820,118 950,145 C1060,165 1140,132 1200,145" stroke="#CBFF00" strokeWidth="1.5"/>
+      <path d="M0,170 C120,192 280,148 440,170 C600,192 760,148 920,170 C1040,186 1130,158 1200,170" stroke="#CBFF00" strokeWidth="1"/>
+      <path d="M0,200 C180,218 360,182 540,200 C720,218 900,182 1080,200 C1140,208 1175,196 1200,200" stroke="#CBFF00" strokeWidth="0.75"/>
+    </svg>
+  );
+}
+
+/* Text label — lives in a circle clip container (same scale as blob).
+   clip-path:circle(50%) is more reliable than overflow:hidden alone for
+   CSS-transformed content — clips the painted area, not just layout bounds.
+   Number: counter-scaled (antiScale = 1/sphereScale) → same visual size for all spheres.
+   Sequence: dim (50%) → bright (100%) as sphere's turn approaches → fade out → text appears. */
 function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: number; progressMV: MotionValue<number> }) {
   const N = PROCESS.length;
   const intensity = useTransform(progressMV, (p) => {
@@ -3822,48 +3851,66 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
     const raw = Math.max(0, 1 - Math.abs(dist));
     return raw * raw;
   });
-  // Number: huge in neutral (~50% of sphere area), shrinks+rises when active
-  const numSize    = useTransform(intensity, [0, 0.55, 1], [110, 58, 26]);
-  const numTranslY = useTransform(intensity, [0, 1], [0, -28]);
-  const numOp      = useTransform(intensity, [0, 1], [0.80, 1.0]);
-  const numColor   = useTransform(intensity, [0, 0.55, 1], ["#CBFF00", "#CBFF00", "#000000"]);
-  // Title and desc appear only when active; all text black on acid sphere
-  const labelOp    = useTransform(intensity, [0, 0.45, 1], [0.00, 0.25, 1.0]);
-  const descOp     = useTransform(intensity, [0, 0.62, 1], [0.00, 0.00, 0.90]);
-  const labelColor = useTransform(intensity, [0, 0.65, 1], ["#ffffff", "#ffffff", "#000000"]);
-  const descColor  = useTransform(intensity, [0, 0.65, 1], ["#ffffff", "#ffffff", "#000000"]);
+  const scaleV    = useTransform(intensity, [0, 1], [0.88, 1.28]);
+  // Counter-scale keeps number the same visual size regardless of sphere scale
+  const antiScale = useTransform(scaleV, (s: number) => 1 / s);
+  // dim → bright → fade: number glows before the sphere expands, then disappears
+  const numOp  = useTransform(intensity, [0, 0.28, 0.52, 0.66], [0.45, 1.0, 1.0, 0.0]);
+  // text fades in only when sphere is nearly fully acid
+  const textOp = useTransform(intensity, [0.60, 0.72, 1.0], [0.0, 0.0, 1.0]);
   return (
-    <div
-      style={{
-        flex: "1 1 0",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 7,
-        pointerEvents: "none",
-        userSelect: "none",
-        textAlign: "center",
-        padding: "16px",
-      }}
-    >
-      <m.span style={{
-        opacity: numOp,
-        color: numColor,
-        fontSize: numSize,
-        fontFamily: "LunaObscura, Geist, sans-serif",
-        fontWeight: 400,
-        lineHeight: 1,
-        translateY: numTranslY,
-      }}>
-        {proc.n}
-      </m.span>
-      <m.p style={{ opacity: labelOp, color: labelColor, fontSize: 16, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
-        {proc.title}
-      </m.p>
-      <m.p style={{ opacity: descOp, color: descColor, fontSize: 12, lineHeight: 1.45, margin: 0, maxWidth: "160px" }}>
-        {proc.desc}
-      </m.p>
+    <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <m.div
+        style={{
+          position: "relative",
+          width: PROC_BALL,
+          height: PROC_BALL,
+          // clip-path clips the painted result of children (incl. CSS transforms)
+          // more reliable than overflow:hidden alone when children use scale transform
+          clipPath: `circle(${PROC_BALL / 2}px at 50% 50%)`,
+          overflow: "hidden",
+          scale: scaleV,
+          willChange: "transform",
+          flexShrink: 0,
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
+      >
+        {/* Number: counter-scaled → constant visual size; brightens then fades before sphere grows */}
+        <m.div style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          opacity: numOp,
+          scale: antiScale,
+        }}>
+          <span style={{
+            color: "#CBFF00",
+            fontSize: 64,
+            fontFamily: "LunaObscura, Geist, sans-serif",
+            fontWeight: 400,
+            lineHeight: 1,
+          }}>
+            {proc.n}
+          </span>
+        </m.div>
+        {/* Title + desc: appear once sphere is acid-green, always black */}
+        <m.div style={{
+          position: "absolute", inset: 0,
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          gap: 8,
+          padding: "22px",
+          opacity: textOp,
+          textAlign: "center",
+        }}>
+          <p style={{ color: "#000", fontSize: 22, fontWeight: 700, lineHeight: 1.15, margin: 0 }}>
+            {proc.title}
+          </p>
+          <p style={{ color: "#000", fontSize: 13, lineHeight: 1.45, margin: 0 }}>
+            {proc.desc}
+          </p>
+        </m.div>
+      </m.div>
     </div>
   );
 }
@@ -3887,6 +3934,8 @@ function Process() {
         <div>
           <div style={{ position: "relative", height: PROC_ROW_H }}>
             <GooFilter />
+            {/* Layer 0: decorative waves behind everything */}
+            <ProcessWaves />
             {/* Layer 1: gooey organic chain — circles merge via SVG filter */}
             <div
               style={{
