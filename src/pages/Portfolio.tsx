@@ -3766,7 +3766,10 @@ function GooFilter() {
   );
 }
 
-/* One blob circle inside the gooey layer — scales and dims with intensity */
+/* One blob circle inside the gooey layer.
+   Two layers: dark opaque base (always fully visible, defines gooey alpha) +
+   acid-green overlay that fades in with intensity.
+   No CSS filter on children — nested filter inside filter: url() breaks in Chromium. */
 function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<number> }) {
   const N = PROCESS.length;
   const intensity = useTransform(progressMV, (p) => {
@@ -3776,24 +3779,36 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
     const raw = Math.max(0, 1 - Math.abs(dist));
     return raw * raw;
   });
-  const scale   = useTransform(intensity, [0, 1], [0.88, 1.28]);
-  const opacity = useTransform(intensity, [0, 1], [0.50, 1.0]);
+  const scale       = useTransform(intensity, [0, 1], [0.88, 1.28]);
+  const acidOpacity = useTransform(intensity, [0, 1], [0.0, 1.0]);
   return (
     <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <m.div
         style={{
+          position: "relative",
           width: PROC_BALL,
           height: PROC_BALL,
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle at 32% 27%, rgba(203,255,0,0.22) 0%, transparent 42%), " +
-            "radial-gradient(circle at 50% 50%, #070D00 0%, #1A2D00 18%, #324F00 40%, #507A00 56%, #324F00 72%, #0D1500 88%, #060900 100%)",
+          overflow: "hidden",
           scale,
-          opacity,
-          willChange: "transform, opacity",
+          willChange: "transform",
           flexShrink: 0,
         }}
-      />
+      >
+        {/* Dark base — always opaque; gives gooey filter a solid alpha to work with */}
+        <div style={{
+          position: "absolute", inset: 0, borderRadius: "50%",
+          background: "#0C1500",
+        }} />
+        {/* Acid green overlay — appears as sphere activates */}
+        <m.div style={{
+          position: "absolute", inset: 0, borderRadius: "50%",
+          opacity: acidOpacity,
+          background:
+            "radial-gradient(circle at 30% 25%, rgba(230,255,60,0.55) 0%, transparent 50%), " +
+            "radial-gradient(circle at 50% 50%, #0A1500 0%, #1C3200 16%, #3A6200 36%, #7AB800 52%, #9ADA10 62%, #5A8C00 74%, #1E3000 87%, #080D00 100%)",
+        }} />
+      </m.div>
     </div>
   );
 }
@@ -3812,10 +3827,12 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
   // Number: large and centered in neutral; shrinks and rises when active
   const numSize    = useTransform(intensity, [0, 0.55, 1], [58, 38, 22]);
   const numTranslY = useTransform(intensity, [0, 1], [0, -20]);
-  const numOp      = useTransform(intensity, [0, 1], [0.65, 1.0]);
-  // Title and desc appear only when active
-  const labelOp = useTransform(intensity, [0, 0.40, 1], [0.00, 0.30, 1.0]);
-  const descOp  = useTransform(intensity, [0, 0.60, 1], [0.00, 0.00, 0.78]);
+  const numOp      = useTransform(intensity, [0, 1], [0.55, 1.0]);
+  // Title and desc appear only when active; text goes dark on acid-green sphere
+  const labelOp    = useTransform(intensity, [0, 0.40, 1], [0.00, 0.30, 1.0]);
+  const descOp     = useTransform(intensity, [0, 0.60, 1], [0.00, 0.00, 0.80]);
+  const labelColor = useTransform(intensity, [0, 0.65, 1], ["#ffffff", "#ffffff", "#0B1A00"]);
+  const descColor  = useTransform(intensity, [0, 0.65, 1], ["rgba(255,255,255,0.55)", "rgba(255,255,255,0.55)", "rgba(10,30,0,0.85)"]);
   return (
     <div
       style={{
@@ -3842,10 +3859,10 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
       }}>
         {proc.n}
       </m.span>
-      <m.p style={{ opacity: labelOp, color: "#ffffff", fontSize: 15, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
+      <m.p style={{ opacity: labelOp, color: labelColor, fontSize: 15, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
         {proc.title}
       </m.p>
-      <m.p style={{ opacity: descOp, color: "rgba(255,255,255,0.55)", fontSize: 11, lineHeight: 1.4, margin: 0 }}>
+      <m.p style={{ opacity: descOp, color: descColor, fontSize: 11, lineHeight: 1.4, margin: 0 }}>
         {proc.desc}
       </m.p>
     </div>
@@ -3868,8 +3885,8 @@ function Process() {
             Как работаем
           </m.h2>
         </Reveal>
-        <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
-          <div style={{ position: "relative", height: PROC_ROW_H, minWidth: `${PROCESS.length * 180}px` }}>
+        <div>
+          <div style={{ position: "relative", height: PROC_ROW_H }}>
             <GooFilter />
             {/* Layer 1: gooey organic chain — circles merge via SVG filter */}
             <div
