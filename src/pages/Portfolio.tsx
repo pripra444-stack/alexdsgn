@@ -3681,12 +3681,14 @@ function WhyMe() {
                     />
                   </div>
 
-                  {/* COVER LAYER — slides up on hover (desktop) or tap (mobile) */}
+                  {/* COVER LAYER — slides up on hover (desktop) or tap (mobile).
+                      bottom-0 is the Tailwind class; only override it with inline
+                      style when tapped (isAct) so group-hover: still wins on desktop. */}
                   <div
-                    className={`absolute top-0 left-0 right-0 group-hover:bottom-[var(--why-img-h)] group-hover:bg-accent transition-[background-color,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-7 flex flex-col ${isAct ? "bg-accent" : "bg-canvas"}`}
+                    className={`absolute top-0 left-0 right-0 bottom-0 group-hover:bottom-[var(--why-img-h)] group-hover:bg-accent transition-[background-color,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-7 flex flex-col ${isAct ? "bg-accent" : "bg-canvas"}`}
                     style={{
                       ["--why-img-h" as never]: `${WHY_IMG_H + 8}px`,
-                      bottom: isAct ? WHY_IMG_H + 8 : 0,
+                      ...(isAct ? { bottom: WHY_IMG_H + 8 } : {}),
                       willChange: "background-color",
                     }}
                   >
