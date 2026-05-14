@@ -3725,16 +3725,26 @@ function WhyMe() {
 
 // ─── PROCESS ─────────────────────────────────────────────────────────────────
 const PROCESS = [
-  { n: "01", title: "Бриф", desc: "Разбираем задачу, нишу, конкурентов и цели." },
-  { n: "02", title: "Анализ", desc: "Смотрю топ выдачи, нахожу точки роста и слабые места." },
-  { n: "03", title: "Концепция", desc: "Предлагаю 2–3 направления на выбор." },
-  { n: "04", title: "Производство", desc: "Дизайн, итерации, правки — до финального результата." },
-  { n: "05", title: "Сдача", desc: "Готовые файлы в нужных форматах. Без доработок за доплату." },
+  { n: "01", title: "Бриф",         desc: "Разбираем задачу, нишу, конкурентов и цели.",                icon: "clipboard" },
+  { n: "02", title: "Анализ",       desc: "Смотрю топ выдачи, нахожу точки роста и слабые места.",      icon: "search"    },
+  { n: "03", title: "Концепция",    desc: "Предлагаю 2–3 направления на выбор.",                        icon: "bulb"      },
+  { n: "04", title: "Производство", desc: "Дизайн, итерации, правки — до финального результата.",       icon: "gear"      },
+  { n: "05", title: "Сдача",        desc: "Готовые файлы в нужных форматах. Без доработок за доплату.", icon: "check"     },
 ];
 
-/* Each card subscribes directly to the shared motion value — no React
-   re-renders, DOM updates happen at 60 fps via Framer Motion internals. */
-function ProcessCard({
+function ProcIcon({ name }: { name: string }) {
+  const p = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  if (name === "clipboard") return <svg {...p}><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="15" y2="16"/></svg>;
+  if (name === "search")    return <svg {...p}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>;
+  if (name === "bulb")      return <svg {...p}><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.8-1.7 5.3-4 6.7V17H9v-1.3C6.7 14.3 5 11.8 5 9a7 7 0 0 1 7-7z"/></svg>;
+  if (name === "gear")      return <svg {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+  if (name === "check")     return <svg {...p} strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>;
+  return null;
+}
+
+const BALL = 120; // sphere base diameter (px)
+
+function ProcessBall({
   proc,
   idx,
   progressMV,
@@ -3745,66 +3755,201 @@ function ProcessCard({
 }) {
   const N = PROCESS.length;
 
-  /* intensity: 1 when this card is "current", 0 when a full step away.
-     Quadratic curve gives the slow water-fill rise and slow drain. */
   const intensity = useTransform(progressMV, (p) => {
     let dist = p - idx;
-    if (dist < -N / 2) dist += N;   // wrap last→first
+    if (dist < -N / 2) dist += N;
     if (dist > N / 2)  dist -= N;
-    dist = Math.abs(dist);
-    const raw = Math.max(0, 1 - dist);
-    return raw * raw;               // ease-in/out: slow fill, slow drain
+    const raw = Math.max(0, 1 - Math.abs(dist));
+    return raw * raw;
   });
 
-  const scale       = useTransform(intensity, [0, 1], [1,                   1.065]);
-  const bgColor     = useTransform(intensity, [0, 1], ["rgba(10,10,10,1)",  "rgba(203,255,0,1)"]);
-  const borderCol   = useTransform(intensity, [0, 1], ["rgba(255,255,255,0.07)", "rgba(203,255,0,1)"]);
-  const numBg       = useTransform(intensity, [0, 1], ["rgba(203,255,0,0.10)", "rgba(0,0,0,0.12)"]);
-  const numBorder   = useTransform(intensity, [0, 1], ["rgba(203,255,0,0.30)", "rgba(0,0,0,0.55)"]);
-  const numColor    = useTransform(intensity, [0.35, 1], ["#CBFF00", "#000000"]);
-  const titleColor  = useTransform(intensity, [0.35, 1], ["#FFFFFF", "#000000"]);
-  const descColor   = useTransform(intensity, [0.35, 1], ["#71717A", "#000000"]);
+  const waterY     = useTransform(intensity, [0, 1], [BALL * 0.93, -2]);
+  const glowOp     = useTransform(intensity, [0, 0.25, 1], [0, 0, 0.7]);
+  const ballScale  = useTransform(intensity, [0, 1], [1, 1.08]);
+  const numColor   = useTransform(intensity, [0.25, 0.85], ["#CBFF00", "#060606"]);
+  const iconColor  = useTransform(intensity, [0.25, 0.85], ["rgba(203,255,0,0.75)", "rgba(0,0,0,0.65)"]);
+  const titleColor = useTransform(intensity, [0, 0.6, 1], ["rgba(180,180,180,0.8)", "#ffffff", "#CBFF00"]);
+  const descOp     = useTransform(intensity, [0, 0.35, 1], [0.35, 0.35, 1]);
 
   return (
-    <Reveal>
-      <m.div
-        variants={fadeUp}
-        style={{
-          scale,
-          backgroundColor: bgColor,
-          borderColor: borderCol,
-          willChange: "transform, background-color",
-        }}
-        className="relative flex flex-col gap-4 rounded-2xl border p-6"
-      >
+    <div className="flex flex-col items-center gap-3 flex-shrink-0" style={{ width: BALL }}>
+      {/* sphere + glow wrapper */}
+      <m.div style={{ scale: ballScale, position: "relative", width: BALL, height: BALL }}>
+        {/* acid glow halo */}
         <m.div
-          style={{ backgroundColor: numBg, borderColor: numBorder }}
-          className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0"
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: -16,
+            borderRadius: "50%",
+            opacity: glowOp,
+            background: "radial-gradient(circle, rgba(203,255,0,0.40) 0%, transparent 68%)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* sphere shell with overflow clip */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            overflow: "hidden",
+            background: "radial-gradient(circle at 38% 28%, rgba(54,54,48,1) 0%, rgba(9,9,8,1) 100%)",
+            boxShadow: "inset 0 -8px 20px rgba(0,0,0,0.75), inset 0 5px 12px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.55)",
+          }}
         >
-          <m.span style={{ color: numColor }} className="text-xs font-mono font-bold">
+          {/* rising water */}
+          <m.div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: -4,
+              right: -4,
+              bottom: 0,
+              height: BALL + 10,
+              y: waterY,
+              background: "linear-gradient(180deg, rgba(203,255,0,0.93) 0%, rgba(148,204,0,0.87) 100%)",
+              borderRadius: "52% 52% 0 0 / 18% 18% 0 0",
+            }}
+          />
+          {/* inner shine */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "50%",
+              background: "radial-gradient(circle at 30% 22%, rgba(255,255,255,0.16) 0%, transparent 52%)",
+              pointerEvents: "none",
+            }}
+          />
+        </div>
+        {/* number + icon overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 5,
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          <m.span style={{ color: numColor, fontSize: 11, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
             {proc.n}
           </m.span>
-        </m.div>
-        <div>
-          <m.h3 style={{ color: titleColor }} className="font-semibold mb-1.5">
-            {proc.title}
-          </m.h3>
-          <m.p style={{ color: descColor }} className="text-sm leading-relaxed">
-            {proc.desc}
-          </m.p>
+          <m.div style={{ color: iconColor }}>
+            <ProcIcon name={proc.icon} />
+          </m.div>
         </div>
+        {/* specular highlight */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            width: 24,
+            height: 14,
+            top: "18%",
+            left: "19%",
+            background: "rgba(255,255,255,0.24)",
+            borderRadius: "50%",
+            filter: "blur(5px)",
+            pointerEvents: "none",
+          }}
+        />
       </m.div>
-    </Reveal>
+      {/* title */}
+      <m.p style={{ color: titleColor, maxWidth: BALL + 20 }} className="text-sm font-semibold text-center leading-tight">
+        {proc.title}
+      </m.p>
+      {/* description — always rendered, opacity-driven */}
+      <m.p style={{ opacity: descOp, maxWidth: 136 }} className="text-[11px] text-zinc-400 text-center leading-snug">
+        {proc.desc}
+      </m.p>
+    </div>
+  );
+}
+
+function FlowConnector({
+  fromIdx,
+  progressMV,
+}: {
+  fromIdx: number;
+  progressMV: MotionValue<number>;
+}) {
+  const N = PROCESS.length;
+
+  /* dotProgress: 0 when source ball is filling, 1 when it drains into next */
+  const dotProgress = useTransform(progressMV, (p) => {
+    let local = p - fromIdx;
+    if (local < -(N / 2)) local += N;
+    if (local > N / 2)    local -= N;
+    return Math.max(0, Math.min(1, local));
+  });
+
+  const dotLeft   = useTransform(dotProgress, [0, 1], ["3%", "97%"]);
+  const dotOp     = useTransform(dotProgress, [0, 0.12, 0.88, 1], [0, 1, 1, 0]);
+  const lineOp    = useTransform(progressMV, (p) => {
+    let dist = p - (fromIdx + 0.5);
+    if (dist < -(N / 2)) dist += N;
+    if (dist > N / 2)    dist -= N;
+    return 0.12 + 0.55 * Math.max(0, 1 - Math.abs(dist) * 1.6);
+  });
+
+  return (
+    <div className="flex-1 relative" style={{ height: BALL + 60, minWidth: 20 }}>
+      {/* line */}
+      <m.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: BALL / 2,
+          height: 2,
+          translateY: "-50%",
+          opacity: lineOp,
+          background: "linear-gradient(90deg, rgba(203,255,0,0.25), rgba(203,255,0,0.7), rgba(203,255,0,0.25))",
+        }}
+      />
+      {/* flowing droplet */}
+      <m.div
+        aria-hidden
+        style={{
+          position: "absolute",
+          width: 9,
+          height: 9,
+          top: BALL / 2,
+          translateY: "-50%",
+          translateX: "-50%",
+          left: dotLeft,
+          opacity: dotOp,
+          borderRadius: "50%",
+          background: "rgba(203,255,0,1)",
+          boxShadow: "0 0 12px 4px rgba(203,255,0,0.75)",
+        }}
+      />
+    </div>
   );
 }
 
 function Process() {
   const progressMV = useMotionValue(0);
 
-  /* Drive the wave at 60 fps without any React state updates. */
   useAnimationFrame((time) => {
-    const STEP_MS = 1800; // ms per card — slow, water-like fill
-    progressMV.set((time / STEP_MS) % PROCESS.length);
+    progressMV.set((time / 1800) % PROCESS.length);
+  });
+
+  const items: React.ReactNode[] = [];
+  PROCESS.forEach((proc, idx) => {
+    items.push(<ProcessBall key={proc.n} proc={proc} idx={idx} progressMV={progressMV} />);
+    if (idx < PROCESS.length - 1) {
+      items.push(<FlowConnector key={`c${idx}`} fromIdx={idx} progressMV={progressMV} />);
+    }
   });
 
   return (
@@ -3816,16 +3961,9 @@ function Process() {
             Как работаем
           </m.h2>
         </Reveal>
-        <div className="relative">
-          <div
-            aria-hidden
-            className="hidden lg:block absolute top-[28px] left-0 right-0 h-px"
-            style={{ background: "linear-gradient(to right, transparent, rgba(203,255,0,0.2) 15%, rgba(203,255,0,0.2) 85%, transparent)" }}
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {PROCESS.map((proc, idx) => (
-              <ProcessCard key={proc.n} proc={proc} idx={idx} progressMV={progressMV} />
-            ))}
+        <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0 pb-4">
+          <div className="flex items-start" style={{ minWidth: `${PROCESS.length * (BALL + 48) + (PROCESS.length - 1) * 20}px` }}>
+            {items}
           </div>
         </div>
       </div>
