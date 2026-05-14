@@ -1581,12 +1581,12 @@ function ServiceCard({
               fontWeight: 900,
               fontSize: "min(24vw, 220px)",
               letterSpacing: "-0.03em",
-              color: "rgba(203,255,0,0.10)",
+              color: "transparent",
               lineHeight: 1,
               whiteSpace: "nowrap",
-              transition: "color 0.3s ease",
+              transition: "color 0.35s ease",
             }}
-            className="group-hover:[color:rgba(0,0,0,0.07)]"
+            className="group-hover:[color:rgba(0,0,0,0.13)]"
           >
             {BRAND_META[s.marketplace].short}
           </span>
