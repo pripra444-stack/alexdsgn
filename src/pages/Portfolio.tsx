@@ -1417,11 +1417,17 @@ const SWIM_BUBBLES = Array.from({ length: 16 }, (_, i) => ({
 const BRAND_META: Record<BrandKey, {
   short: string;
   logo:  string;
+  wmarkSize: string;
 }> = {
-  wb:     { short: "WB",     logo: "/hero/logo-wb-acid.png"     },
-  ozon:   { short: "OZON",   logo: "/hero/logo-ozon-acid.png"   },
-  yandex: { short: "ЯНДЕКС", logo: "/hero/logo-yandex-acid.png" },
-  avito:  { short: "AVITO",  logo: "/hero/logo-avito-acid.png"  },
+  // wmarkSize fills the card (~590px on desktop, ~335px on mobile).
+  // WB  (2 wide chars):   large size, slight overflow is clipped by the card.
+  // OZON (4 chars):       medium.
+  // ЯНДЕКС (6 Cyrillic):  small enough to fit fully inside.
+  // AVITO (5 chars):      between OZON and ЯНДЕКС.
+  wb:     { short: "WB",     logo: "/hero/logo-wb-acid.png",     wmarkSize: "min(38vw, 370px)" },
+  ozon:   { short: "OZON",   logo: "/hero/logo-ozon-acid.png",   wmarkSize: "min(22vw, 215px)" },
+  yandex: { short: "ЯНДЕКС", logo: "/hero/logo-yandex-acid.png", wmarkSize: "min(13vw, 128px)" },
+  avito:  { short: "AVITO",  logo: "/hero/logo-avito-acid.png",  wmarkSize: "min(18vw, 175px)" },
 };
 
 /* Uniform display box for every brand wordmark — same maxH/maxW so square
@@ -1579,7 +1585,7 @@ function ServiceCard({
             style={{
               fontFamily: "'Montserrat', sans-serif",
               fontWeight: 900,
-              fontSize: "min(24vw, 220px)",
+              fontSize: BRAND_META[s.marketplace].wmarkSize,
               letterSpacing: "-0.03em",
               color: "rgba(0,0,0,0.13)",
               lineHeight: 1,
