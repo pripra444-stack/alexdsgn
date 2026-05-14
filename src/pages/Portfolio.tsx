@@ -3692,7 +3692,7 @@ function WhyMe() {
                       willChange: "background-color",
                     }}
                   >
-                    <span className={`block text-[42px] font-bold font-mono mb-3 leading-none transition-colors duration-300 group-hover:text-black/35 ${isAct ? "text-black/35" : "text-white/[0.06]"}`}>
+                    <span className={`block text-[42px] font-bold font-mono mb-3 leading-none transition-colors duration-300 group-hover:text-black/35 ${isAct ? "text-black/35" : "text-accent"}`}>
                       {item.n}
                     </span>
                     <h3 className={`text-base font-semibold transition-colors duration-300 mb-1.5 group-hover:text-black ${isAct ? "text-black" : "text-white"}`}>
