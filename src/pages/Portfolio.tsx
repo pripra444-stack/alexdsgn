@@ -3967,23 +3967,25 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
 
         {/* ── Inner sonar rings ──────────────────────────────────────────────
             Gated by ringOp — zero on inactive spheres, visible only when active.
-            Thick border (6px) but very low opacity (12%) on acid green. */}
+            Very thick border (~18px), low opacity (13%), 5 rings overlapping. */}
         <m.div style={{ position: "absolute", inset: 0, opacity: ringOp, pointerEvents: "none" }}>
           {([
-            { delay: 0,    duration: 1.6 },
-            { delay: 0.53, duration: 1.9 },
-            { delay: 1.06, duration: 1.4 },
+            { delay: 0,    duration: 2.2 },
+            { delay: 0.44, duration: 2.2 },
+            { delay: 0.88, duration: 2.2 },
+            { delay: 1.32, duration: 2.2 },
+            { delay: 1.76, duration: 2.2 },
           ] as const).map(({ delay, duration }, i) => (
             <m.div
               key={i}
               style={{
                 position: "absolute", inset: 0,
                 borderRadius: "50%",
-                border: "6px solid rgba(0, 0, 0, 0.12)",
+                border: "18px solid rgba(0, 0, 0, 0.13)",
                 pointerEvents: "none",
               }}
-              animate={{ scale: [0.10, 1.0], opacity: [1.0, 0] }}
-              transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
+              animate={{ scale: [0.05, 1.02], opacity: [1.0, 0] }}
+              transition={{ duration, repeat: Infinity, delay, ease: "linear" }}
             />
           ))}
         </m.div>
