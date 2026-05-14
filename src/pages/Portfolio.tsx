@@ -3742,64 +3742,33 @@ function ProcIcon({ name }: { name: string }) {
   return null;
 }
 
-const BALL = 164;       // sphere base diameter (px)
-const CONN_W = 72;      // connector (dipole bond) width between spheres
+const PROC_BALL = 220;  // sphere diameter for gooey chain
+const PROC_ROW_H = 320; // container height (fits largest swollen sphere)
 
-/* Dipole bond connecting two adjacent spheres — glows when either neighbor is active */
-function ProcessConnector({
-  leftIdx,
-  rightIdx,
-  progressMV,
-}: {
-  leftIdx: number;
-  rightIdx: number;
-  progressMV: MotionValue<number>;
-}) {
-  const N = PROCESS.length;
-  const intensity = useTransform(progressMV, (p) => {
-    const d = (i: number) => {
-      let dist = p - i;
-      if (dist < -N / 2) dist += N;
-      if (dist > N / 2)  dist -= N;
-      const raw = Math.max(0, 1 - Math.abs(dist));
-      return raw * raw;
-    };
-    return Math.max(d(leftIdx), d(rightIdx));
-  });
-  const pillH   = useTransform(intensity, [0, 1], [10, 22]);
-  const opacity = useTransform(intensity, [0, 1], [0.18, 0.72]);
-  const glowR   = useTransform(intensity, [0, 0.5, 1], [0, 0, 12]);
-  const glowA   = useTransform(intensity, [0, 0.5, 1], [0, 0, 0.40]);
-  const filter  = useMotionTemplate`drop-shadow(0 0 ${glowR}px rgba(203,255,0,${glowA}))`;
+/* SVG gooey filter — blurs circles then sharpens, creating organic merges between
+   adjacent blobs. feComposite "atop" preserves original gradient colors. */
+function GooFilter() {
   return (
-    <div style={{ flex: `0 0 ${CONN_W}px`, height: BALL, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <m.div
-        style={{
-          width: CONN_W,
-          height: pillH,
-          borderRadius: "50%",
-          opacity,
-          filter,
-          background: "radial-gradient(ellipse 100% 100% at 50% 50%, rgba(68,100,4,1) 0%, rgba(100,145,10,0.9) 28%, rgba(145,188,12,0.55) 56%, rgba(14,21,2,0.2) 80%, transparent 100%)",
-        }}
-      />
-    </div>
+    <svg style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}>
+      <defs>
+        <filter id="proc-goo" x="-2%" y="-40%" width="104%" height="180%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="blur" />
+          <feColorMatrix
+            in="blur"
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"
+            result="goo"
+          />
+          <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+        </filter>
+      </defs>
+    </svg>
   );
 }
 
-/* Sphere and text live on SEPARATE layers so the balloon scales independently
-   of the text. Text gets only a mild scale of its own. */
-function ProcessBall({
-  proc,
-  idx,
-  progressMV,
-}: {
-  proc: (typeof PROCESS)[0];
-  idx: number;
-  progressMV: MotionValue<number>;
-}) {
+/* One blob circle inside the gooey layer — scales with intensity */
+function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<number> }) {
   const N = PROCESS.length;
-
   const intensity = useTransform(progressMV, (p) => {
     let dist = p - idx;
     if (dist < -N / 2) dist += N;
@@ -3807,89 +3776,65 @@ function ProcessBall({
     const raw = Math.max(0, 1 - Math.abs(dist));
     return raw * raw;
   });
+  const scale = useTransform(intensity, [0, 1], [0.88, 1.28]);
+  return (
+    <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <m.div
+        style={{
+          width: PROC_BALL,
+          height: PROC_BALL,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle at 32% 27%, rgba(203,255,0,0.22) 0%, transparent 42%), " +
+            "radial-gradient(circle at 50% 50%, #070D00 0%, #1A2D00 18%, #324F00 40%, #507A00 56%, #324F00 72%, #0D1500 88%, #060900 100%)",
+          scale,
+          willChange: "transform",
+          flexShrink: 0,
+        }}
+      />
+    </div>
+  );
+}
 
-  // Sphere scale only
-  const mainScale = useTransform(intensity, [0, 1], [0.64, 1.32]);
-  const sX = useTransform(intensity, [0, 0.42, 0.80, 1], [1, 1.07, 0.95, 1.00]);
-  const sY = useTransform(intensity, [0, 0.42, 0.80, 1], [1, 0.93, 1.05, 1.00]);
-  const scaleX = useTransform([mainScale, sX], ([s, sx]: number[]) => s * sx);
-  const scaleY = useTransform([mainScale, sY], ([s, sy]: number[]) => s * sy);
-
-  // Active ball pops forward
-  const zIdx = useTransform(intensity, (v) => Math.round(1 + v * 14));
-
-  // Inactive spheres at ~50% brightness, active at 100%
-  const sphereOpacity = useTransform(intensity, [0, 1], [0.45, 1.0]);
-
-  // Glow via drop-shadow
-  const glowR = useTransform(intensity, [0, 0.45, 1], [0, 0, 22]);
-  const glowA = useTransform(intensity, [0, 0.45, 1], [0, 0, 0.50]);
-  const filterStyle = useMotionTemplate`drop-shadow(0 0 ${glowR}px rgba(203,255,0,${glowA})) drop-shadow(0 0 ${glowR}px rgba(203,255,0,${glowA}))`;
-
-  // Text: its own mild scale, NOT connected to sphere scale
-  const textScale = useTransform(intensity, [0, 1], [0.84, 1.02]);
-  const numOp   = useTransform(intensity, [0, 0.20, 1], [0.38, 0.68, 1.00]);
-  const labelOp = useTransform(intensity, [0, 0.38, 1], [0.00, 0.42, 1.00]);
-  const descOp  = useTransform(intensity, [0, 0.55, 1], [0.00, 0.00, 0.80]);
-
+/* Text label for each sphere — separate layer, no goo filter, stays crisp */
+function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: number; progressMV: MotionValue<number> }) {
+  const N = PROCESS.length;
+  const intensity = useTransform(progressMV, (p) => {
+    let dist = p - idx;
+    if (dist < -N / 2) dist += N;
+    if (dist > N / 2)  dist -= N;
+    const raw = Math.max(0, 1 - Math.abs(dist));
+    return raw * raw;
+  });
+  const numOp   = useTransform(intensity, [0, 0.25, 1], [0.35, 0.65, 1.0]);
+  const labelOp = useTransform(intensity, [0, 0.45, 1], [0.00, 0.45, 1.0]);
+  const descOp  = useTransform(intensity, [0, 0.60, 1], [0.00, 0.00, 0.78]);
+  const textScale = useTransform(intensity, [0, 1], [0.82, 1.0]);
   return (
     <m.div
       style={{
-        position: "relative",
         flex: "1 1 0",
-        height: BALL,
-        minWidth: BALL,
-        zIndex: zIdx,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 5,
+        scale: textScale,
+        pointerEvents: "none",
+        userSelect: "none",
+        textAlign: "center",
+        padding: "16px",
       }}
     >
-      {/* SPHERE: scales freely, centered in flex slot */}
-      <m.div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          translateX: "-50%",
-          translateY: "-50%",
-          scaleX,
-          scaleY,
-          opacity: sphereOpacity,
-          filter: filterStyle,
-          width: BALL,
-          height: BALL,
-          borderRadius: "50%",
-          willChange: "transform, filter, opacity",
-          background: "radial-gradient(circle at 28% 23%, rgba(190,228,35,0.38) 0%, transparent 34%), radial-gradient(circle at 50% 50%, rgba(4,5,3,0.98) 0%, rgba(4,5,3,0.96) 24%, rgba(58,86,4,0.84) 50%, rgba(145,188,12,0.91) 68%, rgba(78,112,6,0.79) 80%, rgba(14,21,2,0.93) 92%, rgba(5,7,3,0.97) 100%)",
-        }}
-      />
-
-      {/* TEXT: always on top, mild independent scale */}
-      <m.div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 4,
-          scale: textScale,
-          zIndex: 20,
-          pointerEvents: "none",
-          userSelect: "none",
-          textAlign: "center",
-          padding: "8px",
-        }}
-      >
-        <m.span style={{ opacity: numOp, color: "#CBFF00", fontSize: 22, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
-          {proc.n}
-        </m.span>
-        <m.p style={{ opacity: labelOp, color: "#ffffff", fontSize: 12, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
-          {proc.title}
-        </m.p>
-        <m.p style={{ opacity: descOp, color: "rgba(255,255,255,0.50)", fontSize: 9.5, lineHeight: 1.4, margin: 0 }}>
-          {proc.desc}
-        </m.p>
-      </m.div>
+      <m.span style={{ opacity: numOp, color: "#CBFF00", fontSize: 20, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
+        {proc.n}
+      </m.span>
+      <m.p style={{ opacity: labelOp, color: "#ffffff", fontSize: 12, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
+        {proc.title}
+      </m.p>
+      <m.p style={{ opacity: descOp, color: "rgba(255,255,255,0.52)", fontSize: 9.5, lineHeight: 1.4, margin: 0 }}>
+        {proc.desc}
+      </m.p>
     </m.div>
   );
 }
@@ -3901,8 +3846,6 @@ function Process() {
     progressMV.set((time / 1800) % PROCESS.length);
   });
 
-  const minW = PROCESS.length * BALL + (PROCESS.length - 1) * CONN_W;
-
   return (
     <section id="process" className="py-28 md:py-36 bg-surface/20">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
@@ -3912,19 +3855,36 @@ function Process() {
             Как работаем
           </m.h2>
         </Reveal>
-        <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0 pb-4">
-          <div
-            className="flex items-center"
-            style={{ minWidth: `${minW}px` }}
-          >
-            {PROCESS.map((proc, idx) => (
-              <Fragment key={proc.n}>
-                {idx > 0 && (
-                  <ProcessConnector leftIdx={idx - 1} rightIdx={idx} progressMV={progressMV} />
-                )}
-                <ProcessBall proc={proc} idx={idx} progressMV={progressMV} />
-              </Fragment>
-            ))}
+        <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
+          <div style={{ position: "relative", height: PROC_ROW_H, minWidth: `${PROCESS.length * 180}px`, overflow: "hidden" }}>
+            <GooFilter />
+            {/* Layer 1: gooey organic chain — circles merge via SVG filter */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                filter: "url(#proc-goo)",
+              }}
+            >
+              {PROCESS.map((_, idx) => (
+                <ProcBlob key={idx} idx={idx} progressMV={progressMV} />
+              ))}
+            </div>
+            {/* Layer 2: text labels on top, unaffected by goo */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {PROCESS.map((proc, idx) => (
+                <ProcLabel key={proc.n} proc={proc} idx={idx} progressMV={progressMV} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
