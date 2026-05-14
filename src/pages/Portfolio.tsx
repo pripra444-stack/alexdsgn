@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { m, useInView, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
+import { m, useInView, useMotionValue, useTransform, animate, AnimatePresence, useAnimationFrame, MotionValue } from "framer-motion";
 
 // ─── Links ───────────────────────────────────────────────────────────────────
 const TG_LINK = "https://t.me/AlexanderPanurin";
@@ -3732,39 +3732,80 @@ const PROCESS = [
   { n: "05", title: "Сдача", desc: "Готовые файлы в нужных форматах. Без доработок за доплату." },
 ];
 
+/* Each card subscribes directly to the shared motion value — no React
+   re-renders, DOM updates happen at 60 fps via Framer Motion internals. */
+function ProcessCard({
+  proc,
+  idx,
+  progressMV,
+}: {
+  proc: (typeof PROCESS)[0];
+  idx: number;
+  progressMV: MotionValue<number>;
+}) {
+  const N = PROCESS.length;
+
+  /* intensity: 1 when this card is "current", 0 when a full step away.
+     Quadratic curve gives the slow water-fill rise and slow drain. */
+  const intensity = useTransform(progressMV, (p) => {
+    let dist = p - idx;
+    if (dist < -N / 2) dist += N;   // wrap last→first
+    if (dist > N / 2)  dist -= N;
+    dist = Math.abs(dist);
+    const raw = Math.max(0, 1 - dist);
+    return raw * raw;               // ease-in/out: slow fill, slow drain
+  });
+
+  const scale       = useTransform(intensity, [0, 1], [1,                   1.065]);
+  const bgColor     = useTransform(intensity, [0, 1], ["rgba(10,10,10,1)",  "rgba(203,255,0,1)"]);
+  const borderCol   = useTransform(intensity, [0, 1], ["rgba(255,255,255,0.07)", "rgba(203,255,0,1)"]);
+  const numBg       = useTransform(intensity, [0, 1], ["rgba(203,255,0,0.10)", "rgba(0,0,0,0.12)"]);
+  const numBorder   = useTransform(intensity, [0, 1], ["rgba(203,255,0,0.30)", "rgba(0,0,0,0.55)"]);
+  const numColor    = useTransform(intensity, [0.35, 1], ["#CBFF00", "#000000"]);
+  const titleColor  = useTransform(intensity, [0.35, 1], ["#FFFFFF", "#000000"]);
+  const descColor   = useTransform(intensity, [0.35, 1], ["#71717A", "#000000"]);
+
+  return (
+    <Reveal>
+      <m.div
+        variants={fadeUp}
+        style={{
+          scale,
+          backgroundColor: bgColor,
+          borderColor: borderCol,
+          willChange: "transform, background-color",
+        }}
+        className="relative flex flex-col gap-4 rounded-2xl border p-6"
+      >
+        <m.div
+          style={{ backgroundColor: numBg, borderColor: numBorder }}
+          className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0"
+        >
+          <m.span style={{ color: numColor }} className="text-xs font-mono font-bold">
+            {proc.n}
+          </m.span>
+        </m.div>
+        <div>
+          <m.h3 style={{ color: titleColor }} className="font-semibold mb-1.5">
+            {proc.title}
+          </m.h3>
+          <m.p style={{ color: descColor }} className="text-sm leading-relaxed">
+            {proc.desc}
+          </m.p>
+        </div>
+      </m.div>
+    </Reveal>
+  );
+}
+
 function Process() {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  // Per-card flag: true while the wave pulse is "passing through" that card
-  const [waveActive, setWaveActive] = useState<boolean[]>(() => new Array(PROCESS.length).fill(false));
+  const progressMV = useMotionValue(0);
 
-  // When hovered card changes, schedule the wave: each card after the hovered
-  // one briefly turns active (acid + scale) with a delay = (i - hoveredIdx) *
-  // STEP_MS, then deactivates after PULSE_MS. Cleanup cancels in-flight
-  // timeouts so moving between cards restarts the wave from the new origin.
-  useEffect(() => {
-    if (hoveredIdx === null) {
-      setWaveActive(new Array(PROCESS.length).fill(false));
-      return;
-    }
-    const STEP_MS  = 170;   // delay between successive cards in the wave
-    const PULSE_MS = 420;   // how long each card stays in the active state
-    const timeouts: number[] = [];
-
-    for (let i = hoveredIdx + 1; i < PROCESS.length; i++) {
-      const start = (i - hoveredIdx) * STEP_MS;
-      timeouts.push(window.setTimeout(() => {
-        setWaveActive(prev => { const next = [...prev]; next[i] = true; return next; });
-      }, start));
-      timeouts.push(window.setTimeout(() => {
-        setWaveActive(prev => { const next = [...prev]; next[i] = false; return next; });
-      }, start + PULSE_MS));
-    }
-
-    return () => {
-      timeouts.forEach(clearTimeout);
-      setWaveActive(new Array(PROCESS.length).fill(false));
-    };
-  }, [hoveredIdx]);
+  /* Drive the wave at 60 fps without any React state updates. */
+  useAnimationFrame((time) => {
+    const STEP_MS = 1800; // ms per card — slow, water-like fill
+    progressMV.set((time / STEP_MS) % PROCESS.length);
+  });
 
   return (
     <section id="process" className="py-28 md:py-36 bg-surface/20">
@@ -3782,64 +3823,9 @@ function Process() {
             style={{ background: "linear-gradient(to right, transparent, rgba(203,255,0,0.2) 15%, rgba(203,255,0,0.2) 85%, transparent)" }}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {PROCESS.map((step, idx) => {
-              const isHovered = hoveredIdx === idx;
-              const isWaving  = waveActive[idx];
-              const isActive  = isHovered || isWaving;
-              return (
-                <Reveal key={step.n}>
-                  <m.div
-                    variants={fadeUp}
-                    onMouseEnter={() => setHoveredIdx(idx)}
-                    onMouseLeave={() => setHoveredIdx(prev => (prev === idx ? null : prev))}
-                    animate={{
-                      scale: isActive ? 1.06 : 1,
-                      backgroundColor: isActive ? "#CBFF00" : "rgba(10,10,10,1)",
-                      borderColor:     isActive ? "rgba(203,255,0,1)" : "rgba(255,255,255,0.07)",
-                    }}
-                    transition={{
-                      duration: isHovered ? 0.30 : 0.22,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                    className="relative flex flex-col gap-4 rounded-2xl border p-6"
-                    style={{ willChange: "transform, background-color" }}
-                  >
-                    <m.div
-                      animate={{
-                        backgroundColor: isActive ? "rgba(0,0,0,0.12)" : "rgba(203,255,0,0.10)",
-                        borderColor:     isActive ? "rgba(0,0,0,0.55)" : "rgba(203,255,0,0.30)",
-                      }}
-                      transition={{ duration: 0.22 }}
-                      className="w-10 h-10 rounded-full border flex items-center justify-center flex-shrink-0"
-                    >
-                      <m.span
-                        animate={{ color: isActive ? "#000" : "#CBFF00" }}
-                        transition={{ duration: 0.22 }}
-                        className="text-xs font-mono font-bold"
-                      >
-                        {step.n}
-                      </m.span>
-                    </m.div>
-                    <div>
-                      <m.h3
-                        animate={{ color: isActive ? "#000" : "#FFF" }}
-                        transition={{ duration: 0.22 }}
-                        className="font-semibold mb-1.5"
-                      >
-                        {step.title}
-                      </m.h3>
-                      <m.p
-                        animate={{ color: isActive ? "rgba(0,0,0,0.70)" : "#71717a" }}
-                        transition={{ duration: 0.22 }}
-                        className="text-sm leading-relaxed"
-                      >
-                        {step.desc}
-                      </m.p>
-                    </div>
-                  </m.div>
-                </Reveal>
-              );
-            })}
+            {PROCESS.map((proc, idx) => (
+              <ProcessCard key={proc.n} proc={proc} idx={idx} progressMV={progressMV} />
+            ))}
           </div>
         </div>
       </div>
