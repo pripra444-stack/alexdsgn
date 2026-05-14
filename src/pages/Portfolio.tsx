@@ -3742,9 +3742,11 @@ function ProcIcon({ name }: { name: string }) {
   return null;
 }
 
-const BALL = 156;       // sphere base diameter (px)
-const BALL_SLOT = 164;  // layout slot per ball
+const BALL = 164;       // sphere base diameter (px)
+const BALL_SLOT = 138;  // slot narrower than BALL — inflated balls overlap neighbors
 
+/* Sphere and text live on SEPARATE layers so the balloon scales independently
+   of the text. Text gets only a mild scale of its own. */
 function ProcessBall({
   proc,
   idx,
@@ -3764,138 +3766,85 @@ function ProcessBall({
     return raw * raw;
   });
 
-  const mainScale = useTransform(intensity, [0, 1], [0.50, 1.24]);
-  const sX = useTransform(intensity, [0, 0.42, 0.80, 1], [1, 1.08, 0.94, 1.00]);
-  const sY = useTransform(intensity, [0, 0.42, 0.80, 1], [1, 0.92, 1.06, 1.00]);
+  // Sphere scale only
+  const mainScale = useTransform(intensity, [0, 1], [0.64, 1.32]);
+  const sX = useTransform(intensity, [0, 0.42, 0.80, 1], [1, 1.07, 0.95, 1.00]);
+  const sY = useTransform(intensity, [0, 0.42, 0.80, 1], [1, 0.93, 1.05, 1.00]);
   const scaleX = useTransform([mainScale, sX], ([s, sx]: number[]) => s * sx);
   const scaleY = useTransform([mainScale, sY], ([s, sy]: number[]) => s * sy);
 
-  // Acid green stroke: near-invisible when idle, vivid at peak
-  const borderColor = useTransform(
-    intensity,
-    [0, 1],
-    ["rgba(203,255,0,0.08)", "rgba(203,255,0,0.92)"]
-  );
+  // Active ball pops forward
+  const zIdx = useTransform(intensity, (v) => Math.round(1 + v * 14));
 
-  // Outer glow via drop-shadow on the scaling element
+  // Glow via drop-shadow
   const glowR = useTransform(intensity, [0, 0.45, 1], [0, 0, 22]);
-  const glowA = useTransform(intensity, [0, 0.45, 1], [0, 0, 0.52]);
+  const glowA = useTransform(intensity, [0, 0.45, 1], [0, 0, 0.50]);
   const filterStyle = useMotionTemplate`drop-shadow(0 0 ${glowR}px rgba(203,255,0,${glowA})) drop-shadow(0 0 ${glowR}px rgba(203,255,0,${glowA}))`;
 
-  const numOp  = useTransform(intensity, [0, 0.22, 1], [0.28, 0.60, 1.00]);
-  const textOp = useTransform(intensity, [0, 0.38, 1], [0.00, 0.42, 1.00]);
+  // Text: its own mild scale, NOT connected to sphere scale
+  const textScale = useTransform(intensity, [0, 1], [0.84, 1.02]);
+  const numOp   = useTransform(intensity, [0, 0.20, 1], [0.38, 0.68, 1.00]);
+  const labelOp = useTransform(intensity, [0, 0.38, 1], [0.00, 0.42, 1.00]);
+  const descOp  = useTransform(intensity, [0, 0.55, 1], [0.00, 0.00, 0.80]);
 
   return (
-    <div
-      className="flex-shrink-0 flex items-center justify-center"
-      style={{ width: BALL_SLOT, height: BALL_SLOT }}
+    <m.div
+      style={{
+        position: "relative",
+        width: BALL_SLOT,
+        height: BALL_SLOT,
+        flexShrink: 0,
+        zIndex: zIdx,
+      }}
     >
+      {/* SPHERE: scales freely */}
       <m.div
         style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          translateX: "-50%",
+          translateY: "-50%",
           scaleX,
           scaleY,
           filter: filterStyle,
           width: BALL,
           height: BALL,
           borderRadius: "50%",
-          borderStyle: "solid",
-          borderWidth: 3,
-          borderColor,
-          background: "radial-gradient(circle at 64% 28%, rgba(203,255,0,0.15) 0%, rgba(16,19,13,0.93) 48%, rgba(8,9,7,0.97) 100%)",
-          boxShadow: "inset 0 -10px 28px rgba(0,0,0,0.70), inset 0 4px 14px rgba(255,255,255,0.04)",
-          position: "relative",
-          overflow: "hidden",
           willChange: "transform, filter",
-          flexShrink: 0,
-        }}
-      >
-        <div
-          aria-hidden
-          style={{
-            position: "absolute", inset: 0, borderRadius: "50%",
-            background: "radial-gradient(circle at 32% 22%, rgba(255,255,255,0.10) 0%, transparent 46%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute", inset: 0,
-            display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center",
-            gap: 5, padding: "18px",
-            pointerEvents: "none", userSelect: "none",
-            textAlign: "center",
-          }}
-        >
-          <m.span style={{ opacity: numOp, color: "#CBFF00", fontSize: 30, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
-            {proc.n}
-          </m.span>
-          <m.p style={{ opacity: textOp, color: "#ffffff", fontSize: 13, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
-            {proc.title}
-          </m.p>
-          <m.p style={{ opacity: textOp, color: "rgba(255,255,255,0.50)", fontSize: 10, lineHeight: 1.45, margin: 0 }}>
-            {proc.desc}
-          </m.p>
-        </div>
-      </m.div>
-    </div>
-  );
-}
-
-/* Connector: 3px acid line same thickness as sphere border — the stroke
-   "continues" between spheres, brightens during the hand-off, dot travels along. */
-function FlowConnector({
-  fromIdx,
-  progressMV,
-}: {
-  fromIdx: number;
-  progressMV: MotionValue<number>;
-}) {
-  const N = PROCESS.length;
-
-  const lineIntensity = useTransform(progressMV, (p) => {
-    let dist = p - (fromIdx + 0.5);
-    if (dist < -(N / 2)) dist += N;
-    if (dist > N / 2)    dist -= N;
-    return Math.max(0, 1 - Math.abs(dist) * 1.7);
-  });
-
-  const lineOp = useTransform(lineIntensity, [0, 1], [0.07, 0.85]);
-
-  const dotProgress = useTransform(progressMV, (p) => {
-    let local = p - fromIdx;
-    if (local < -(N / 2)) local += N;
-    if (local > N / 2)    local -= N;
-    return Math.max(0, Math.min(1, local));
-  });
-
-  const dotLeft = useTransform(dotProgress, [0, 1], ["0%", "100%"]);
-  const dotOp   = useTransform(dotProgress, [0, 0.08, 0.92, 1], [0, 1, 1, 0]);
-
-  return (
-    <div className="flex-1 relative" style={{ height: BALL_SLOT, minWidth: 12 }}>
-      <m.div
-        aria-hidden
-        style={{
-          position: "absolute", left: 0, right: 0,
-          top: "50%", height: 3, translateY: "-50%",
-          opacity: lineOp,
-          background: "rgba(203,255,0,1)",
-          boxShadow: "0 0 8px 2px rgba(203,255,0,0.55)",
+          background: "radial-gradient(circle at 28% 23%, rgba(190,228,35,0.38) 0%, transparent 34%), radial-gradient(circle at 50% 50%, rgba(4,5,3,0.98) 0%, rgba(4,5,3,0.96) 24%, rgba(58,86,4,0.84) 50%, rgba(145,188,12,0.91) 68%, rgba(78,112,6,0.79) 80%, rgba(14,21,2,0.93) 92%, rgba(5,7,3,0.97) 100%)",
         }}
       />
+
+      {/* TEXT: always on top, mild independent scale */}
       <m.div
-        aria-hidden
         style={{
           position: "absolute",
-          width: 10, height: 10, borderRadius: "50%",
-          top: "50%", translateY: "-50%", translateX: "-50%",
-          left: dotLeft, opacity: dotOp,
-          background: "#ffffff",
-          boxShadow: "0 0 12px 4px rgba(203,255,0,0.85)",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 4,
+          scale: textScale,
+          zIndex: 20,
+          pointerEvents: "none",
+          userSelect: "none",
+          textAlign: "center",
+          padding: "8px",
         }}
-      />
-    </div>
+      >
+        <m.span style={{ opacity: numOp, color: "#CBFF00", fontSize: 22, fontFamily: "monospace", fontWeight: 700, lineHeight: 1 }}>
+          {proc.n}
+        </m.span>
+        <m.p style={{ opacity: labelOp, color: "#ffffff", fontSize: 12, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
+          {proc.title}
+        </m.p>
+        <m.p style={{ opacity: descOp, color: "rgba(255,255,255,0.50)", fontSize: 9.5, lineHeight: 1.4, margin: 0 }}>
+          {proc.desc}
+        </m.p>
+      </m.div>
+    </m.div>
   );
 }
 
@@ -3904,14 +3853,6 @@ function Process() {
 
   useAnimationFrame((time) => {
     progressMV.set((time / 1800) % PROCESS.length);
-  });
-
-  const items: React.ReactNode[] = [];
-  PROCESS.forEach((proc, idx) => {
-    items.push(<ProcessBall key={proc.n} proc={proc} idx={idx} progressMV={progressMV} />);
-    if (idx < PROCESS.length - 1) {
-      items.push(<FlowConnector key={`c${idx}`} fromIdx={idx} progressMV={progressMV} />);
-    }
   });
 
   return (
@@ -3925,10 +3866,12 @@ function Process() {
         </Reveal>
         <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0 pb-4">
           <div
-            className="flex items-center"
-            style={{ minWidth: `${PROCESS.length * BALL_SLOT}px` }}
+            className="flex items-center justify-center"
+            style={{ minWidth: `${PROCESS.length * BALL_SLOT + 60}px` }}
           >
-            {items}
+            {PROCESS.map((proc, idx) => (
+              <ProcessBall key={proc.n} proc={proc} idx={idx} progressMV={progressMV} />
+            ))}
           </div>
         </div>
       </div>
