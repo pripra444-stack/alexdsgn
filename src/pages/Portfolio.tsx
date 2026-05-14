@@ -3880,18 +3880,19 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
   // Number: constant dim (0.45) → instant disappear the moment sphere starts growing
   const numOp  = useTransform(intensity, [0.0, 0.08, 0.16], [0.45, 0.45, 0.0]);
   // Text: appears almost instantly after number gone, stays until sphere fully returns to rest
-  // useTransform clamps at last value → text = 1.0 for entire peak, fades when intensity<0.18
   const textOp = useTransform(intensity, [0.13, 0.19], [0.0, 1.0]);
+  // Ring gate: rings visible ONLY when THIS sphere is near peak — zero on all others
+  const ringOp = useTransform(intensity, [0.58, 0.82], [0, 1]);
   return (
     <div style={{ flex: "1 1 0", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
 
       {/* ── Outer acid rings ──────────────────────────────────────────────────
-          Live OUTSIDE the clipped sphere. Very thin — they cross the boundary
-          and dissolve into space. Start exactly at sphere edge (scale 1.0). */}
+          Only visible on active sphere (ringOp=0 on all others).
+          Thin 0.75px, 25% peak opacity, spread ~1.65x then vanish. */}
       <m.div style={{
         position: "absolute",
         width: PROC_BALL, height: PROC_BALL,
-        opacity: textOp,
+        opacity: ringOp,
         pointerEvents: "none",
         zIndex: 0,
       }}>
@@ -3907,7 +3908,7 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
               borderRadius: "50%",
               border: "0.75px solid #CBFF00",
             }}
-            animate={{ scale: [1.0, 2.60], opacity: [0.55, 0] }}
+            animate={{ scale: [1.0, 1.65], opacity: [0.25, 0] }}
             transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
           />
         ))}
@@ -3965,24 +3966,27 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
         </m.div>
 
         {/* ── Inner sonar rings ──────────────────────────────────────────────
-            Thick dark rings expand from centre — highly visible on acid green */}
-        {([
-          { delay: 0,    duration: 1.6 },
-          { delay: 0.53, duration: 1.9 },
-          { delay: 1.06, duration: 1.4 },
-        ] as const).map(({ delay, duration }, i) => (
-          <m.div
-            key={i}
-            style={{
-              position: "absolute", inset: 0,
-              borderRadius: "50%",
-              border: "5px solid rgba(0, 0, 0, 0.75)",
-              pointerEvents: "none",
-            }}
-            animate={{ scale: [0.10, 1.0], opacity: [1.0, 0] }}
-            transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
-          />
-        ))}
+            Gated by ringOp — zero on inactive spheres, visible only when active.
+            Thick border (6px) but very low opacity (12%) on acid green. */}
+        <m.div style={{ position: "absolute", inset: 0, opacity: ringOp, pointerEvents: "none" }}>
+          {([
+            { delay: 0,    duration: 1.6 },
+            { delay: 0.53, duration: 1.9 },
+            { delay: 1.06, duration: 1.4 },
+          ] as const).map(({ delay, duration }, i) => (
+            <m.div
+              key={i}
+              style={{
+                position: "absolute", inset: 0,
+                borderRadius: "50%",
+                border: "6px solid rgba(0, 0, 0, 0.12)",
+                pointerEvents: "none",
+              }}
+              animate={{ scale: [0.10, 1.0], opacity: [1.0, 0] }}
+              transition={{ duration, repeat: Infinity, delay, ease: "easeOut" }}
+            />
+          ))}
+        </m.div>
       </m.div>
     </div>
   );
