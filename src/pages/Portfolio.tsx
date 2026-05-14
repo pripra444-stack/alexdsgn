@@ -1569,20 +1569,57 @@ function ServiceCard({
         style={{ cursor: hasSlideshow ? "pointer" : "default" }}
         onClick={hasSlideshow ? onOpen : undefined}
       >
-        <span className="absolute top-6 right-7 text-xs font-mono text-zinc-700 group-hover:text-black/40 transition-colors duration-300">{s.num}</span>
-        <h3 className="text-lg font-semibold text-white group-hover:text-black transition-colors duration-300 mt-2 mb-2">{s.title}</h3>
-        <p className="text-sm text-accent/70 font-mono mb-3 group-hover:text-black/55 transition-colors duration-300">{s.subtitle}</p>
-        <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-black/65 transition-colors duration-300">{s.desc}</p>
-        <div className="flex flex-wrap gap-1.5 mt-5">
-          {s.tags.map((t) => (
-            <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500 group-hover:bg-black/10 group-hover:text-black/55 transition-colors duration-300">
-              {t}
-            </span>
-          ))}
+        {/* Background brand watermark */}
+        <div
+          aria-hidden
+          className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none"
+          style={{ zIndex: 0 }}
+        >
+          <span
+            style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 900,
+              fontSize: "min(24vw, 220px)",
+              letterSpacing: "-0.03em",
+              color: "rgba(203,255,0,0.10)",
+              lineHeight: 1,
+              whiteSpace: "nowrap",
+              transition: "color 0.3s ease",
+            }}
+            className="group-hover:[color:rgba(0,0,0,0.07)]"
+          >
+            {BRAND_META[s.marketplace].short}
+          </span>
         </div>
-        <MarketplaceFlair brand={s.marketplace} />
+
+        {/* Num badge */}
+        <span
+          className="absolute top-6 right-7 text-xs font-mono text-zinc-700 group-hover:text-black/40 transition-colors duration-300"
+          style={{ zIndex: 2 }}
+        >
+          {s.num}
+        </span>
+
+        {/* Card content */}
+        <div className="relative" style={{ zIndex: 1 }}>
+          <h3 className="text-lg font-semibold text-white group-hover:text-black transition-colors duration-300 mt-2 mb-2">{s.title}</h3>
+          <p className="text-sm text-accent/70 font-mono mb-3 group-hover:text-black/55 transition-colors duration-300">{s.subtitle}</p>
+          <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-black/65 transition-colors duration-300">{s.desc}</p>
+          <div className="flex flex-wrap gap-1.5 mt-5">
+            {s.tags.map((t) => (
+              <span key={t} className="px-2 py-0.5 rounded-md bg-white/[0.05] text-[11px] font-mono text-zinc-500 group-hover:bg-black/10 group-hover:text-black/55 transition-colors duration-300">
+                {t}
+              </span>
+            ))}
+          </div>
+          <MarketplaceFlair brand={s.marketplace} />
+        </div>
+
         {hasSlideshow && (
-          <span className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/45 transition-colors duration-200">
+          <span
+            className="absolute bottom-4 right-5 text-[10px] font-mono text-accent/35 uppercase tracking-[0.15em] group-hover:text-black/45 transition-colors duration-200"
+            style={{ zIndex: 2 }}
+          >
             смотреть примеры →
           </span>
         )}
@@ -3600,6 +3637,8 @@ const WHY_TEXT_H = 200;
 const WHY_CARD_H = WHY_TEXT_H + WHY_IMG_H + 16; // text + image + breathing room
 
 function WhyMe() {
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
   return (
     <section className="py-28 md:py-36">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
@@ -3610,67 +3649,68 @@ function WhyMe() {
           </m.h2>
         </Reveal>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {WHY.map((item) => (
-            <Reveal key={item.n}>
-              <m.div
-                variants={fadeUp}
-                whileHover={{ y: -6 }}
-                transition={{ type: "tween", duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="group relative overflow-hidden rounded-2xl border border-white/[0.05] bg-canvas"
-                style={{ height: WHY_CARD_H, willChange: "transform" }}
-              >
-                {/* IMAGE REGION — fixed at the bottom of the card. The image
-                    is shown at full natural aspect (object-contain), so 100%
-                    of the picture is always visible from underneath. */}
-                <div
-                  className="absolute inset-x-0 bottom-0 overflow-hidden"
-                  style={{ height: WHY_IMG_H + 8 }}
+          {WHY.map((item, idx) => {
+            const isAct = activeIdx === idx;
+            return (
+              <Reveal key={item.n}>
+                <m.div
+                  variants={fadeUp}
+                  whileHover={{ y: -6 }}
+                  animate={{ y: isAct ? -6 : 0 }}
+                  transition={{ type: "tween", duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="group relative overflow-hidden rounded-2xl border border-white/[0.05] bg-canvas cursor-pointer"
+                  style={{ height: WHY_CARD_H, willChange: "transform" }}
+                  onClick={() => setActiveIdx(isAct ? null : idx)}
                 >
-                  <img
-                    src={item.img}
-                    alt=""
-                    draggable={false}
-                    width={WHY_IMG_W}
-                    height={WHY_IMG_H}
-                    className="block w-full h-full object-contain scale-[1.04] group-hover:scale-100 transition-transform duration-[1100ms] ease-out"
+                  {/* IMAGE REGION */}
+                  <div
+                    className="absolute inset-x-0 bottom-0 overflow-hidden"
+                    style={{ height: WHY_IMG_H + 8 }}
+                  >
+                    <img
+                      src={item.img}
+                      alt=""
+                      draggable={false}
+                      width={WHY_IMG_W}
+                      height={WHY_IMG_H}
+                      className={`block w-full h-full object-contain group-hover:scale-100 transition-transform duration-[1100ms] ease-out ${isAct ? "scale-100" : "scale-[1.04]"}`}
+                    />
+                  </div>
+
+                  {/* COVER LAYER — slides up on hover (desktop) or tap (mobile) */}
+                  <div
+                    className={`absolute top-0 left-0 right-0 group-hover:bottom-[var(--why-img-h)] group-hover:bg-accent transition-[background-color,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-7 flex flex-col ${isAct ? "bg-accent" : "bg-canvas"}`}
+                    style={{
+                      ["--why-img-h" as never]: `${WHY_IMG_H + 8}px`,
+                      bottom: isAct ? WHY_IMG_H + 8 : 0,
+                      willChange: "background-color",
+                    }}
+                  >
+                    <span className={`block text-[42px] font-bold font-mono mb-3 leading-none transition-colors duration-300 group-hover:text-black/35 ${isAct ? "text-black/35" : "text-white/[0.06]"}`}>
+                      {item.n}
+                    </span>
+                    <h3 className={`text-base font-semibold transition-colors duration-300 mb-1.5 group-hover:text-black ${isAct ? "text-black" : "text-white"}`}>
+                      {item.title}
+                    </h3>
+                    <p className={`text-sm leading-relaxed transition-colors duration-300 group-hover:text-black/75 ${isAct ? "text-black/75" : "text-zinc-500"}`}>
+                      {item.desc}
+                    </p>
+
+                    <span className={`absolute top-4 right-5 text-[9px] font-mono tracking-[0.18em] transition-colors duration-300 uppercase pointer-events-none group-hover:text-black/45 ${isAct ? "text-black/45" : "text-accent/30"}`}>
+                      {isAct ? "↓ закрыть" : "↑ навести"}
+                    </span>
+                  </div>
+
+                  {/* Acid glow ring */}
+                  <div
+                    aria-hidden
+                    className={`pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-500 group-hover:opacity-100 ${isAct ? "opacity-100" : "opacity-0"}`}
+                    style={{ boxShadow: "0 0 0 1.5px rgba(203,255,0,0.55), 0 18px 48px rgba(203,255,0,0.18)" }}
                   />
-                </div>
-
-                {/* COVER LAYER — sits over the image and the text area by
-                    default (full card). On hover it slides up to expose the
-                    full image, and its background turns acid green. */}
-                <div
-                  className="absolute top-0 left-0 right-0 bottom-0 bg-canvas group-hover:bottom-[var(--why-img-h)] group-hover:bg-accent transition-[background-color,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] p-7 flex flex-col"
-                  style={{
-                    ["--why-img-h" as never]: `${WHY_IMG_H + 8}px`,
-                    willChange: "background-color",
-                  }}
-                >
-                  <span className="block text-[42px] font-bold text-white/[0.06] group-hover:text-black/35 font-mono mb-3 leading-none transition-colors duration-300">
-                    {item.n}
-                  </span>
-                  <h3 className="text-base font-semibold text-white group-hover:text-black transition-colors duration-300 mb-1.5">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-zinc-500 group-hover:text-black/75 transition-colors duration-300 leading-relaxed">
-                    {item.desc}
-                  </p>
-
-                  {/* Tiny ↑ hint at top-right of card content */}
-                  <span className="absolute top-4 right-5 text-[9px] font-mono tracking-[0.18em] text-accent/30 group-hover:text-black/45 transition-colors duration-300 uppercase pointer-events-none">
-                    ↑ навести
-                  </span>
-                </div>
-
-                {/* Acid glow ring on hover */}
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ boxShadow: "0 0 0 1.5px rgba(203,255,0,0.55), 0 18px 48px rgba(203,255,0,0.18)" }}
-                />
-              </m.div>
-            </Reveal>
-          ))}
+                </m.div>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
