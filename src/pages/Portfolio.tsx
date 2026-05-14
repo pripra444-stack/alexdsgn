@@ -3811,52 +3811,95 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Animated wave ribbons behind sphere chain.
-   Three layers at different speeds create organic flowing depth.
-   All wave paths tile at period=1200 (matches animateTransform range).
-   Bézier control points computed from sine approximation c≈0.552*(P/4). */
+/* Canvas-based organic wave ribbons — multiple flowing line bands,
+   each band composed of many thin lines at slightly different phases/amps.
+   Mimics the dense flowing ribbon look from the reference. */
 function ProcessWaves() {
-  // Main wave: yc=160, amp=35  →  peaks at y=125, troughs at y=195
-  const W1 = "M0,160 C166,160 134,125 300,125 C466,125 434,160 600,160 C766,160 734,195 900,195 C1066,195 1034,160 1200,160 C1366,160 1334,125 1500,125 C1666,125 1634,160 1800,160 C1966,160 1934,195 2100,195 C2266,195 2234,160 2400,160";
-  // Upper ribbon: yc=153, amp=28
-  const W2 = "M0,153 C166,153 134,125 300,125 C466,125 434,153 600,153 C766,153 734,181 900,181 C1066,181 1034,153 1200,153 C1366,153 1334,125 1500,125 C1666,125 1634,153 1800,153 C1966,153 1934,181 2100,181 C2266,181 2234,153 2400,153";
-  // Lower ribbon: yc=167, amp=30
-  const W3 = "M0,167 C166,167 134,137 300,137 C466,137 434,167 600,167 C766,167 734,197 900,197 C1066,197 1034,167 1200,167 C1366,167 1334,137 1500,137 C1666,137 1634,167 1800,167 C1966,167 1934,197 2100,197 C2266,197 2234,167 2400,167";
-  // Inverse-phase wave: peaks and troughs flipped relative to W1
-  const W4 = "M0,160 C166,160 134,195 300,195 C466,195 434,160 600,160 C766,160 734,125 900,125 C1066,125 1034,160 1200,160 C1366,160 1334,195 1500,195 C1666,195 1634,160 1800,160 C1966,160 1934,125 2100,125 C2266,125 2234,160 2400,160";
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let raf: number;
+    let t = 0;
+    let W = 0, H = 0;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(devicePixelRatio, 2);
+      W = rect.width;
+      H = rect.height;
+      canvas.width  = W * dpr;
+      canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    // Three ribbon bands, each with many lines
+    const BANDS = [
+      { yFrac: 0.38, spread: 0.22, count: 22, ampBase: 38, fq: 0.0038, sp: 0.9,  r: 170, g: 255, b: 0 },
+      { yFrac: 0.52, spread: 0.18, count: 18, ampBase: 52, fq: 0.0028, sp: 0.65, r: 203, g: 255, b: 0 },
+      { yFrac: 0.64, spread: 0.16, count: 16, ampBase: 30, fq: 0.0048, sp: 1.1,  r: 148, g: 230, b: 0 },
+    ];
+
+    const draw = () => {
+      if (W === 0) { raf = requestAnimationFrame(draw); return; }
+      ctx.clearRect(0, 0, W, H);
+
+      for (const band of BANDS) {
+        const yc = H * band.yFrac;
+        for (let li = 0; li < band.count; li++) {
+          const frac   = li / (band.count - 1);          // 0..1
+          const center = Math.abs(frac - 0.5) * 2;       // 0 at centre, 1 at edge
+          const yOff   = (frac - 0.5) * H * band.spread;
+          const amp    = band.ampBase * (1 - center * 0.7);
+          const freq   = band.fq * (1 + frac * 0.4);
+          const phase  = t * band.sp + li * 0.55 + frac * 2.8;
+          // harmonic overtone adds organic irregularity
+          const phase2 = t * band.sp * 1.6 + li * 0.3;
+          const op     = (0.06 + (1 - center) * 0.20);
+          const lw     = 0.5 + (1 - center) * 1.4;
+
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(${band.r},${band.g},${band.b},${op.toFixed(3)})`;
+          ctx.lineWidth   = lw;
+
+          const step = Math.max(1.5, W / 700);
+          for (let x = 0; x <= W; x += step) {
+            const y = yc + yOff
+              + amp * Math.sin(freq * x + phase)
+              + amp * 0.28 * Math.sin(freq * 2.4 * x + phase2);
+            if (x < step) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      }
+
+      t += 0.011;
+      raf = requestAnimationFrame(draw);
+    };
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+    resize();
+    draw();
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
+  }, []);
 
   return (
-    <svg
+    <canvas
+      ref={canvasRef}
       aria-hidden="true"
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%",
-               opacity: 0.10, pointerEvents: "none", overflow: "hidden" }}
-      viewBox="0 0 1200 320"
-      preserveAspectRatio="none"
-      fill="none"
-    >
-      {/* Layer 1 — main ribbon, moderate speed 14s */}
-      <g stroke="#CBFF00">
-        <path d={W1} strokeWidth="1.4" />
-        <path d={W2} strokeWidth="1.0" />
-        <path d={W3} strokeWidth="0.8" />
-        <animateTransform attributeName="transform" type="translate"
-          from="0,0" to="-1200,0" dur="14s" repeatCount="indefinite" />
-      </g>
-      {/* Layer 2 — counter-phase, slower 20s, offset start */}
-      <g stroke="#CBFF00">
-        <path d={W4} strokeWidth="1.1" />
-        <path d={W2} strokeWidth="0.7" opacity="0.7" />
-        <animateTransform attributeName="transform" type="translate"
-          from="-600,0" to="-1800,0" dur="20s" repeatCount="indefinite" />
-      </g>
-      {/* Layer 3 — thin accents, fastest 9s, different offset */}
-      <g stroke="#b8e800">
-        <path d={W1} strokeWidth="0.5" />
-        <path d={W4} strokeWidth="0.5" />
-        <animateTransform attributeName="transform" type="translate"
-          from="-300,0" to="-1500,0" dur="9s" repeatCount="indefinite" />
-      </g>
-    </svg>
+      style={{
+        position: "absolute", inset: 0,
+        width: "100%", height: "100%",
+        opacity: 0.60,
+        pointerEvents: "none",
+      }}
+    />
   );
 }
 
