@@ -1569,10 +1569,10 @@ function ServiceCard({
         style={{ cursor: hasSlideshow ? "pointer" : "default" }}
         onClick={hasSlideshow ? onOpen : undefined}
       >
-        {/* Background brand watermark */}
+        {/* Background brand watermark — invisible by default, appears on hover */}
         <div
           aria-hidden
-          className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none"
+          className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{ zIndex: 0 }}
         >
           <span
@@ -1581,12 +1581,10 @@ function ServiceCard({
               fontWeight: 900,
               fontSize: "min(24vw, 220px)",
               letterSpacing: "-0.03em",
-              color: "transparent",
+              color: "rgba(0,0,0,0.13)",
               lineHeight: 1,
               whiteSpace: "nowrap",
-              transition: "color 0.35s ease",
             }}
-            className="group-hover:[color:rgba(0,0,0,0.13)]"
           >
             {BRAND_META[s.marketplace].short}
           </span>
