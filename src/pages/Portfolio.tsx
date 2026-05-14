@@ -3800,13 +3800,11 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
           position: "absolute", inset: 0, borderRadius: "50%",
           background: "#0C1500",
         }} />
-        {/* Acid green overlay — appears as sphere activates */}
+        {/* Solid acid overlay — appears as sphere activates; no gradient, pure #CBFF00 */}
         <m.div style={{
           position: "absolute", inset: 0, borderRadius: "50%",
           opacity: acidOpacity,
-          background:
-            "radial-gradient(circle at 30% 25%, rgba(230,255,60,0.55) 0%, transparent 50%), " +
-            "radial-gradient(circle at 50% 50%, #0A1500 0%, #1C3200 16%, #3A6200 36%, #7AB800 52%, #9ADA10 62%, #5A8C00 74%, #1E3000 87%, #080D00 100%)",
+          background: "#CBFF00",
         }} />
       </m.div>
     </div>
@@ -3824,15 +3822,16 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
     const raw = Math.max(0, 1 - Math.abs(dist));
     return raw * raw;
   });
-  // Number: large and centered in neutral; shrinks and rises when active
-  const numSize    = useTransform(intensity, [0, 0.55, 1], [58, 38, 22]);
-  const numTranslY = useTransform(intensity, [0, 1], [0, -20]);
-  const numOp      = useTransform(intensity, [0, 1], [0.55, 1.0]);
-  // Title and desc appear only when active; text goes dark on acid-green sphere
-  const labelOp    = useTransform(intensity, [0, 0.40, 1], [0.00, 0.30, 1.0]);
-  const descOp     = useTransform(intensity, [0, 0.60, 1], [0.00, 0.00, 0.80]);
-  const labelColor = useTransform(intensity, [0, 0.65, 1], ["#ffffff", "#ffffff", "#0B1A00"]);
-  const descColor  = useTransform(intensity, [0, 0.65, 1], ["rgba(255,255,255,0.55)", "rgba(255,255,255,0.55)", "rgba(10,30,0,0.85)"]);
+  // Number: huge in neutral (~50% of sphere area), shrinks+rises when active
+  const numSize    = useTransform(intensity, [0, 0.55, 1], [110, 58, 26]);
+  const numTranslY = useTransform(intensity, [0, 1], [0, -28]);
+  const numOp      = useTransform(intensity, [0, 1], [0.80, 1.0]);
+  const numColor   = useTransform(intensity, [0, 0.55, 1], ["#CBFF00", "#CBFF00", "#000000"]);
+  // Title and desc appear only when active; all text black on acid sphere
+  const labelOp    = useTransform(intensity, [0, 0.45, 1], [0.00, 0.25, 1.0]);
+  const descOp     = useTransform(intensity, [0, 0.62, 1], [0.00, 0.00, 0.90]);
+  const labelColor = useTransform(intensity, [0, 0.65, 1], ["#ffffff", "#ffffff", "#000000"]);
+  const descColor  = useTransform(intensity, [0, 0.65, 1], ["#ffffff", "#ffffff", "#000000"]);
   return (
     <div
       style={{
@@ -3841,7 +3840,7 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 6,
+        gap: 7,
         pointerEvents: "none",
         userSelect: "none",
         textAlign: "center",
@@ -3850,19 +3849,19 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
     >
       <m.span style={{
         opacity: numOp,
-        color: "#CBFF00",
+        color: numColor,
         fontSize: numSize,
-        fontFamily: "monospace",
-        fontWeight: 700,
+        fontFamily: "LunaObscura, Geist, sans-serif",
+        fontWeight: 400,
         lineHeight: 1,
         translateY: numTranslY,
       }}>
         {proc.n}
       </m.span>
-      <m.p style={{ opacity: labelOp, color: labelColor, fontSize: 15, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
+      <m.p style={{ opacity: labelOp, color: labelColor, fontSize: 16, fontWeight: 600, lineHeight: 1.25, margin: 0 }}>
         {proc.title}
       </m.p>
-      <m.p style={{ opacity: descOp, color: descColor, fontSize: 11, lineHeight: 1.4, margin: 0 }}>
+      <m.p style={{ opacity: descOp, color: descColor, fontSize: 12, lineHeight: 1.45, margin: 0, maxWidth: "160px" }}>
         {proc.desc}
       </m.p>
     </div>
@@ -3873,7 +3872,7 @@ function Process() {
   const progressMV = useMotionValue(0);
 
   useAnimationFrame((time) => {
-    progressMV.set((time / 1800) % PROCESS.length);
+    progressMV.set((time / 3600) % PROCESS.length);
   });
 
   return (
