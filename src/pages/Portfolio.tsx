@@ -3883,30 +3883,105 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Static SVG wave background — user-provided file, recoloured to acid green. */
-function ProcessWaves() {
+/* Organic 3D orb floating behind the Process sphere chain.
+   Follows progressMV left→right in sync with active step.
+   Morphs shape continuously with slow border-radius animation. */
+function ProcessBgOrb({ progressMV }: { progressMV: MotionValue<number> }) {
+  const N = PROCESS.length;
+  // Smooth X: 12% when step=0, 88% when step=N-1
+  const leftPct = useTransform(progressMV, (p) => {
+    const bounded = Math.max(0, Math.min(N - 1, p));
+    return `${12 + (bounded / (N - 1)) * 76}%`;
+  });
+
   return (
-    <div aria-hidden style={{
-      position: "absolute",
-      left: "50%", transform: "translateX(-50%)",
-      width: "100vw", top: 0, bottom: 0,
-      pointerEvents: "none", overflow: "hidden",
-    }}>
-      {/* grayscale→sepia→hue-rotate→saturate pipeline forces all colours to acid-green */}
-      <img
-        src="/hero/%D1%84%D0%BE%D0%BD%20%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B%201.svg"
-        aria-hidden
+    <m.div
+      aria-hidden
+      style={{
+        position: "absolute",
+        left: leftPct,
+        top: "50%",
+        translateX: "-50%",
+        translateY: "-50%",
+        width: 360,
+        height: 360,
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    >
+      {/* Outer glow — large soft halo */}
+      <m.div
+        animate={{
+          borderRadius: [
+            "60% 40% 55% 45% / 55% 60% 40% 45%",
+            "40% 55% 45% 60% / 60% 40% 55% 45%",
+            "50% 50% 60% 40% / 45% 55% 50% 50%",
+            "60% 40% 55% 45% / 55% 60% 40% 45%",
+          ],
+          rotate: [0, 12, -8, 0],
+        }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
         style={{
           position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover",
-          objectPosition: "center center",
-          opacity: 0.55,
-          filter: "grayscale(1) sepia(1) hue-rotate(58deg) saturate(4) brightness(0.9)",
-          mixBlendMode: "luminosity",
+          background: "radial-gradient(ellipse at 42% 38%, rgba(203,255,0,0.22) 0%, rgba(160,220,0,0.10) 40%, transparent 72%)",
+          filter: "blur(18px)",
         }}
       />
-    </div>
+      {/* Mid layer — shaped body */}
+      <m.div
+        animate={{
+          borderRadius: [
+            "55% 45% 38% 62% / 62% 38% 55% 45%",
+            "38% 62% 55% 45% / 45% 55% 62% 38%",
+            "62% 38% 45% 55% / 55% 45% 38% 62%",
+            "55% 45% 38% 62% / 62% 38% 55% 45%",
+          ],
+        }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute",
+          inset: "14%",
+          background: "radial-gradient(ellipse at 48% 44%, rgba(203,255,0,0.18) 0%, rgba(100,160,0,0.08) 55%, transparent 80%)",
+          filter: "blur(8px)",
+        }}
+      />
+      {/* Inner bright core */}
+      <m.div
+        animate={{
+          borderRadius: [
+            "50% 50% 45% 55% / 55% 45% 50% 50%",
+            "45% 55% 50% 50% / 50% 50% 45% 55%",
+            "55% 45% 50% 50% / 45% 55% 55% 45%",
+            "50% 50% 45% 55% / 55% 45% 50% 50%",
+          ],
+          scale: [1, 1.06, 0.97, 1],
+        }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute",
+          inset: "28%",
+          background: "radial-gradient(ellipse at 50% 46%, rgba(203,255,0,0.30) 0%, rgba(180,255,0,0.10) 50%, transparent 80%)",
+          filter: "blur(4px)",
+        }}
+      />
+      {/* Sharp bright rim — defines the sphere edge */}
+      <m.div
+        animate={{
+          borderRadius: [
+            "58% 42% 48% 52% / 52% 48% 42% 58%",
+            "42% 58% 52% 48% / 48% 52% 58% 42%",
+            "58% 42% 48% 52% / 52% 48% 42% 58%",
+          ],
+        }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: "absolute", inset: "4%",
+          border: "1px solid rgba(203,255,0,0.12)",
+          boxShadow: "inset 0 0 40px rgba(203,255,0,0.06), 0 0 60px rgba(203,255,0,0.08)",
+          filter: "blur(1px)",
+        }}
+      />
+    </m.div>
   );
 }
 
@@ -4063,8 +4138,8 @@ function Process() {
         <div>
           <div style={{ position: "relative", height: PROC_ROW_H }}>
             <GooFilter />
-            {/* Layer 0: decorative waves behind everything */}
-            <ProcessWaves />
+            {/* Layer 0: organic orb floating in sync with active step */}
+            <ProcessBgOrb progressMV={progressMV} />
             {/* Layer 1: gooey organic chain — circles merge via SVG filter */}
             <div
               style={{
@@ -4106,6 +4181,36 @@ function Contacts() {
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
           <div className="relative overflow-hidden rounded-3xl border border-white/[0.07] bg-surface p-10 md:p-16" style={{ minHeight: 340 }}>
+            <style>{`
+              @keyframes glintFull {
+                0%   { transform: translateX(-140%) skewX(-16deg); opacity: 0; }
+                6%   { opacity: 1; }
+                28%  { transform: translateX(200%) skewX(-16deg); opacity: 0; }
+                100% { transform: translateX(200%) skewX(-16deg); opacity: 0; }
+              }
+              @keyframes edgePulse {
+                0%,100% { opacity: 0.0; }
+                50%     { opacity: 0.60; }
+              }
+              @keyframes sparkle1 {
+                0%,100% { opacity:0; transform:scale(0.4); }
+                45%,55% { opacity:1; transform:scale(1.2); }
+              }
+              @keyframes sparkle2 {
+                0%,100% { opacity:0; transform:scale(0.3); }
+                40%,60% { opacity:0.85; transform:scale(1.0); }
+              }
+              @keyframes lensFlare {
+                0%,100% { opacity:0; width:2px; }
+                50%     { opacity:0.7; width:80px; }
+              }
+              @keyframes photoFloat {
+                0%,100% { transform: scaleX(-1) scale(1.0) translate(0px, 0px); }
+                33%     { transform: scaleX(-1) scale(1.02) translate(-3px, -4px); }
+                66%     { transform: scaleX(-1) scale(1.01) translate(2px, -2px); }
+              }
+            `}</style>
+
             {/* Acid glow top-left */}
             <div
               aria-hidden
@@ -4113,42 +4218,34 @@ function Contacts() {
               style={{ background: "radial-gradient(circle, #CBFF00 0%, transparent 70%)", filter: "blur(70px)" }}
             />
 
+            {/* ── Full-card glint sweeps — cover text + photo ── */}
+            <div aria-hidden style={{
+              position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 2,
+              borderRadius: "inherit",
+            }}>
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.10) 48%, rgba(255,255,220,0.14) 53%, transparent 66%)",
+                animation: "glintFull 7s ease-in-out infinite",
+                animationDelay: "0.8s",
+              }} />
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.07) 48%, rgba(255,255,255,0.10) 53%, transparent 66%)",
+                animation: "glintFull 7s ease-in-out infinite",
+                animationDelay: "4.3s",
+              }} />
+            </div>
+
             {/* Portrait photo — right side, frosted/matte + animations */}
             <div aria-hidden style={{
               position: "absolute", right: 0, top: 0, bottom: 0,
               width: "46%",
               overflow: "hidden",
               pointerEvents: "none",
+              zIndex: 1,
             }}>
-              <style>{`
-                @keyframes glintSweep {
-                  0%   { transform: translateX(-180%) skewX(-18deg); opacity: 0; }
-                  8%   { opacity: 1; }
-                  30%  { transform: translateX(220%) skewX(-18deg); opacity: 0; }
-                  100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
-                }
-                @keyframes edgePulse {
-                  0%,100% { opacity: 0.0; }
-                  50%     { opacity: 0.55; }
-                }
-                @keyframes sparkle1 {
-                  0%,100% { opacity:0; transform:scale(0.4); }
-                  45%,55% { opacity:1; transform:scale(1.2); }
-                }
-                @keyframes sparkle2 {
-                  0%,100% { opacity:0; transform:scale(0.3); }
-                  40%,60% { opacity:0.85; transform:scale(1.0); }
-                }
-                @keyframes lensFlare {
-                  0%,100% { opacity:0; width:2px; }
-                  50%     { opacity:0.7; width:80px; }
-                }
-                @keyframes borderGlow {
-                  0%,100% { box-shadow: 0 0 0px 0px rgba(203,255,0,0); }
-                  50%     { box-shadow: 0 0 18px 4px rgba(203,255,0,0.18); }
-                }
-              `}</style>
-
+              {/* Photo with float animation + brightness +12% */}
               <img
                 src="/hero/прне.png"
                 style={{
@@ -4156,27 +4253,12 @@ function Contacts() {
                   height: "100%", width: "100%",
                   objectFit: "cover",
                   objectPosition: "center top",
-                  transform: "scaleX(-1)",
-                  filter: "grayscale(20%) brightness(0.52) saturate(0.75)",
+                  filter: "grayscale(20%) brightness(0.64) saturate(0.80)",
+                  animation: "photoFloat 9s ease-in-out infinite",
                 }}
               />
 
-              {/* ── Diagonal glint sweep — crosses every 6s ── */}
-              <div style={{
-                position: "absolute", inset: 0,
-                background: "linear-gradient(105deg, transparent 40%, rgba(203,255,0,0.18) 50%, rgba(255,255,200,0.22) 55%, transparent 65%)",
-                animation: "glintSweep 6s ease-in-out infinite",
-                animationDelay: "1.2s",
-              }} />
-              {/* second glint with offset */}
-              <div style={{
-                position: "absolute", inset: 0,
-                background: "linear-gradient(105deg, transparent 40%, rgba(203,255,0,0.12) 50%, rgba(255,255,255,0.15) 55%, transparent 65%)",
-                animation: "glintSweep 6s ease-in-out infinite",
-                animationDelay: "4.5s",
-              }} />
-
-              {/* ── Acid-green edge glow — pulses along left border ── */}
+              {/* ── Acid-green edge pulse — left border ── */}
               <div style={{
                 position: "absolute", left: 0, top: 0, bottom: 0, width: 3,
                 background: "linear-gradient(to bottom, transparent 0%, #CBFF00 30%, #CBFF00 70%, transparent 100%)",
@@ -4184,7 +4266,7 @@ function Contacts() {
                 animationDelay: "0.5s",
               }} />
 
-              {/* ── Lens-flare spark on glasses area ── */}
+              {/* ── Glasses spark ── */}
               <div style={{
                 position: "absolute", right: "28%", top: "32%",
                 width: 6, height: 6, borderRadius: "50%",
@@ -4200,14 +4282,13 @@ function Contacts() {
                 animation: "sparkle2 4.2s ease-in-out infinite",
                 animationDelay: "0.6s",
               }} />
-              {/* horizontal lens-flare streak */}
               <div style={{
                 position: "absolute", right: "15%", top: "calc(32% + 2px)",
                 height: 1, background: "linear-gradient(to right, transparent, rgba(203,255,0,0.8), transparent)",
                 animation: "lensFlare 4.2s ease-in-out infinite",
               }} />
 
-              {/* ── Contour highlight — top-right face edge ── */}
+              {/* ── Right contour glow ── */}
               <div style={{
                 position: "absolute", right: 0, top: 0, bottom: 0, width: 1,
                 background: "linear-gradient(to bottom, transparent 10%, rgba(203,255,0,0.4) 35%, rgba(203,255,0,0.15) 65%, transparent 90%)",
