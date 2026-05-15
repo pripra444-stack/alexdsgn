@@ -4155,7 +4155,7 @@ function Contacts() {
     <section id="contacts" className="py-28 md:py-36">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
-          <div className="relative overflow-hidden rounded-3xl border border-white/[0.07] bg-surface p-10 md:p-16" style={{ minHeight: 340 }}>
+          <div className="contacts-card relative overflow-hidden rounded-3xl border border-white/[0.07] bg-surface p-10 md:p-16" style={{ minHeight: 340 }}>
             <style>{`
               @keyframes glintFull {
                 0%   { transform: translateX(-140%) skewX(-16deg); opacity: 0; }
@@ -4185,10 +4185,11 @@ function Contacts() {
                 66%     { transform: scaleX(-1) scale(1.01) translate(2px, -2px); }
               }
               @media (max-width: 767px) {
+                .contacts-card { min-height: 460px !important; padding: 0 !important; }
                 .contacts-photo { width: 100% !important; left: 0 !important; }
-                .contacts-photo img { filter: grayscale(20%) brightness(0.58) saturate(0.75) !important; }
-                .contacts-photo .contacts-fade-left { background: linear-gradient(to top, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.80) 40%, rgba(10,10,10,0.2) 100%) !important; }
-                .contacts-content { max-width: 100% !important; position: relative; z-index: 3 !important; padding-bottom: 8px; }
+                .contacts-photo img { filter: grayscale(20%) brightness(0.62) saturate(0.80) !important; object-position: center 15% !important; }
+                .contacts-photo .contacts-fade-left { background: linear-gradient(to bottom, transparent 0%, transparent 35%, rgba(8,8,8,0.85) 60%, rgba(8,8,8,0.98) 80%) !important; }
+                .contacts-content { max-width: 100% !important; position: absolute !important; bottom: 0 !important; left: 0 !important; right: 0 !important; z-index: 3 !important; padding: 0 28px 28px !important; }
               }
             `}</style>
 
