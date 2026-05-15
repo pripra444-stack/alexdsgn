@@ -3883,72 +3883,8 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Generates a sine-wave SVG path string.
-   yc=centre, amp=amplitude, P=period (px in 1920-wide viewBox), dx=phase offset */
-function wavePath(yc: number, amp: number, P: number, dx = 0): string {
-  const c = P * 0.276; // Bezier tangent ≈ 0.552 * P/2
-  const start = -P * 2 + dx;
-  let d = `M${start},${yc}`;
-  for (let x = start; x < 1920 + P * 2; x += P) {
-    d += ` C${x+c},${yc} ${x+P/2-c},${yc+amp} ${x+P/2},${yc+amp}`;
-    d += ` C${x+P/2+c},${yc+amp} ${x+P-c},${yc} ${x+P},${yc}`;
-  }
-  return d;
-}
-
-/* Full-viewport-width wave SVG — 9 animation groups × 3 paths = 27 lines.
-   High frequency (period 200-400px), varying thickness & opacity. */
+/* Static SVG wave background — user-provided file, recoloured to acid green. */
 function ProcessWaves() {
-  // [yc, amp, period, strokeW, color, opacity, speed(s), phaseStart]
-  type WL = [number,number,number,number,string,number,number,number];
-  const LINES: WL[] = [
-    // ── Group A — centre-band, slow ──────────────────────────────────────
-    [160, 42, 320, 2.8, "#CBFF00", 0.20, 22, 0   ],
-    [155, 38, 300, 1.4, "#CBFF00", 0.16, 22, 40  ],
-    [165, 46, 360, 0.7, "#b8ee00", 0.12, 22, -60 ],
-    // ── Group B — upper ribbon, medium ───────────────────────────────────
-    [115, 32, 280, 2.2, "#CBFF00", 0.17, 17, 0   ],
-    [108, 28, 240, 1.0, "#d4ff40", 0.13, 17, 30  ],
-    [122, 36, 310, 0.5, "#a0d000", 0.10, 17, -50 ],
-    // ── Group C — lower ribbon, medium ───────────────────────────────────
-    [205, 34, 270, 2.0, "#CBFF00", 0.17, 19, 0   ],
-    [212, 30, 250, 1.1, "#d4ff40", 0.13, 19, 35  ],
-    [198, 38, 300, 0.5, "#88cc00", 0.09, 19, -55 ],
-    // ── Group D — counter-phase, fast ────────────────────────────────────
-    [160, 55, 380, 1.8, "#CBFF00", 0.14, 14, 0   ],
-    [152, 60, 350, 0.9, "#e0ff60", 0.10, 14, 50  ],
-    [168, 50, 400, 0.4, "#CBFF00", 0.08, 14, -70 ],
-    // ── Group E — fine high-frequency ────────────────────────────────────
-    [160, 22, 200, 1.6, "#CBFF00", 0.15, 12, 0   ],
-    [155, 20, 190, 0.8, "#ccff00", 0.11, 12, 20  ],
-    [165, 24, 210, 0.4, "#b0e000", 0.08, 12, -30 ],
-    // ── Group F — deep sub-wave, very slow ───────────────────────────────
-    [160, 65, 480, 3.0, "#CBFF00", 0.13, 30, 0   ],
-    [148, 70, 460, 1.6, "#d0ff20", 0.09, 30, 60  ],
-    [172, 58, 500, 0.6, "#98c800", 0.07, 30, -80 ],
-    // ── Group G — upper-edge micro lines ─────────────────────────────────
-    [75,  18, 220, 1.2, "#CBFF00", 0.12, 16, 0   ],
-    [68,  15, 200, 0.6, "#d4ff40", 0.09, 16, 25  ],
-    [82,  20, 240, 0.3, "#b0d800", 0.07, 16, -35 ],
-    // ── Group H — lower-edge micro lines ─────────────────────────────────
-    [248, 18, 230, 1.2, "#CBFF00", 0.12, 15, 0   ],
-    [255, 15, 210, 0.6, "#d4ff40", 0.09, 15, 28  ],
-    [241, 20, 250, 0.3, "#a8d400", 0.07, 15, -40 ],
-    // ── Group I — wide-span accent ────────────────────────────────────────
-    [160, 80, 600, 2.4, "#CBFF00", 0.11, 38, 0   ],
-    [144, 85, 560, 1.2, "#e0ff80", 0.08, 38, 70  ],
-    [176, 75, 640, 0.5, "#90c000", 0.06, 38, -90 ],
-  ];
-
-  // Build CSS keyframes once per unique speed
-  const speeds = [...new Set(LINES.map(l => l[6]))];
-  const css = speeds.map(s =>
-    `@keyframes wv${s} { from{transform:translateX(0)} to{transform:translateX(-${s*60}px)} }`
-  ).join("\n") + "\n" +
-  speeds.map(s =>
-    `.wv${s}{animation:wv${s} ${s}s linear infinite;}`
-  ).join("\n");
-
   return (
     <div aria-hidden style={{
       position: "absolute",
@@ -3956,19 +3892,20 @@ function ProcessWaves() {
       width: "100vw", top: 0, bottom: 0,
       pointerEvents: "none", overflow: "hidden",
     }}>
-      <svg
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        viewBox="0 0 1920 320"
-        preserveAspectRatio="none"
-        fill="none"
-      >
-        <defs><style>{css}</style></defs>
-        {LINES.map(([yc,amp,P,sw,col,op,spd,dx], i) => (
-          <g key={i} className={`wv${spd}`} opacity={op}>
-            <path d={wavePath(yc, amp, P, dx)} stroke={col} strokeWidth={sw} />
-          </g>
-        ))}
-      </svg>
+      {/* grayscale→sepia→hue-rotate→saturate pipeline forces all colours to acid-green */}
+      <img
+        src="/hero/%D1%84%D0%BE%D0%BD%20%D0%B2%D0%BE%D0%BB%D0%BD%D1%8B%201.svg"
+        aria-hidden
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          objectPosition: "center center",
+          opacity: 0.55,
+          filter: "grayscale(1) sepia(1) hue-rotate(58deg) saturate(4) brightness(0.9)",
+          mixBlendMode: "luminosity",
+        }}
+      />
     </div>
   );
 }
