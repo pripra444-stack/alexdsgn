@@ -3796,6 +3796,66 @@ function WhyMe() {
 }
 
 // ─── PROCESS ─────────────────────────────────────────────────────────────────
+const PROC_BUBBLES = Array.from({ length: 22 }, (_, i) => ({
+  id: i,
+  x: 1 + (i * 41 + 7) % 97,
+  size: 2 + (i * 3 + 5) % 9,
+  dur: 4.5 + (i * 1.3 + 0.6) % 6.5,
+  delay: (i * 1.05 + 0.15) % 10,
+  opa: 0.18 + (i * 0.07) % 0.45,
+}));
+
+function ProcessBg() {
+  return (
+    <div aria-hidden style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+      {/* Vertical light rays — like in Cases cards */}
+      {[0,1,2,3,4,5,6,7].map(i => (
+        <m.div key={i} style={{
+          position: "absolute", top: 0,
+          left: `${4 + i * 12}%`,
+          width: `${3 + (i % 4) * 1.5}%`, height: "80%",
+          background: `linear-gradient(180deg, rgba(203,255,0,${0.045 + (i % 4) * 0.015}) 0%, transparent 100%)`,
+          transform: `skewX(${-12 + i * 4}deg)`,
+          transformOrigin: "top center",
+          borderRadius: "0 0 55% 55%",
+        }}
+        animate={{ opacity: [0.4, 0.75, 0.4] }}
+        transition={{ duration: 3.2 + i * 0.65, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
+        />
+      ))}
+
+      {/* Floating bubbles rising upward */}
+      {PROC_BUBBLES.map(b => (
+        <m.div key={b.id} style={{
+          position: "absolute",
+          left: `${b.x}%`, bottom: -(b.size + 4),
+          width: b.size, height: b.size, borderRadius: "50%",
+          background: "transparent",
+          border: `1px solid rgba(203,255,0,${b.opa})`,
+          boxShadow: `0 0 ${b.size * 2}px rgba(203,255,0,${b.opa * 0.5})`,
+        }}
+        animate={{ y: [0, -700], x: [0, Math.sin(b.id * 1.5) * 14, 0], opacity: [0, b.opa, b.opa * 0.85, 0] }}
+        transition={{ duration: b.dur, repeat: Infinity, delay: b.delay, ease: "linear" }}
+        />
+      ))}
+
+      {/* Small sparkle dots */}
+      {[0,1,2,3,4,5,6,7,8,9].map(i => (
+        <m.div key={i} style={{
+          position: "absolute", pointerEvents: "none",
+          width: 2, height: 2, borderRadius: "50%",
+          background: "rgba(203,255,0,0.85)",
+          left: `${8 + (i * 47) % 84}%`,
+          top: `${10 + (i * 31) % 78}%`,
+        }}
+        animate={{ opacity: [0, 0.9, 0], scale: [0, 1.6, 0] }}
+        transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.9, ease: "easeInOut" }}
+        />
+      ))}
+    </div>
+  );
+}
+
 const PROCESS = [
   { n: "01", title: "Бриф",         desc: "Разбираем задачу, нишу, конкурентов и цели.",                icon: "clipboard" },
   { n: "02", title: "Анализ",       desc: "Смотрю топ выдачи, нахожу точки роста и слабые места.",      icon: "search"    },
@@ -4103,8 +4163,9 @@ function Process() {
   });
 
   return (
-    <section id="process" className="py-28 md:py-36 bg-surface/20" style={{ overflowX: "clip" }}>
-      <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <section id="process" className="py-28 md:py-36 bg-surface/20" style={{ overflowX: "clip", position: "relative" }}>
+      <ProcessBg />
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10" style={{ position: "relative", zIndex: 1 }}>
         <Reveal>
           <Label>Процесс</Label>
           <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-[0.06em] text-white mb-14">
