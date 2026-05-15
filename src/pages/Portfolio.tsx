@@ -3593,27 +3593,99 @@ function Cases() {
             Реальные результаты — CTR, позиции в выдаче, конверсия
           </m.p>
         </Reveal>
+        {/* ── Cases grid: left(1,4) | center video | right(2,6) ── */}
         <div style={{ perspective: "1100px", perspectiveOrigin: "50% 40%" }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {CASES.map((c, idx) => (
-              <div
-                key={c.id}
-                onMouseEnter={() => setHovCase(idx)}
-                onMouseLeave={() => setHovCase(null)}
-                style={{ position: "relative", ...caseStyle(idx) }}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            {/* LEFT column — косметика + уличная одежда */}
+            <div className="flex flex-col gap-4">
+              {[CASES[0], CASES[3]].map((c, idx) => (
+                <div key={c.id}
+                  onMouseEnter={() => setHovCase(idx)}
+                  onMouseLeave={() => setHovCase(null)}
+                  style={{ position: "relative", ...caseStyle(idx) }}
+                >
+                  <AnimatedCaseCard
+                    c={c}
+                    onOpen={
+                      c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,  title: "Карточки для бренда натуральной косметики" }) :
+                      c.id === 4 ? () => setCaseModal({ slides: FASHION_SLIDES,  title: "Карточки для бренда уличной одежды" }) :
+                      undefined
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* CENTER column — видео (spanning full height of two cards) */}
+            <Reveal>
+              <m.div
+                variants={fadeUp}
+                className="relative overflow-hidden rounded-2xl"
+                style={{
+                  height: "calc(360px * 2 + 16px)",
+                  border: "1px solid rgba(203,255,0,0.18)",
+                  background: "#0a0f00",
+                }}
               >
-                <AnimatedCaseCard
-                  c={c}
-                  onOpen={
-                    c.id === 1 ? () => setCaseModal({ slides: PROJECT_SLIDES,      title: "Карточки для бренда натуральной косметики" }) :
-                    c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
-                    c.id === 4 ? () => setCaseModal({ slides: FASHION_SLIDES,      title: "Карточки для бренда уличной одежды" }) :
-                    c.id === 6 ? () => setCaseModal({ slides: SWIM_SLIDES,         title: "Hero + карточки для спорт-бренда на Ozon" }) :
-                    undefined
-                  }
+                <video
+                  src="/hero/%D1%81%D0%B0%D0%B9%D1%82%20%D0%BF%D0%BE%D1%80%D1%82%D1%84%D0%BE%D0%BB%D0%B8%D0%BE%20%D0%B2%D0%B8%D0%B4%D0%B5%D0%BE%20%D0%BA%D0%B8%D1%81%D0%BB.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    position: "absolute", inset: 0,
+                    width: "100%", height: "100%",
+                    objectFit: "cover",
+                  }}
                 />
-              </div>
-            ))}
+                {/* Subtle dark vignette to blend with card style */}
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.5) 100%)",
+                  pointerEvents: "none",
+                }} />
+                {/* Acid-green bottom badge */}
+                <div style={{
+                  position: "absolute", bottom: 20, left: 20, right: 20,
+                  pointerEvents: "none",
+                }}>
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    padding: "4px 12px", borderRadius: 999,
+                    background: "rgba(203,255,0,0.12)",
+                    border: "1px solid rgba(203,255,0,0.3)",
+                    color: "#CBFF00",
+                    fontSize: 11, fontFamily: "monospace",
+                    letterSpacing: "0.15em", textTransform: "uppercase",
+                  }}>
+                    ◆ ПРОЦЕСС СОЗДАНИЯ
+                  </span>
+                </div>
+              </m.div>
+            </Reveal>
+
+            {/* RIGHT column — умная электроника + спорт FitSmile */}
+            <div className="flex flex-col gap-4">
+              {[CASES[1], CASES[5]].map((c, idx) => (
+                <div key={c.id}
+                  onMouseEnter={() => setHovCase(idx + 10)}
+                  onMouseLeave={() => setHovCase(null)}
+                  style={{ position: "relative", ...caseStyle(idx + 3) }}
+                >
+                  <AnimatedCaseCard
+                    c={c}
+                    onOpen={
+                      c.id === 2 ? () => setCaseModal({ slides: HERO_PROJECT_SLIDES, title: "HERO-экран для бренда умной электроники" }) :
+                      c.id === 6 ? () => setCaseModal({ slides: SWIM_SLIDES,         title: "Hero + карточки для спорт-бренда на Ozon" }) :
+                      undefined
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
       </div>
@@ -3811,14 +3883,21 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Static wave image background for the Process section.
-   1. Image rendered via screen blend — dark bg becomes transparent.
-   2. Acid-green (#CBFF00) overlay via mix-blend-mode:color forces all
-      bright particles to shift to acid green hue while preserving luminosity. */
+/* Full-viewport-width wave SVG behind the Process section.
+   Uses absolute + 100vw to break out of the max-width container.
+   Three bands of flowing wave paths, animated via CSS, acid-green palette. */
 function ProcessWaves() {
   return (
-    <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-      {/* Base image — screen blend makes black background invisible */}
+    <div aria-hidden style={{
+      position: "absolute",
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: "100vw",
+      top: 0, bottom: 0,
+      pointerEvents: "none",
+      overflow: "hidden",
+    }}>
+      {/* Particle wave image — screen blend removes dark bg */}
       <img
         src="/hero/3d-abstract-sound-waves-design-with-flowing-particles.jpg"
         style={{
@@ -3826,18 +3905,51 @@ function ProcessWaves() {
           width: "100%", height: "100%",
           objectFit: "cover",
           objectPosition: "center center",
-          opacity: 0.65,
-          filter: "brightness(0.9) saturate(1.2)",
+          opacity: 0.55,
+          filter: "brightness(0.9) saturate(1.1)",
           mixBlendMode: "screen",
         }}
       />
-      {/* Color overlay: forces hue+saturation → acid green, keeps luminosity */}
+      {/* Acid-green color wash over the image */}
       <div style={{
         position: "absolute", inset: 0,
         background: "#CBFF00",
         mixBlendMode: "color",
-        opacity: 0.85,
+        opacity: 0.80,
       }} />
+      {/* SVG wave lines on top — full width, multiple animated bands */}
+      <svg
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        viewBox="0 0 1920 320"
+        preserveAspectRatio="none"
+        fill="none"
+      >
+        <defs>
+          <style>{`
+            @keyframes waveL { from { transform: translateX(0) } to { transform: translateX(-960px) } }
+            @keyframes waveR { from { transform: translateX(-480px) } to { transform: translateX(-1440px) } }
+            .wl1 { animation: waveL 18s linear infinite; }
+            .wl2 { animation: waveL 26s linear infinite; }
+            .wr1 { animation: waveR 14s linear infinite; }
+          `}</style>
+        </defs>
+        {/* Band 1 — main thick ribbon */}
+        <g className="wl1" opacity="0.18">
+          <path d="M-960,160 C-800,160 -720,100 -480,100 C-240,100 -160,160 0,160 C160,160 240,220 480,220 C720,220 800,160 960,160 C1120,160 1200,100 1440,100 C1680,100 1760,160 1920,160 C2080,160 2160,220 2400,220 C2640,220 2720,160 2880,160" stroke="#CBFF00" strokeWidth="2.5"/>
+          <path d="M-960,155 C-800,155 -720,95 -480,95 C-240,95 -160,155 0,155 C160,155 240,215 480,215 C720,215 800,155 960,155 C1120,155 1200,95 1440,95 C1680,95 1760,155 1920,155 C2080,155 2160,215 2400,215 C2640,215 2720,155 2880,155" stroke="#CBFF00" strokeWidth="1.5"/>
+          <path d="M-960,165 C-800,165 -720,105 -480,105 C-240,105 -160,165 0,165 C160,165 240,225 480,225 C720,225 800,165 960,165 C1120,165 1200,105 1440,105 C1680,105 1760,165 1920,165 C2080,165 2160,225 2400,225 C2640,225 2720,165 2880,165" stroke="#a8d800" strokeWidth="1.0"/>
+        </g>
+        {/* Band 2 — counter-phase, wider amplitude */}
+        <g className="wl2" opacity="0.13">
+          <path d="M-960,160 C-800,160 -720,220 -480,220 C-240,220 -160,160 0,160 C160,160 240,100 480,100 C720,100 800,160 960,160 C1120,160 1200,220 1440,220 C1680,220 1760,160 1920,160 C2080,160 2160,100 2400,100 C2640,100 2720,160 2880,160" stroke="#CBFF00" strokeWidth="2.0"/>
+          <path d="M-960,148 C-800,148 -720,232 -480,232 C-240,232 -160,148 0,148 C160,148 240,88 480,88 C720,88 800,148 960,148 C1120,148 1200,232 1440,232 C1680,232 1760,148 1920,148 C2080,148 2160,88 2400,88 C2640,88 2720,148 2880,148" stroke="#d4ff40" strokeWidth="1.2"/>
+        </g>
+        {/* Band 3 — fine detail lines, fast */}
+        <g className="wr1" opacity="0.09">
+          <path d="M-960,160 C-720,160 -600,120 -480,120 C-360,120 -240,160 0,160 C240,160 360,200 480,200 C600,200 720,160 960,160 C1200,160 1320,120 1440,120 C1560,120 1680,160 1920,160 C2160,160 2280,200 2400,200 C2520,200 2640,160 2880,160" stroke="#CBFF00" strokeWidth="0.8"/>
+          <path d="M-960,175 C-720,175 -600,135 -480,135 C-360,135 -240,175 0,175 C240,175 360,215 480,215 C600,215 720,175 960,175 C1200,175 1320,135 1440,135 C1560,135 1680,175 1920,175 C2160,175 2280,215 2400,215 C2520,215 2640,175 2880,175" stroke="#88bb00" strokeWidth="0.6"/>
+        </g>
+      </svg>
     </div>
   );
 }
