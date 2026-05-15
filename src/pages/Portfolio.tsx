@@ -3712,12 +3712,100 @@ const WHY_IMG_H = 171;
 const WHY_TEXT_H = 200;
 const WHY_CARD_H = WHY_TEXT_H + WHY_IMG_H + 16; // text + image + breathing room
 
+const WHY_STARS = Array.from({ length: 80 }, (_, i) => ({
+  id: i,
+  x: (i * 53 + 13) % 99,
+  y: (i * 37 + 9) % 97,
+  size: 1 + (i % 4) * 0.55,
+  opa: 0.18 + (i % 6) * 0.07,
+  dur: 2.2 + (i % 8) * 0.75,
+  delay: (i * 0.38) % 7,
+}));
+
+function WhyMeBg() {
+  return (
+    <div aria-hidden style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+      {/* Stars — twinkle with varying rhythm */}
+      {WHY_STARS.map(s => (
+        <m.div
+          key={s.id}
+          style={{
+            position: "absolute",
+            left: `${s.x}%`, top: `${s.y}%`,
+            width: s.size, height: s.size,
+            borderRadius: "50%",
+            background: s.id % 7 === 0 ? "rgba(230,255,160,0.9)" : "#CBFF00",
+            boxShadow: s.size > 2 ? `0 0 ${s.size * 3}px rgba(203,255,0,${s.opa * 0.6})` : "none",
+          }}
+          animate={{
+            opacity: [s.opa * 0.3, s.opa, s.opa * 0.5, s.opa * 0.9, s.opa * 0.3],
+            scale:   [1, 1.5, 0.7, 1.3, 1],
+          }}
+          transition={{ duration: s.dur, repeat: Infinity, ease: "easeInOut", delay: s.delay }}
+        />
+      ))}
+
+      {/* Comet — very subtle, flies across every ~11s */}
+      <m.div
+        style={{
+          position: "absolute",
+          top: "12%", right: "-8%",
+          width: 180, height: 1.5,
+          borderRadius: 2,
+          background: "linear-gradient(to left, transparent 0%, rgba(203,255,0,0.04) 25%, rgba(203,255,0,0.22) 62%, rgba(240,255,200,0.32) 82%, rgba(203,255,0,0.08) 100%)",
+          rotate: 32,
+          transformOrigin: "right center",
+        }}
+        animate={{
+          x: [0, "-115vw"],
+          y: [0, "65vh"],
+          opacity: [0, 0, 0.9, 0.75, 0],
+        }}
+        transition={{
+          duration: 2.4,
+          repeat: Infinity,
+          repeatDelay: 9.2,
+          ease: [0.3, 0, 0.7, 1],
+          times: [0, 0.06, 0.18, 0.88, 1],
+        }}
+      />
+
+      {/* Second comet — different angle, offset delay */}
+      <m.div
+        style={{
+          position: "absolute",
+          top: "38%", left: "-6%",
+          width: 140, height: 1,
+          borderRadius: 1,
+          background: "linear-gradient(to right, transparent 0%, rgba(203,255,0,0.03) 20%, rgba(203,255,0,0.18) 60%, rgba(240,255,200,0.26) 80%, rgba(203,255,0,0.06) 100%)",
+          rotate: -22,
+          transformOrigin: "left center",
+        }}
+        animate={{
+          x: [0, "115vw"],
+          y: [0, "-40vh"],
+          opacity: [0, 0, 0.7, 0.6, 0],
+        }}
+        transition={{
+          duration: 2.0,
+          repeat: Infinity,
+          repeatDelay: 13.5,
+          ease: [0.3, 0, 0.7, 1],
+          times: [0, 0.07, 0.2, 0.88, 1],
+          delay: 5.8,
+        }}
+      />
+    </div>
+  );
+}
+
 function WhyMe() {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   return (
-    <section className="py-28 md:py-36">
-      <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <section className="py-28 md:py-36" style={{ position: "relative" }}>
+      <WhyMeBg />
+      <div className="max-w-[1280px] mx-auto px-5 md:px-10" style={{ position: "relative", zIndex: 1 }}>
         <Reveal>
           <Label>Почему я</Label>
           <m.h2 variants={fadeUp} className="font-luna text-4xl md:text-5xl font-bold tracking-[0.06em] text-white mb-14">
