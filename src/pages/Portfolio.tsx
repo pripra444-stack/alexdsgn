@@ -4059,7 +4059,7 @@ function ProcessMobile() {
               boxShadow: "0 0 60px rgba(203,255,0,0.35)",
             }}
           >
-            <span style={{ fontSize: 44, fontWeight: 700, color: "#0B0B0C", lineHeight: 1, fontFamily: "monospace", letterSpacing: "-0.02em" }}>
+            <span className="font-luna" style={{ fontSize: 44, fontWeight: 800, color: "#0B0B0C", lineHeight: 1, letterSpacing: "0.04em" }}>
               {cur.n}
             </span>
           </m.div>
@@ -4186,7 +4186,7 @@ function Contacts() {
               }
               @media (max-width: 767px) {
                 .contacts-photo { width: 100% !important; left: 0 !important; }
-                .contacts-photo img { filter: grayscale(40%) brightness(0.42) saturate(0.60) !important; }
+                .contacts-photo img { filter: grayscale(20%) brightness(0.58) saturate(0.75) !important; }
                 .contacts-photo .contacts-fade-left { background: linear-gradient(to top, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.80) 40%, rgba(10,10,10,0.2) 100%) !important; }
                 .contacts-content { max-width: 100% !important; position: relative; z-index: 3 !important; padding-bottom: 8px; }
               }
@@ -4206,13 +4206,13 @@ function Contacts() {
             }}>
               <div style={{
                 position: "absolute", inset: 0,
-                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.13) 48%, rgba(255,255,220,0.18) 53%, transparent 66%)",
+                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.16) 48%, rgba(203,255,0,0.22) 53%, transparent 66%)",
                 animation: "glintFull 21s ease-in-out infinite",
                 animationDelay: "0.8s",
               }} />
               <div style={{
                 position: "absolute", inset: 0,
-                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.09) 48%, rgba(255,255,255,0.13) 53%, transparent 66%)",
+                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.11) 48%, rgba(203,255,0,0.16) 53%, transparent 66%)",
                 animation: "glintFull 21s ease-in-out infinite",
                 animationDelay: "11.8s",
               }} />
