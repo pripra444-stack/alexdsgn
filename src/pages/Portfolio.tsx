@@ -3883,52 +3883,91 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Full-viewport-width wave SVG behind the Process section.
-   Uses absolute + 100vw to break out of the max-width container.
-   Three bands of flowing wave paths, animated via CSS, acid-green palette. */
+/* Generates a sine-wave SVG path string.
+   yc=centre, amp=amplitude, P=period (px in 1920-wide viewBox), dx=phase offset */
+function wavePath(yc: number, amp: number, P: number, dx = 0): string {
+  const c = P * 0.276; // Bezier tangent ≈ 0.552 * P/2
+  const start = -P * 2 + dx;
+  let d = `M${start},${yc}`;
+  for (let x = start; x < 1920 + P * 2; x += P) {
+    d += ` C${x+c},${yc} ${x+P/2-c},${yc+amp} ${x+P/2},${yc+amp}`;
+    d += ` C${x+P/2+c},${yc+amp} ${x+P-c},${yc} ${x+P},${yc}`;
+  }
+  return d;
+}
+
+/* Full-viewport-width wave SVG — 9 animation groups × 3 paths = 27 lines.
+   High frequency (period 200-400px), varying thickness & opacity. */
 function ProcessWaves() {
+  // [yc, amp, period, strokeW, color, opacity, speed(s), phaseStart]
+  type WL = [number,number,number,number,string,number,number,number];
+  const LINES: WL[] = [
+    // ── Group A — centre-band, slow ──────────────────────────────────────
+    [160, 42, 320, 2.8, "#CBFF00", 0.20, 22, 0   ],
+    [155, 38, 300, 1.4, "#CBFF00", 0.16, 22, 40  ],
+    [165, 46, 360, 0.7, "#b8ee00", 0.12, 22, -60 ],
+    // ── Group B — upper ribbon, medium ───────────────────────────────────
+    [115, 32, 280, 2.2, "#CBFF00", 0.17, 17, 0   ],
+    [108, 28, 240, 1.0, "#d4ff40", 0.13, 17, 30  ],
+    [122, 36, 310, 0.5, "#a0d000", 0.10, 17, -50 ],
+    // ── Group C — lower ribbon, medium ───────────────────────────────────
+    [205, 34, 270, 2.0, "#CBFF00", 0.17, 19, 0   ],
+    [212, 30, 250, 1.1, "#d4ff40", 0.13, 19, 35  ],
+    [198, 38, 300, 0.5, "#88cc00", 0.09, 19, -55 ],
+    // ── Group D — counter-phase, fast ────────────────────────────────────
+    [160, 55, 380, 1.8, "#CBFF00", 0.14, 14, 0   ],
+    [152, 60, 350, 0.9, "#e0ff60", 0.10, 14, 50  ],
+    [168, 50, 400, 0.4, "#CBFF00", 0.08, 14, -70 ],
+    // ── Group E — fine high-frequency ────────────────────────────────────
+    [160, 22, 200, 1.6, "#CBFF00", 0.15, 12, 0   ],
+    [155, 20, 190, 0.8, "#ccff00", 0.11, 12, 20  ],
+    [165, 24, 210, 0.4, "#b0e000", 0.08, 12, -30 ],
+    // ── Group F — deep sub-wave, very slow ───────────────────────────────
+    [160, 65, 480, 3.0, "#CBFF00", 0.13, 30, 0   ],
+    [148, 70, 460, 1.6, "#d0ff20", 0.09, 30, 60  ],
+    [172, 58, 500, 0.6, "#98c800", 0.07, 30, -80 ],
+    // ── Group G — upper-edge micro lines ─────────────────────────────────
+    [75,  18, 220, 1.2, "#CBFF00", 0.12, 16, 0   ],
+    [68,  15, 200, 0.6, "#d4ff40", 0.09, 16, 25  ],
+    [82,  20, 240, 0.3, "#b0d800", 0.07, 16, -35 ],
+    // ── Group H — lower-edge micro lines ─────────────────────────────────
+    [248, 18, 230, 1.2, "#CBFF00", 0.12, 15, 0   ],
+    [255, 15, 210, 0.6, "#d4ff40", 0.09, 15, 28  ],
+    [241, 20, 250, 0.3, "#a8d400", 0.07, 15, -40 ],
+    // ── Group I — wide-span accent ────────────────────────────────────────
+    [160, 80, 600, 2.4, "#CBFF00", 0.11, 38, 0   ],
+    [144, 85, 560, 1.2, "#e0ff80", 0.08, 38, 70  ],
+    [176, 75, 640, 0.5, "#90c000", 0.06, 38, -90 ],
+  ];
+
+  // Build CSS keyframes once per unique speed
+  const speeds = [...new Set(LINES.map(l => l[6]))];
+  const css = speeds.map(s =>
+    `@keyframes wv${s} { from{transform:translateX(0)} to{transform:translateX(-${s*60}px)} }`
+  ).join("\n") + "\n" +
+  speeds.map(s =>
+    `.wv${s}{animation:wv${s} ${s}s linear infinite;}`
+  ).join("\n");
+
   return (
     <div aria-hidden style={{
       position: "absolute",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: "100vw",
-      top: 0, bottom: 0,
-      pointerEvents: "none",
-      overflow: "hidden",
+      left: "50%", transform: "translateX(-50%)",
+      width: "100vw", top: 0, bottom: 0,
+      pointerEvents: "none", overflow: "hidden",
     }}>
-      {/* SVG wave lines on top — full width, multiple animated bands */}
       <svg
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
         viewBox="0 0 1920 320"
         preserveAspectRatio="none"
         fill="none"
       >
-        <defs>
-          <style>{`
-            @keyframes waveL { from { transform: translateX(0) } to { transform: translateX(-960px) } }
-            @keyframes waveR { from { transform: translateX(-480px) } to { transform: translateX(-1440px) } }
-            .wl1 { animation: waveL 18s linear infinite; }
-            .wl2 { animation: waveL 26s linear infinite; }
-            .wr1 { animation: waveR 14s linear infinite; }
-          `}</style>
-        </defs>
-        {/* Band 1 — main thick ribbon */}
-        <g className="wl1" opacity="0.18">
-          <path d="M-960,160 C-800,160 -720,100 -480,100 C-240,100 -160,160 0,160 C160,160 240,220 480,220 C720,220 800,160 960,160 C1120,160 1200,100 1440,100 C1680,100 1760,160 1920,160 C2080,160 2160,220 2400,220 C2640,220 2720,160 2880,160" stroke="#CBFF00" strokeWidth="2.5"/>
-          <path d="M-960,155 C-800,155 -720,95 -480,95 C-240,95 -160,155 0,155 C160,155 240,215 480,215 C720,215 800,155 960,155 C1120,155 1200,95 1440,95 C1680,95 1760,155 1920,155 C2080,155 2160,215 2400,215 C2640,215 2720,155 2880,155" stroke="#CBFF00" strokeWidth="1.5"/>
-          <path d="M-960,165 C-800,165 -720,105 -480,105 C-240,105 -160,165 0,165 C160,165 240,225 480,225 C720,225 800,165 960,165 C1120,165 1200,105 1440,105 C1680,105 1760,165 1920,165 C2080,165 2160,225 2400,225 C2640,225 2720,165 2880,165" stroke="#a8d800" strokeWidth="1.0"/>
-        </g>
-        {/* Band 2 — counter-phase, wider amplitude */}
-        <g className="wl2" opacity="0.13">
-          <path d="M-960,160 C-800,160 -720,220 -480,220 C-240,220 -160,160 0,160 C160,160 240,100 480,100 C720,100 800,160 960,160 C1120,160 1200,220 1440,220 C1680,220 1760,160 1920,160 C2080,160 2160,100 2400,100 C2640,100 2720,160 2880,160" stroke="#CBFF00" strokeWidth="2.0"/>
-          <path d="M-960,148 C-800,148 -720,232 -480,232 C-240,232 -160,148 0,148 C160,148 240,88 480,88 C720,88 800,148 960,148 C1120,148 1200,232 1440,232 C1680,232 1760,148 1920,148 C2080,148 2160,88 2400,88 C2640,88 2720,148 2880,148" stroke="#d4ff40" strokeWidth="1.2"/>
-        </g>
-        {/* Band 3 — fine detail lines, fast */}
-        <g className="wr1" opacity="0.09">
-          <path d="M-960,160 C-720,160 -600,120 -480,120 C-360,120 -240,160 0,160 C240,160 360,200 480,200 C600,200 720,160 960,160 C1200,160 1320,120 1440,120 C1560,120 1680,160 1920,160 C2160,160 2280,200 2400,200 C2520,200 2640,160 2880,160" stroke="#CBFF00" strokeWidth="0.8"/>
-          <path d="M-960,175 C-720,175 -600,135 -480,135 C-360,135 -240,175 0,175 C240,175 360,215 480,215 C600,215 720,175 960,175 C1200,175 1320,135 1440,135 C1560,135 1680,175 1920,175 C2160,175 2280,215 2400,215 C2520,215 2640,175 2880,175" stroke="#88bb00" strokeWidth="0.6"/>
-        </g>
+        <defs><style>{css}</style></defs>
+        {LINES.map(([yc,amp,P,sw,col,op,spd,dx], i) => (
+          <g key={i} className={`wv${spd}`} opacity={op}>
+            <path d={wavePath(yc, amp, P, dx)} stroke={col} strokeWidth={sw} />
+          </g>
+        ))}
       </svg>
     </div>
   );
@@ -4137,13 +4176,42 @@ function Contacts() {
               style={{ background: "radial-gradient(circle, #CBFF00 0%, transparent 70%)", filter: "blur(70px)" }}
             />
 
-            {/* Portrait photo — right side, frosted/matte */}
+            {/* Portrait photo — right side, frosted/matte + animations */}
             <div aria-hidden style={{
               position: "absolute", right: 0, top: 0, bottom: 0,
               width: "46%",
               overflow: "hidden",
               pointerEvents: "none",
             }}>
+              <style>{`
+                @keyframes glintSweep {
+                  0%   { transform: translateX(-180%) skewX(-18deg); opacity: 0; }
+                  8%   { opacity: 1; }
+                  30%  { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+                  100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+                }
+                @keyframes edgePulse {
+                  0%,100% { opacity: 0.0; }
+                  50%     { opacity: 0.55; }
+                }
+                @keyframes sparkle1 {
+                  0%,100% { opacity:0; transform:scale(0.4); }
+                  45%,55% { opacity:1; transform:scale(1.2); }
+                }
+                @keyframes sparkle2 {
+                  0%,100% { opacity:0; transform:scale(0.3); }
+                  40%,60% { opacity:0.85; transform:scale(1.0); }
+                }
+                @keyframes lensFlare {
+                  0%,100% { opacity:0; width:2px; }
+                  50%     { opacity:0.7; width:80px; }
+                }
+                @keyframes borderGlow {
+                  0%,100% { box-shadow: 0 0 0px 0px rgba(203,255,0,0); }
+                  50%     { box-shadow: 0 0 18px 4px rgba(203,255,0,0.18); }
+                }
+              `}</style>
+
               <img
                 src="/hero/прне.png"
                 style={{
@@ -4155,7 +4223,62 @@ function Contacts() {
                   filter: "grayscale(20%) brightness(0.52) saturate(0.75)",
                 }}
               />
-              {/* Fade gradient — card colour bleeds in from left */}
+
+              {/* ── Diagonal glint sweep — crosses every 6s ── */}
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "linear-gradient(105deg, transparent 40%, rgba(203,255,0,0.18) 50%, rgba(255,255,200,0.22) 55%, transparent 65%)",
+                animation: "glintSweep 6s ease-in-out infinite",
+                animationDelay: "1.2s",
+              }} />
+              {/* second glint with offset */}
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "linear-gradient(105deg, transparent 40%, rgba(203,255,0,0.12) 50%, rgba(255,255,255,0.15) 55%, transparent 65%)",
+                animation: "glintSweep 6s ease-in-out infinite",
+                animationDelay: "4.5s",
+              }} />
+
+              {/* ── Acid-green edge glow — pulses along left border ── */}
+              <div style={{
+                position: "absolute", left: 0, top: 0, bottom: 0, width: 3,
+                background: "linear-gradient(to bottom, transparent 0%, #CBFF00 30%, #CBFF00 70%, transparent 100%)",
+                animation: "edgePulse 3.8s ease-in-out infinite",
+                animationDelay: "0.5s",
+              }} />
+
+              {/* ── Lens-flare spark on glasses area ── */}
+              <div style={{
+                position: "absolute", right: "28%", top: "32%",
+                width: 6, height: 6, borderRadius: "50%",
+                background: "#CBFF00",
+                boxShadow: "0 0 8px 4px rgba(203,255,0,0.6), 0 0 20px 8px rgba(203,255,0,0.3)",
+                animation: "sparkle1 4.2s ease-in-out infinite",
+              }} />
+              <div style={{
+                position: "absolute", right: "18%", top: "30%",
+                width: 4, height: 4, borderRadius: "50%",
+                background: "#e0ffaa",
+                boxShadow: "0 0 6px 3px rgba(203,255,0,0.5)",
+                animation: "sparkle2 4.2s ease-in-out infinite",
+                animationDelay: "0.6s",
+              }} />
+              {/* horizontal lens-flare streak */}
+              <div style={{
+                position: "absolute", right: "15%", top: "calc(32% + 2px)",
+                height: 1, background: "linear-gradient(to right, transparent, rgba(203,255,0,0.8), transparent)",
+                animation: "lensFlare 4.2s ease-in-out infinite",
+              }} />
+
+              {/* ── Contour highlight — top-right face edge ── */}
+              <div style={{
+                position: "absolute", right: 0, top: 0, bottom: 0, width: 1,
+                background: "linear-gradient(to bottom, transparent 10%, rgba(203,255,0,0.4) 35%, rgba(203,255,0,0.15) 65%, transparent 90%)",
+                animation: "edgePulse 5s ease-in-out infinite",
+                animationDelay: "1.8s",
+              }} />
+
+              {/* Fade gradient — left bleed */}
               <div style={{
                 position: "absolute", inset: 0,
                 background: "linear-gradient(to right, #111111 0%, rgba(17,17,17,0.55) 30%, rgba(17,17,17,0.0) 65%)",
@@ -4165,7 +4288,7 @@ function Contacts() {
                 position: "absolute", inset: 0,
                 background: "linear-gradient(to top, #111111 0%, transparent 40%)",
               }} />
-              {/* Matte dark veil for frosted-glass feel */}
+              {/* Matte dark veil */}
               <div style={{
                 position: "absolute", inset: 0,
                 background: "rgba(10,18,0,0.28)",
