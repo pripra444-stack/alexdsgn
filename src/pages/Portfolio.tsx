@@ -3712,30 +3712,31 @@ const WHY_IMG_H = 171;
 const WHY_TEXT_H = 200;
 const WHY_CARD_H = WHY_TEXT_H + WHY_IMG_H + 16; // text + image + breathing room
 
-// Background stars — uniform scatter
+// Background stars — uniform scatter, 3x larger
 const WHY_STARS = Array.from({ length: 65 }, (_, i) => ({
   id: i,
   x: (i * 53 + 13) % 99,
   y: (i * 37 + 9) % 97,
-  size: 0.8 + (i % 4) * 0.45,
-  opa: 0.14 + (i % 6) * 0.06,
+  size: 2.4 + (i % 4) * 1.3,   // was 0.8-2.15 → now 2.4-6.3
+  opa: 0.22 + (i % 6) * 0.07,
   dur: 2.2 + (i % 8) * 0.75,
   delay: (i * 0.38) % 7,
 }));
 
 // Milky Way band stars — concentrated along diagonal (bottom-left → top-right)
 // Band line: y ≈ 72 - 0.62*x  (% coords)
-const WHY_BAND = Array.from({ length: 110 }, (_, i) => {
+const WHY_BAND = Array.from({ length: 130 }, (_, i) => {
   const x = (i * 47 + 3) % 99;
   const yBase = 72 - 0.62 * x;
   const spread = ((i * 29 + 11) % 26) - 13; // -13..+13% spread around band center
   const y = Math.max(1, Math.min(97, yBase + spread));
   const dist = Math.abs(spread) / 13; // 0=center, 1=edge
-  const opa = Math.max(0.06, 0.42 - dist * 0.34 + (i % 5) * 0.03);
+  const opa = Math.max(0.15, 0.65 - dist * 0.42 + (i % 5) * 0.04);
   return {
     id: i + 200,
     x, y,
-    size: dist < 0.35 ? 1.0 + (i % 4) * 0.5 : 0.7 + (i % 2) * 0.3,
+    // center stars: 2-5px; edge stars: 1.5-3px — clearly individual
+    size: dist < 0.35 ? 2.0 + (i % 5) * 0.9 : 1.5 + (i % 3) * 0.6,
     opa,
     dur: 1.8 + (i % 7) * 0.65,
     delay: (i * 0.44) % 6,
@@ -3750,19 +3751,19 @@ function WhyMeBg() {
       {/* Outer diffuse halo */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(148deg, transparent 18%, rgba(203,255,0,0.008) 32%, rgba(203,255,0,0.025) 47%, rgba(190,255,0,0.018) 55%, rgba(203,255,0,0.008) 65%, transparent 80%)",
+        background: "linear-gradient(148deg, transparent 18%, rgba(203,255,0,0.022) 32%, rgba(203,255,0,0.065) 47%, rgba(190,255,0,0.048) 55%, rgba(203,255,0,0.022) 65%, transparent 80%)",
         filter: "blur(28px)",
       }} />
       {/* Core brighter stripe */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(148deg, transparent 34%, rgba(203,255,0,0.005) 43%, rgba(203,255,0,0.016) 49.5%, rgba(203,255,0,0.005) 56%, transparent 66%)",
+        background: "linear-gradient(148deg, transparent 34%, rgba(203,255,0,0.018) 43%, rgba(203,255,0,0.048) 49.5%, rgba(203,255,0,0.018) 56%, transparent 66%)",
         filter: "blur(6px)",
       }} />
       {/* Faint cloud wisps */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(148deg, transparent 28%, rgba(180,255,60,0.006) 40%, rgba(203,255,0,0.013) 50%, rgba(170,240,0,0.006) 60%, transparent 72%)",
+        background: "linear-gradient(148deg, transparent 28%, rgba(180,255,60,0.018) 40%, rgba(203,255,0,0.038) 50%, rgba(170,240,0,0.018) 60%, transparent 72%)",
         filter: "blur(50px)",
       }} />
 
