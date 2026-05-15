@@ -3811,95 +3811,34 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Canvas-based organic wave ribbons — multiple flowing line bands,
-   each band composed of many thin lines at slightly different phases/amps.
-   Mimics the dense flowing ribbon look from the reference. */
+/* Static wave image background for the Process section.
+   1. Image rendered via screen blend — dark bg becomes transparent.
+   2. Acid-green (#CBFF00) overlay via mix-blend-mode:color forces all
+      bright particles to shift to acid green hue while preserving luminosity. */
 function ProcessWaves() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let raf: number;
-    let t = 0;
-    let W = 0, H = 0;
-
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(devicePixelRatio, 2);
-      W = rect.width;
-      H = rect.height;
-      canvas.width  = W * dpr;
-      canvas.height = H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-
-    // Three ribbon bands, each with many lines
-    const BANDS = [
-      { yFrac: 0.38, spread: 0.22, count: 22, ampBase: 38, fq: 0.0038, sp: 0.9,  r: 170, g: 255, b: 0 },
-      { yFrac: 0.52, spread: 0.18, count: 18, ampBase: 52, fq: 0.0028, sp: 0.65, r: 203, g: 255, b: 0 },
-      { yFrac: 0.64, spread: 0.16, count: 16, ampBase: 30, fq: 0.0048, sp: 1.1,  r: 148, g: 230, b: 0 },
-    ];
-
-    const draw = () => {
-      if (W === 0) { raf = requestAnimationFrame(draw); return; }
-      ctx.clearRect(0, 0, W, H);
-
-      for (const band of BANDS) {
-        const yc = H * band.yFrac;
-        for (let li = 0; li < band.count; li++) {
-          const frac   = li / (band.count - 1);          // 0..1
-          const center = Math.abs(frac - 0.5) * 2;       // 0 at centre, 1 at edge
-          const yOff   = (frac - 0.5) * H * band.spread;
-          const amp    = band.ampBase * (1 - center * 0.7);
-          const freq   = band.fq * (1 + frac * 0.4);
-          const phase  = t * band.sp + li * 0.55 + frac * 2.8;
-          // harmonic overtone adds organic irregularity
-          const phase2 = t * band.sp * 1.6 + li * 0.3;
-          const op     = (0.06 + (1 - center) * 0.20);
-          const lw     = 0.5 + (1 - center) * 1.4;
-
-          ctx.beginPath();
-          ctx.strokeStyle = `rgba(${band.r},${band.g},${band.b},${op.toFixed(3)})`;
-          ctx.lineWidth   = lw;
-
-          const step = Math.max(1.5, W / 700);
-          for (let x = 0; x <= W; x += step) {
-            const y = yc + yOff
-              + amp * Math.sin(freq * x + phase)
-              + amp * 0.28 * Math.sin(freq * 2.4 * x + phase2);
-            if (x < step) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-        }
-      }
-
-      t += 0.011;
-      raf = requestAnimationFrame(draw);
-    };
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-    resize();
-    draw();
-    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
-  }, []);
-
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      style={{
+    <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+      {/* Base image — screen blend makes black background invisible */}
+      <img
+        src="/hero/3d-abstract-sound-waves-design-with-flowing-particles.jpg"
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          objectPosition: "center center",
+          opacity: 0.65,
+          filter: "brightness(0.9) saturate(1.2)",
+          mixBlendMode: "screen",
+        }}
+      />
+      {/* Color overlay: forces hue+saturation → acid green, keeps luminosity */}
+      <div style={{
         position: "absolute", inset: 0,
-        width: "100%", height: "100%",
-        opacity: 0.60,
-        pointerEvents: "none",
-      }}
-    />
+        background: "#CBFF00",
+        mixBlendMode: "color",
+        opacity: 0.85,
+      }} />
+    </div>
   );
 }
 
@@ -4098,13 +4037,51 @@ function Contacts() {
     <section id="contacts" className="py-28 md:py-36">
       <div className="max-w-[1280px] mx-auto px-5 md:px-10">
         <Reveal>
-          <div className="relative overflow-hidden rounded-3xl border border-white/[0.07] bg-surface p-10 md:p-16">
+          <div className="relative overflow-hidden rounded-3xl border border-white/[0.07] bg-surface p-10 md:p-16" style={{ minHeight: 340 }}>
+            {/* Acid glow top-left */}
             <div
               aria-hidden
-              className="pointer-events-none absolute -top-32 -right-32 w-80 h-80 rounded-full opacity-30"
-              style={{ background: "radial-gradient(circle, #CBFF00 0%, transparent 70%)", filter: "blur(60px)" }}
+              className="pointer-events-none absolute -top-32 -left-16 w-80 h-80 rounded-full opacity-20"
+              style={{ background: "radial-gradient(circle, #CBFF00 0%, transparent 70%)", filter: "blur(70px)" }}
             />
-            <div className="relative">
+
+            {/* Portrait photo — right side, frosted/matte */}
+            <div aria-hidden style={{
+              position: "absolute", right: 0, top: 0, bottom: 0,
+              width: "46%",
+              overflow: "hidden",
+              pointerEvents: "none",
+            }}>
+              <img
+                src="/hero/прне.png"
+                style={{
+                  position: "absolute", right: 0, top: 0,
+                  height: "100%", width: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  transform: "scaleX(-1)",
+                  filter: "grayscale(20%) brightness(0.52) saturate(0.75)",
+                }}
+              />
+              {/* Fade gradient — card colour bleeds in from left */}
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "linear-gradient(to right, #111111 0%, rgba(17,17,17,0.55) 30%, rgba(17,17,17,0.0) 65%)",
+              }} />
+              {/* Bottom fade */}
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "linear-gradient(to top, #111111 0%, transparent 40%)",
+              }} />
+              {/* Matte dark veil for frosted-glass feel */}
+              <div style={{
+                position: "absolute", inset: 0,
+                background: "rgba(10,18,0,0.28)",
+              }} />
+            </div>
+
+            {/* Content */}
+            <div className="relative" style={{ maxWidth: "54%" }}>
               <m.p variants={fadeUp} className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-5">
                 Контакты
               </m.p>
