@@ -3897,26 +3897,6 @@ function ProcessWaves() {
       pointerEvents: "none",
       overflow: "hidden",
     }}>
-      {/* Particle wave image — screen blend removes dark bg */}
-      <img
-        src="/hero/3d-abstract-sound-waves-design-with-flowing-particles.jpg"
-        style={{
-          position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover",
-          objectPosition: "center center",
-          opacity: 0.55,
-          filter: "brightness(0.9) saturate(1.1)",
-          mixBlendMode: "screen",
-        }}
-      />
-      {/* Acid-green color wash over the image */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "#CBFF00",
-        mixBlendMode: "color",
-        opacity: 0.80,
-      }} />
       {/* SVG wave lines on top — full width, multiple animated bands */}
       <svg
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
