@@ -3883,108 +3883,6 @@ function ProcBlob({ idx, progressMV }: { idx: number; progressMV: MotionValue<nu
   );
 }
 
-/* Organic 3D orb floating behind the Process sphere chain.
-   Follows progressMV left→right in sync with active step.
-   Morphs shape continuously with slow border-radius animation. */
-function ProcessBgOrb({ progressMV }: { progressMV: MotionValue<number> }) {
-  const N = PROCESS.length;
-  // Smooth X: 12% when step=0, 88% when step=N-1
-  const leftPct = useTransform(progressMV, (p) => {
-    const bounded = Math.max(0, Math.min(N - 1, p));
-    return `${12 + (bounded / (N - 1)) * 76}%`;
-  });
-
-  return (
-    <m.div
-      aria-hidden
-      style={{
-        position: "absolute",
-        left: leftPct,
-        top: "50%",
-        translateX: "-50%",
-        translateY: "-50%",
-        width: 360,
-        height: 360,
-        pointerEvents: "none",
-        zIndex: 0,
-      }}
-    >
-      {/* Outer glow — large soft halo */}
-      <m.div
-        animate={{
-          borderRadius: [
-            "60% 40% 55% 45% / 55% 60% 40% 45%",
-            "40% 55% 45% 60% / 60% 40% 55% 45%",
-            "50% 50% 60% 40% / 45% 55% 50% 50%",
-            "60% 40% 55% 45% / 55% 60% 40% 45%",
-          ],
-          rotate: [0, 12, -8, 0],
-        }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse at 42% 38%, rgba(203,255,0,0.22) 0%, rgba(160,220,0,0.10) 40%, transparent 72%)",
-          filter: "blur(18px)",
-        }}
-      />
-      {/* Mid layer — shaped body */}
-      <m.div
-        animate={{
-          borderRadius: [
-            "55% 45% 38% 62% / 62% 38% 55% 45%",
-            "38% 62% 55% 45% / 45% 55% 62% 38%",
-            "62% 38% 45% 55% / 55% 45% 38% 62%",
-            "55% 45% 38% 62% / 62% 38% 55% 45%",
-          ],
-        }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          position: "absolute",
-          inset: "14%",
-          background: "radial-gradient(ellipse at 48% 44%, rgba(203,255,0,0.18) 0%, rgba(100,160,0,0.08) 55%, transparent 80%)",
-          filter: "blur(8px)",
-        }}
-      />
-      {/* Inner bright core */}
-      <m.div
-        animate={{
-          borderRadius: [
-            "50% 50% 45% 55% / 55% 45% 50% 50%",
-            "45% 55% 50% 50% / 50% 50% 45% 55%",
-            "55% 45% 50% 50% / 45% 55% 55% 45%",
-            "50% 50% 45% 55% / 55% 45% 50% 50%",
-          ],
-          scale: [1, 1.06, 0.97, 1],
-        }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          position: "absolute",
-          inset: "28%",
-          background: "radial-gradient(ellipse at 50% 46%, rgba(203,255,0,0.30) 0%, rgba(180,255,0,0.10) 50%, transparent 80%)",
-          filter: "blur(4px)",
-        }}
-      />
-      {/* Sharp bright rim — defines the sphere edge */}
-      <m.div
-        animate={{
-          borderRadius: [
-            "58% 42% 48% 52% / 52% 48% 42% 58%",
-            "42% 58% 52% 48% / 48% 52% 58% 42%",
-            "58% 42% 48% 52% / 52% 48% 42% 58%",
-          ],
-        }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          position: "absolute", inset: "4%",
-          border: "1px solid rgba(203,255,0,0.12)",
-          boxShadow: "inset 0 0 40px rgba(203,255,0,0.06), 0 0 60px rgba(203,255,0,0.08)",
-          filter: "blur(1px)",
-        }}
-      />
-    </m.div>
-  );
-}
-
 /* Text label — lives in a circle clip container (same scale as blob).
    clip-path:circle(50%) is more reliable than overflow:hidden alone for
    CSS-transformed content — clips the painted area, not just layout bounds.
@@ -4119,6 +4017,84 @@ function ProcLabel({ proc, idx, progressMV }: { proc: (typeof PROCESS)[0]; idx: 
   );
 }
 
+function ProcessMobile() {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setStep(s => (s + 1) % PROCESS.length), 2800);
+    return () => clearInterval(id);
+  }, []);
+
+  const cur = PROCESS[step];
+
+  return (
+    <div className="md:hidden flex flex-col items-center py-4">
+      <div style={{ position: "relative", width: 240, height: 240, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {/* Emanating rings */}
+        {[0, 0.55, 1.1].map((delay, i) => (
+          <m.div
+            key={i}
+            aria-hidden
+            style={{
+              position: "absolute", width: 200, height: 200, borderRadius: "50%",
+              border: "0.75px solid #CBFF00", pointerEvents: "none",
+            }}
+            animate={{ scale: [1.0, 1.7], opacity: [0.28, 0] }}
+            transition={{ duration: 2.0, repeat: Infinity, delay, ease: "easeOut" }}
+          />
+        ))}
+        {/* Sphere */}
+        <AnimatePresence mode="wait">
+          <m.div
+            key={step}
+            initial={{ scale: 0.25, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 1.15, opacity: 0 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              width: 200, height: 200, borderRadius: "50%",
+              background: "#CBFF00",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexDirection: "column", gap: 4,
+              boxShadow: "0 0 60px rgba(203,255,0,0.35)",
+            }}
+          >
+            <span style={{ fontSize: 44, fontWeight: 700, color: "#0B0B0C", lineHeight: 1, fontFamily: "monospace", letterSpacing: "-0.02em" }}>
+              {cur.n}
+            </span>
+          </m.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Step title + desc */}
+      <AnimatePresence mode="wait">
+        <m.div
+          key={step}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          style={{ textAlign: "center", padding: "20px 24px 0", minHeight: 100 }}
+        >
+          <h3 style={{ color: "white", fontSize: 20, fontWeight: 600, marginBottom: 8, letterSpacing: "0.01em" }}>{cur.title}</h3>
+          <p style={{ color: "#71717a", fontSize: 15, lineHeight: 1.6 }}>{cur.desc}</p>
+        </m.div>
+      </AnimatePresence>
+
+      {/* Step dots */}
+      <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
+        {PROCESS.map((_, i) => (
+          <div key={i} style={{
+            width: i === step ? 20 : 6, height: 6, borderRadius: 3,
+            background: i === step ? "#CBFF00" : "rgba(203,255,0,0.2)",
+            transition: "all 0.4s ease",
+          }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Process() {
   const progressMV = useMotionValue(0);
 
@@ -4135,11 +4111,10 @@ function Process() {
             Как работаем
           </m.h2>
         </Reveal>
-        <div>
+        <ProcessMobile />
+        <div className="hidden md:block">
           <div style={{ position: "relative", height: PROC_ROW_H }}>
             <GooFilter />
-            {/* Layer 0: organic orb floating in sync with active step */}
-            <ProcessBgOrb progressMV={progressMV} />
             {/* Layer 1: gooey organic chain — circles merge via SVG filter */}
             <div
               style={{
@@ -4209,6 +4184,12 @@ function Contacts() {
                 33%     { transform: scaleX(-1) scale(1.02) translate(-3px, -4px); }
                 66%     { transform: scaleX(-1) scale(1.01) translate(2px, -2px); }
               }
+              @media (max-width: 767px) {
+                .contacts-photo { width: 100% !important; left: 0 !important; }
+                .contacts-photo img { filter: grayscale(40%) brightness(0.42) saturate(0.60) !important; }
+                .contacts-photo .contacts-fade-left { background: linear-gradient(to top, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.80) 40%, rgba(10,10,10,0.2) 100%) !important; }
+                .contacts-content { max-width: 100% !important; position: relative; z-index: 3 !important; padding-bottom: 8px; }
+              }
             `}</style>
 
             {/* Acid glow top-left */}
@@ -4225,20 +4206,20 @@ function Contacts() {
             }}>
               <div style={{
                 position: "absolute", inset: 0,
-                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.10) 48%, rgba(255,255,220,0.14) 53%, transparent 66%)",
-                animation: "glintFull 7s ease-in-out infinite",
+                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.13) 48%, rgba(255,255,220,0.18) 53%, transparent 66%)",
+                animation: "glintFull 21s ease-in-out infinite",
                 animationDelay: "0.8s",
               }} />
               <div style={{
                 position: "absolute", inset: 0,
-                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.07) 48%, rgba(255,255,255,0.10) 53%, transparent 66%)",
-                animation: "glintFull 7s ease-in-out infinite",
-                animationDelay: "4.3s",
+                background: "linear-gradient(105deg, transparent 35%, rgba(203,255,0,0.09) 48%, rgba(255,255,255,0.13) 53%, transparent 66%)",
+                animation: "glintFull 21s ease-in-out infinite",
+                animationDelay: "11.8s",
               }} />
             </div>
 
-            {/* Portrait photo — right side, frosted/matte + animations */}
-            <div aria-hidden style={{
+            {/* Portrait photo — right side on desktop, full-bg on mobile */}
+            <div aria-hidden className="contacts-photo" style={{
               position: "absolute", right: 0, top: 0, bottom: 0,
               width: "46%",
               overflow: "hidden",
@@ -4297,7 +4278,7 @@ function Contacts() {
               }} />
 
               {/* Fade gradient — left bleed */}
-              <div style={{
+              <div className="contacts-fade-left" style={{
                 position: "absolute", inset: 0,
                 background: "linear-gradient(to right, #111111 0%, rgba(17,17,17,0.55) 30%, rgba(17,17,17,0.0) 65%)",
               }} />
@@ -4314,7 +4295,7 @@ function Contacts() {
             </div>
 
             {/* Content */}
-            <div className="relative" style={{ maxWidth: "54%" }}>
+            <div className="relative contacts-content" style={{ maxWidth: "54%" }}>
               <m.p variants={fadeUp} className="text-[11px] font-mono uppercase tracking-[0.22em] text-accent mb-5">
                 Контакты
               </m.p>
