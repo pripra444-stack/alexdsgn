@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { LazyMotion, domAnimation } from "framer-motion";
 import "./index.css";
 
@@ -11,7 +11,7 @@ const Privacy   = lazy(() => import("./pages/Privacy"));
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <LazyMotion features={domAnimation} strict>
-      <BrowserRouter>
+      <HashRouter>
         <Suspense fallback={null}>
           <Routes>
             <Route path="/"        element={<Portfolio />} />
@@ -19,7 +19,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/privacy" element={<Privacy />} />
           </Routes>
         </Suspense>
-      </BrowserRouter>
+      </HashRouter>
     </LazyMotion>
   </React.StrictMode>
 );
