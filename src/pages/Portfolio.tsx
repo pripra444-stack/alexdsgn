@@ -4,7 +4,7 @@ import { m, useInView, useMotionValue, useTransform, animate, AnimatePresence, u
 
 // ─── Links ───────────────────────────────────────────────────────────────────
 const TG_LINK = "https://t.me/AlexanderPanurin";
-const BEHANCE_LINK = "https://www.behance.net/alexanderpanurin";
+const BEHANCE_LINK = "https://www.behance.net/alexandpanurin";
 
 // ─── Animation helpers ───────────────────────────────────────────────────────
 const fadeUp = {
