@@ -286,7 +286,7 @@ const HERO_CARDS: HeroCard[] = [
   {
     id: "headphones",
     title: "Карточка наушников",
-    img: "/hero/card-headphones.png",
+    img: import.meta.env.BASE_URL + "hero/card-headphones.png",
     metric: { label: "CTR", num: 32, chart: "line" },
     rotate: -9,
     floatY: 14,
@@ -300,7 +300,7 @@ const HERO_CARDS: HeroCard[] = [
   {
     id: "drill",
     title: "Карточка дрели",
-    img: "/hero/card-drill.png",
+    img: import.meta.env.BASE_URL + "hero/card-drill.png",
     metric: { label: "Просмотры", num: 47, chart: "line" },
     rotate: 7,
     floatY: 10,
@@ -314,7 +314,7 @@ const HERO_CARDS: HeroCard[] = [
   {
     id: "thermos",
     title: "Карточка термобутылки",
-    img: "/hero/card-thermos.png",
+    img: import.meta.env.BASE_URL + "hero/card-thermos.png",
     rotate: -5,
     floatY: 16,
     dur: 5.5,
@@ -327,7 +327,7 @@ const HERO_CARDS: HeroCard[] = [
   {
     id: "serum",
     title: "Карточка сыворотки",
-    img: "/hero/card-serum.png",
+    img: import.meta.env.BASE_URL + "hero/card-serum.png",
     metric: { label: "Конверсия", num: 28, chart: "ring" },
     rotate: 8,
     floatY: 12,
@@ -839,7 +839,7 @@ function AvatarPanel() {
       {/* Raw image — no border, no shadow, no rounded clip.
           Dark background in the PNG matches the site canvas so edges vanish. */}
       <img
-        src="/hero/avatar.png"
+        src={import.meta.env.BASE_URL + "hero/avatar.png"}
         alt="Alex"
         className="w-full h-auto block select-none"
         draggable={false}
@@ -856,7 +856,7 @@ function Hero() {
       {/* ── Background photo — BG HS 1.png as full-cover hero image ── */}
       <div aria-hidden className="absolute inset-0 z-0">
         <img
-          src="/hero/BG HS 2.png"
+          src={import.meta.env.BASE_URL + "hero/BG HS 2.png"}
           alt=""
           className="w-full h-full object-cover object-center select-none brightness-75 md:brightness-100"
           draggable={false}
@@ -1061,49 +1061,49 @@ const SERVICES: Array<{
 
 // ─── Slideshow slide sets ─────────────────────────────────────────────────────
 const SHOWCASE_SLIDES = [
-  { img: "/hero/card%2001.png", label: "Первый слайд" },
-  { img: "/hero/card%2002.png", label: "Второй слайд" },
-  { img: "/hero/card%2003.png", label: "Третий слайд" },
+  { img: import.meta.env.BASE_URL + "hero/card%2001.png", label: "Первый слайд" },
+  { img: import.meta.env.BASE_URL + "hero/card%2002.png", label: "Второй слайд" },
+  { img: import.meta.env.BASE_URL + "hero/card%2003.png", label: "Третий слайд" },
 ];
 
 const HERO_SLIDES = [
-  { img: "/hero/hero%20001.png", label: "Робот-мойщик окон" },
-  { img: "/hero/hero%20002.png", label: "Аппликатор Кузнецова" },
-  { img: "/hero/hero%20003.png", label: "Машинка для стрижки волос" },
-  { img: "/hero/hero%20004.png", label: "Наушники" },
+  { img: import.meta.env.BASE_URL + "hero/hero%20001.png", label: "Робот-мойщик окон" },
+  { img: import.meta.env.BASE_URL + "hero/hero%20002.png", label: "Аппликатор Кузнецова" },
+  { img: import.meta.env.BASE_URL + "hero/hero%20003.png", label: "Машинка для стрижки волос" },
+  { img: import.meta.env.BASE_URL + "hero/hero%20004.png", label: "Наушники" },
 ];
 
 const AI_SLIDES = [
-  { img: "/hero/ai%20visual%20001.png", label: "Прохладительные напитки" },
-  { img: "/hero/ai%20visual%20002.png", label: "Собачий корм" },
-  { img: "/hero/ai%20visual%20003.png", label: "Зубная паста" },
+  { img: import.meta.env.BASE_URL + "hero/ai%20visual%20001.png", label: "Прохладительные напитки" },
+  { img: import.meta.env.BASE_URL + "hero/ai%20visual%20002.png", label: "Собачий корм" },
+  { img: import.meta.env.BASE_URL + "hero/ai%20visual%20003.png", label: "Зубная паста" },
 ];
 
 const VORONKA_SLIDES = [
-  { img: "/hero/voronka%2001.png", label: "Воронка 1" },
-  { img: "/hero/voronka%2002.png", label: "Воронка 2" },
-  { img: "/hero/voronka%2003.png", label: "Воронка 3" },
+  { img: import.meta.env.BASE_URL + "hero/voronka%2001.png", label: "Воронка 1" },
+  { img: import.meta.env.BASE_URL + "hero/voronka%2002.png", label: "Воронка 2" },
+  { img: import.meta.env.BASE_URL + "hero/voronka%2003.png", label: "Воронка 3" },
 ];
 
 const PROJECT_SLIDES = [
-  { img: "/hero/project%20card%2001.png", label: "Исходная карточка" },
-  { img: "/hero/project%20card%2002.png", label: "Разработка воронки" },
-  { img: "/hero/project%20card%2003.png", label: "Готовая карточка" },
-  { img: "/hero/project%20card%2004.png", label: "Результат" },
+  { img: import.meta.env.BASE_URL + "hero/project%20card%2001.png", label: "Исходная карточка" },
+  { img: import.meta.env.BASE_URL + "hero/project%20card%2002.png", label: "Разработка воронки" },
+  { img: import.meta.env.BASE_URL + "hero/project%20card%2003.png", label: "Готовая карточка" },
+  { img: import.meta.env.BASE_URL + "hero/project%20card%2004.png", label: "Результат" },
 ];
 
 const HERO_PROJECT_SLIDES = [
-  { img: "/hero/hero%20project%2001.svg", label: "Исходный Hero-экран" },
-  { img: "/hero/hero%20project%2002.svg", label: "Разработка" },
-  { img: "/hero/hero%20project%2003.svg", label: "Готовый Hero-экран" },
-  { img: "/hero/hero%20project%2004.svg", label: "Результат" },
+  { img: import.meta.env.BASE_URL + "hero/hero%20project%2001.svg", label: "Исходный Hero-экран" },
+  { img: import.meta.env.BASE_URL + "hero/hero%20project%2002.svg", label: "Разработка" },
+  { img: import.meta.env.BASE_URL + "hero/hero%20project%2003.svg", label: "Готовый Hero-экран" },
+  { img: import.meta.env.BASE_URL + "hero/hero%20project%2004.svg", label: "Результат" },
 ];
 
 const FASHION_SLIDES = [
-  { img: "/hero/Project%20jacket%20Card%20001.png", label: "Задача" },
-  { img: "/hero/Project%20jacket%20Card%20002.png", label: "Визуальная система" },
-  { img: "/hero/Project%20jacket%20Card%20003.png", label: "Серия из 9 слайдов" },
-  { img: "/hero/Project%20jacket%20Card%20004.png", label: "Результат" },
+  { img: import.meta.env.BASE_URL + "hero/Project%20jacket%20Card%20001.png", label: "Задача" },
+  { img: import.meta.env.BASE_URL + "hero/Project%20jacket%20Card%20002.png", label: "Визуальная система" },
+  { img: import.meta.env.BASE_URL + "hero/Project%20jacket%20Card%20003.png", label: "Серия из 9 слайдов" },
+  { img: import.meta.env.BASE_URL + "hero/Project%20jacket%20Card%20004.png", label: "Результат" },
 ];
 
 const SWIM_SLIDES: SlideEntry[] = [
@@ -1259,7 +1259,7 @@ const PRODUCT_DECK_DATA: SubsectionSlideData[] = [
       { icon: "✓", title: "3 ГЛАВНЫХ УТП",      desc: "супермягкий, не скользит, быстро сохнет" },
       { icon: "◑", title: "ЯСНЫЙ РАЗМЕР",       desc: "40×60 см вынесен прямо под заголовок" },
     ],
-    img: "/hero/card%2001.png",
+    img: import.meta.env.BASE_URL + "hero/card%2001.png",
     imgAlt: "Главная карточка товара",
   },
   {
@@ -1271,7 +1271,7 @@ const PRODUCT_DECK_DATA: SubsectionSlideData[] = [
       { icon: "♡", title: "ТАКТИЛЬНОСТЬ",      desc: "крупный план фактуры — хочется потрогать" },
       { icon: "◆", title: "ЭМОЦИЯ КОМФОРТА",   desc: "тёплый свет и шоколадный оттенок продают уют" },
     ],
-    img: "/hero/card%2002.png",
+    img: import.meta.env.BASE_URL + "hero/card%2002.png",
     imgAlt: "Слайд про эффект памяти",
   },
   {
@@ -1283,7 +1283,7 @@ const PRODUCT_DECK_DATA: SubsectionSlideData[] = [
       { icon: "▼", title: "БЕЗОПАСНОСТЬ",     desc: "ПВХ-основа — не скользит даже на мокром полу" },
       { icon: "◉", title: "КОНТЕКСТ ПРИМЕНЕНИЯ", desc: "интерьер ванной задаёт сценарий использования" },
     ],
-    img: "/hero/card%2003.png",
+    img: import.meta.env.BASE_URL + "hero/card%2003.png",
     imgAlt: "Слайд с размерами товара",
   },
 ];
@@ -1298,7 +1298,7 @@ const HERO_DECK_DATA: SubsectionSlideData[] = [
       { icon: "✦", title: "ДРАМАТИЧНЫЙ КАДР", desc: "лицо за окном создаёт WOW-эффект" },
       { icon: "◇", title: "БРЕНД-АКЦЕНТ",     desc: "Cleanbot вынесен в верхний правый угол" },
     ],
-    img: "/hero/hero%20001.png",
+    img: import.meta.env.BASE_URL + "hero/hero%20001.png",
     imgAlt: "HERO-экран робота-мойщика",
   },
   {
@@ -1310,7 +1310,7 @@ const HERO_DECK_DATA: SubsectionSlideData[] = [
       { icon: "✓", title: "ИКОНКИ-ПРЕИМУЩЕСТВА",     desc: "три главные пользы понятны без чтения" },
       { icon: "◎", title: "ИСТОРИЯ БРЕНДА",          desc: "«с 1998 года» = доверие и проверенность" },
     ],
-    img: "/hero/hero%20002.png",
+    img: import.meta.env.BASE_URL + "hero/hero%20002.png",
     imgAlt: "HERO-экран аппликатора Кузнецова",
   },
   {
@@ -1322,7 +1322,7 @@ const HERO_DECK_DATA: SubsectionSlideData[] = [
       { icon: "★", title: "ИКОНКИ ФУНКЦИЙ",   desc: "комплектация показана сразу — снимаем возражения" },
       { icon: "✦", title: "МУЖСКОЙ КОД",      desc: "тёмные цвета и металл говорят с целевой аудиторией" },
     ],
-    img: "/hero/hero%20003.png",
+    img: import.meta.env.BASE_URL + "hero/hero%20003.png",
     imgAlt: "HERO-экран машинки для стрижки",
   },
   {
@@ -1334,7 +1334,7 @@ const HERO_DECK_DATA: SubsectionSlideData[] = [
       { icon: "◐", title: "ЧИСТАЯ ТИПОГРАФИКА", desc: "лаконичный текст не отвлекает от продукта" },
       { icon: "✓", title: "ФОКУС НА ПРОДУКТЕ",  desc: "наушники в центре, всё остальное вторично" },
     ],
-    img: "/hero/hero%20004.png",
+    img: import.meta.env.BASE_URL + "hero/hero%20004.png",
     imgAlt: "HERO-экран беспроводных наушников",
   },
 ];
@@ -1349,7 +1349,7 @@ const AI_DECK_DATA: SubsectionSlideData[] = [
       { icon: "⚡", title: "СКОРОСТЬ",      desc: "финальный кадр за 3 часа вместо недели студии" },
       { icon: "◇", title: "ГИБРИД БРЕНДА",  desc: "узнаваемая Coca-Cola в неожиданном контексте" },
     ],
-    img: "/hero/ai%20visual%20001.png",
+    img: import.meta.env.BASE_URL + "hero/ai%20visual%20001.png",
     imgAlt: "AI-визуал Coca-Cola с роботом",
   },
   {
@@ -1361,7 +1361,7 @@ const AI_DECK_DATA: SubsectionSlideData[] = [
       { icon: "★", title: "АППЕТИТНОСТЬ",       desc: "фактура корма выглядит свежей и крупной" },
       { icon: "✓", title: "БРЕНД В ФОКУСЕ",     desc: "упаковка читается с первого взгляда" },
     ],
-    img: "/hero/ai%20visual%20002.png",
+    img: import.meta.env.BASE_URL + "hero/ai%20visual%20002.png",
     imgAlt: "AI-визуал собачьего корма",
   },
   {
@@ -1373,7 +1373,7 @@ const AI_DECK_DATA: SubsectionSlideData[] = [
       { icon: "◑", title: "ЦВЕТОВОЙ КОД",    desc: "холодная палитра ассоциируется с чистотой" },
       { icon: "✓", title: "FOCUS ON PRODUCT", desc: "тюбик в центре кадра, всё остальное декор" },
     ],
-    img: "/hero/ai%20visual%20003.png",
+    img: import.meta.env.BASE_URL + "hero/ai%20visual%20003.png",
     imgAlt: "AI-визуал зубной пасты",
   },
 ];
@@ -1424,10 +1424,10 @@ const BRAND_META: Record<BrandKey, {
   // OZON (4 chars):       medium.
   // ЯНДЕКС (6 Cyrillic):  small enough to fit fully inside.
   // AVITO (5 chars):      between OZON and ЯНДЕКС.
-  wb:     { short: "WB",     logo: "/hero/logo-wb-acid.png",     wmarkSize: "min(38vw, 370px)" },
-  ozon:   { short: "OZON",   logo: "/hero/logo-ozon-acid.png",   wmarkSize: "min(22vw, 215px)" },
-  yandex: { short: "ЯНДЕКС", logo: "/hero/logo-yandex-acid.png", wmarkSize: "min(13vw, 128px)" },
-  avito:  { short: "AVITO",  logo: "/hero/logo-avito-acid.png",  wmarkSize: "min(18vw, 175px)" },
+  wb:     { short: "WB",     logo: import.meta.env.BASE_URL + "hero/logo-wb-acid.png",     wmarkSize: "min(38vw, 370px)" },
+  ozon:   { short: "OZON",   logo: import.meta.env.BASE_URL + "hero/logo-ozon-acid.png",   wmarkSize: "min(22vw, 215px)" },
+  yandex: { short: "ЯНДЕКС", logo: import.meta.env.BASE_URL + "hero/logo-yandex-acid.png", wmarkSize: "min(13vw, 128px)" },
+  avito:  { short: "AVITO",  logo: import.meta.env.BASE_URL + "hero/logo-avito-acid.png",  wmarkSize: "min(18vw, 175px)" },
 };
 
 /* Uniform display box for every brand wordmark — same maxH/maxW so square
@@ -1688,7 +1688,7 @@ function Services() {
         }}
       >
         <m.img
-          src="/hero/bg-3d.png"
+          src={import.meta.env.BASE_URL + "hero/bg-3d.png"}
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -2517,7 +2517,7 @@ function GogglesSlide1() {
             boxShadow: "0 22px 60px rgba(0,0,0,0.70), 0 0 32px rgba(203,255,0,0.18)",
           }}
         >
-          <img src="/hero/goggles-product.png" alt="Карточка до редизайна" draggable={false}
+          <img src={import.meta.env.BASE_URL + "hero/goggles-product.png"} alt="Карточка до редизайна" draggable={false}
             style={{ width: "100%", height: "auto", display: "block", borderRadius: 16 }}/>
         </m.div>
       </div>
@@ -2739,7 +2739,7 @@ function GogglesSlide2() {
               position: "absolute", left: "-6%", bottom: "6%", width: "84%", zIndex: 2,
             }}
           >
-            <img src="/hero/goggles-slide2-a.png" alt="Очки" draggable={false}
+            <img src={import.meta.env.BASE_URL + "hero/goggles-slide2-a.png"} alt="Очки" draggable={false}
               style={{ width: "100%", height: "auto", display: "block",
                 filter: "drop-shadow(0 26px 54px rgba(0,0,0,0.88)) drop-shadow(0 0 38px rgba(203,255,0,0.30))" }}/>
           </m.div>
@@ -2889,7 +2889,7 @@ function GogglesSlide3() {
           }}
         >
           <img
-            src="/hero/goggles-card.png"
+            src={import.meta.env.BASE_URL + "hero/goggles-card.png"}
             alt="Новый Hero-визуал — FitSmile очки"
             draggable={false}
             style={{ width: "100%", height: "auto", display: "block", borderRadius: 16 }}
@@ -2903,10 +2903,10 @@ function GogglesSlide3() {
 
 // ─── Swim goggles — Slide 4: «Дополнительные слайды» ────────────────────────
 const GS4_CARDS = [
-  { n: "1", title: "НЕ ЗАПОТЕВАЮТ",  sub: "Anti-fog покрытие",  img: "/hero/goggles-extra-1.png" },
-  { n: "2", title: "МЯГКАЯ ПОСАДКА", sub: "без следов и давления", img: "/hero/goggles-extra-2.png" },
-  { n: "3", title: "ГЕРМЕТИЧНОСТЬ",  sub: "100% — ни капли воды",  img: "/hero/goggles-extra-3.png" },
-  { n: "4", title: "ТОЧНАЯ ПОСАДКА", sub: "все размеры в наличии", img: "/hero/goggles-extra-4.png" },
+  { n: "1", title: "НЕ ЗАПОТЕВАЮТ",  sub: "Anti-fog покрытие",  img: import.meta.env.BASE_URL + "hero/goggles-extra-1.png" },
+  { n: "2", title: "МЯГКАЯ ПОСАДКА", sub: "без следов и давления", img: import.meta.env.BASE_URL + "hero/goggles-extra-2.png" },
+  { n: "3", title: "ГЕРМЕТИЧНОСТЬ",  sub: "100% — ни капли воды",  img: import.meta.env.BASE_URL + "hero/goggles-extra-3.png" },
+  { n: "4", title: "ТОЧНАЯ ПОСАДКА", sub: "все размеры в наличии", img: import.meta.env.BASE_URL + "hero/goggles-extra-4.png" },
 ] as const;
 
 const GS4_RESULTS = [
@@ -3369,7 +3369,7 @@ function CaseCard({ c, onOpen, isHovered }: { c: (typeof CASES)[0]; onOpen?: () 
           /* Case 1 — product card preview */
           <img
             aria-hidden
-            src="/hero/project%20card%2003.png"
+            src={import.meta.env.BASE_URL + "hero/project%20card%2003.png"}
             alt=""
             draggable={false}
             className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
@@ -3388,7 +3388,7 @@ function CaseCard({ c, onOpen, isHovered }: { c: (typeof CASES)[0]; onOpen?: () 
           /* Case 2 — hero screen preview */
           <img
             aria-hidden
-            src="/hero/hero%20project%2003.svg"
+            src={import.meta.env.BASE_URL + "hero/hero%20project%2003.svg"}
             alt=""
             draggable={false}
             className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
@@ -3407,7 +3407,7 @@ function CaseCard({ c, onOpen, isHovered }: { c: (typeof CASES)[0]; onOpen?: () 
           /* Case 4 — fashion jacket brand preview */
           <img
             aria-hidden
-            src="/hero/Project%20jacket%20Card%20004.png"
+            src={import.meta.env.BASE_URL + "hero/Project%20jacket%20Card%20004.png"}
             alt=""
             draggable={false}
             className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
@@ -3426,7 +3426,7 @@ function CaseCard({ c, onOpen, isHovered }: { c: (typeof CASES)[0]; onOpen?: () 
           /* Case 6 — swim goggles sport brand preview */
           <img
             aria-hidden
-            src="/hero/Project%20Card%20003.png"
+            src={import.meta.env.BASE_URL + "hero/Project%20Card%20003.png"}
             alt=""
             draggable={false}
             className="absolute pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
@@ -3565,7 +3565,7 @@ function Cases() {
         }}
       >
         <m.img
-          src="/hero/bg-3d-spiral.png"
+          src={import.meta.env.BASE_URL + "hero/bg-3d-spiral.png"}
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -3629,7 +3629,7 @@ function Cases() {
                 }}
               >
                 <video
-                  src="/hero/%D1%81%D0%B0%D0%B9%D1%82%20%D0%BF%D0%BE%D1%80%D1%82%D1%84%D0%BE%D0%BB%D0%B8%D0%BE%20%D0%B2%D0%B8%D0%B4%D0%B5%D0%BE%20%D0%BA%D0%B8%D1%81%D0%BB.mp4"
+                  src={import.meta.env.BASE_URL + "hero/%D1%81%D0%B0%D0%B9%D1%82%20%D0%BF%D0%BE%D1%80%D1%82%D1%84%D0%BE%D0%BB%D0%B8%D0%BE%20%D0%B2%D0%B8%D0%B4%D0%B5%D0%BE%20%D0%BA%D0%B8%D1%81%D0%BB.mp4"}
                   autoPlay
                   loop
                   muted
@@ -3695,11 +3695,11 @@ function Cases() {
 
 // ─── WHY ME ───────────────────────────────────────────────────────────────────
 const WHY = [
-  { n: "01", title: "Работа на результат",              desc: "Не «красиво» — а CTR и продажи. Дизайн — это инструмент, а не искусство.",        img: "/hero/why-01.png" },
-  { n: "02", title: "Знаю маркетплейсы изнутри",        desc: "Понимаю алгоритмы, конкурентный анализ, логику выдачи WB и Ozon.",               img: "/hero/why-02.png" },
-  { n: "03", title: "AI как конкурентное преимущество", desc: "Midjourney, Flux, ControlNet — генерирую уникальный визуал за часы, а не дни.",  img: "/hero/why-03.png" },
-  { n: "04", title: "Коммерческий уровень",             desc: "Дизайн как у топ-продавцов. Без стоков, без шаблонов, без «просто красиво».",    img: "/hero/why-04.png" },
-  { n: "05", title: "Скорость без потери качества",     desc: "Первые концепции — за 24–48 часов. Правки — в тот же день.",                     img: "/hero/why-05.png" },
+  { n: "01", title: "Работа на результат",              desc: "Не «красиво» — а CTR и продажи. Дизайн — это инструмент, а не искусство.",        img: import.meta.env.BASE_URL + "hero/why-01.png" },
+  { n: "02", title: "Знаю маркетплейсы изнутри",        desc: "Понимаю алгоритмы, конкурентный анализ, логику выдачи WB и Ozon.",               img: import.meta.env.BASE_URL + "hero/why-02.png" },
+  { n: "03", title: "AI как конкурентное преимущество", desc: "Midjourney, Flux, ControlNet — генерирую уникальный визуал за часы, а не дни.",  img: import.meta.env.BASE_URL + "hero/why-03.png" },
+  { n: "04", title: "Коммерческий уровень",             desc: "Дизайн как у топ-продавцов. Без стоков, без шаблонов, без «просто красиво».",    img: import.meta.env.BASE_URL + "hero/why-04.png" },
+  { n: "05", title: "Скорость без потери качества",     desc: "Первые концепции — за 24–48 часов. Правки — в тот же день.",                     img: import.meta.env.BASE_URL + "hero/why-05.png" },
 ];
 
 /* Card uses two fixed regions:
@@ -4412,7 +4412,7 @@ function Contacts() {
             }}>
               {/* Photo with float animation + brightness +12% */}
               <img
-                src="/hero/прне.png"
+                src={import.meta.env.BASE_URL + "hero/прне.png"}
                 style={{
                   position: "absolute", right: 0, top: 0,
                   height: "100%", width: "100%",
