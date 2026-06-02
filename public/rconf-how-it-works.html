@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Как работает RConf AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #f0f0f8;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+/* ── Section ── */
+.section {
+  width: 100%;
+  max-width: 1160px;
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #fff;
+  border: 1px solid #e0e0ee;
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #5b6cf0;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #5b6cf0; }
+
+.section-title {
+  font-size: 42px;
+  font-weight: 800;
+  color: #0e0e1f;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.section-sub {
+  font-size: 15px;
+  color: #6c6c8a;
+  line-height: 1.65;
+  max-width: 500px;
+  margin: 0 auto 52px;
+  font-weight: 400;
+}
+
+/* ── Row ── */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr 40px 1fr;
+  align-items: center;
+  gap: 0;
+}
+
+.arrow-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px; /* shift down to card content area */
+}
+
+/* ── Card ── */
+.card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 24px 24px 22px;
+  border: 1px solid #e8e8f4;
+  box-shadow: 0 2px 16px rgba(60,60,120,0.06), 0 8px 40px rgba(60,60,120,0.05);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b0b0cc;
+}
+.card-num {
+  font-size: 14px;
+  font-weight: 500;
+  color: #d8d8ec;
+  letter-spacing: 0.02em;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0e0e1f;
+  line-height: 1.3;
+  margin-bottom: 18px;
+}
+
+/* ════════════════════════════
+   CARD 1 – ДИАЛОГ
+════════════════════════════ */
+.messenger {
+  flex: 1;
+  border: 1px solid #eaeaf4;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar */
+.msg-topbar {
+  background: #f7f7fc;
+  border-bottom: 1px solid #eaeaf4;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.msg-appicon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: linear-gradient(135deg, #5b6cf0, #9055f5);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.msg-appicon svg { width: 15px; height: 15px; fill: #fff; }
+.msg-appname { font-size: 13px; font-weight: 700; color: #0e0e1f; }
+
+/* Body */
+.msg-body {
+  display: flex;
+  flex: 1;
+}
+
+/* Sidebar */
+.msg-sidebar {
+  width: 38px;
+  background: #f7f7fc;
+  border-right: 1px solid #eaeaf4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 0;
+  gap: 16px;
+}
+.sb-icon { width: 18px; height: 18px; color: #c0c0da; }
+.sb-icon.on { color: #5b6cf0; }
+
+/* Messages */
+.msg-feed {
+  flex: 1;
+  padding: 14px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.msg-item { display: flex; gap: 9px; align-items: flex-start; }
+.av {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+}
+.av-a { background: #e8756a; }
+.av-i { background: #5b9cf0; }
+.av-m { background: #6ac47a; }
+
+.msg-right {}
+.msg-head {
+  display: flex; gap: 7px; align-items: baseline;
+  margin-bottom: 3px;
+}
+.msg-name { font-size: 12px; font-weight: 700; color: #1a1a30; }
+.msg-time { font-size: 10px; color: #b8b8d0; }
+.msg-text { font-size: 12px; color: #4a4a70; line-height: 1.5; }
+
+/* Footer */
+.msg-footer {
+  border-top: 1px solid #eaeaf4;
+  padding: 9px 14px;
+  background: #fafafd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.msg-footer-label { font-size: 11px; color: #7070a0; }
+.msg-footer-right { display: flex; align-items: center; gap: 8px; }
+.mini-avs { display: flex; }
+.mini-av {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid #fff;
+  margin-left: -6px;
+}
+.mini-av:first-child { margin-left: 0; }
+.mav1 { background: #e8756a; }
+.mav2 { background: #5b9cf0; }
+.footer-count { font-size: 11px; color: #7070a0; font-weight: 600; }
+
+/* ════════════════════════════
+   CARD 2 – AI-АНАЛИЗ
+════════════════════════════ */
+.analysis-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.analysis-main {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+/* Brain */
+.brain-container {
+  width: 140px;
+  flex-shrink: 0;
+}
+.brain-container svg { width: 100%; height: auto; display: block; }
+
+/* Stats */
+.stats-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.stats-head {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b0b0cc;
+  margin-bottom: 2px;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f7f7fc;
+  border: 1px solid #eaeaf4;
+  border-radius: 9px;
+  padding: 7px 11px;
+}
+.stat-name { font-size: 11px; color: #5050780; font-weight: 500; color: #505078; }
+.stat-val { font-size: 12px; font-weight: 700; color: #0e0e1f; display: flex; align-items: center; gap: 4px; }
+.stat-val.g { color: #22c55e; }
+.stat-val.o { color: #f59e0b; }
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f4f4fb;
+  border: 1px solid #e8e8f4;
+  border-radius: 100px;
+  padding: 5px 11px;
+  font-size: 11px;
+  color: #7070a0;
+  font-weight: 500;
+}
+.tag svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+/* ════════════════════════════
+   CARD 3 – РАЗВИТИЕ
+════════════════════════════ */
+.growth-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Chart + rocket area */
+.chart-area {
+  position: relative;
+  height: 130px;
+  background: linear-gradient(155deg, #eeecff 0%, #f5f3ff 60%, #fafaff 100%);
+  border-radius: 14px;
+  border: 1px solid #e8e4f8;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 18px 0 18px;
+}
+
+/* Bars */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 90px;
+  padding-bottom: 14px;
+}
+.b {
+  width: 16px;
+  border-radius: 5px 5px 0 0;
+}
+.b1 { height: 25%; background: #c4baff; }
+.b2 { height: 40%; background: #b0a4ff; }
+.b3 { height: 58%; background: #9d8fff; }
+.b4 { height: 76%; background: #8a78f0; }
+.b5 { height: 92%; background: linear-gradient(180deg, #a78bfa 0%, #7c3aed 100%); }
+
+/* Growth line overlay */
+.chart-line {
+  position: absolute;
+  bottom: 22px;
+  left: 20px;
+  right: 90px;
+  height: 60px;
+  pointer-events: none;
+}
+
+/* Rocket */
+.rocket-wrap {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  width: 75px;
+  height: 100px;
+}
+.rocket-wrap svg { width: 100%; height: 100%; }
+
+/* Plus sparkle */
+.sparkle {
+  position: absolute;
+  top: 14px; right: 18px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: rgba(167,139,250,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  color: #7c3aed;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Rec card */
+.rec-card {
+  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+  border: 1px solid #ddd6fe;
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.rec-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a78bfa;
+  margin-bottom: 10px;
+}
+.rec-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.rec-icon-box {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: #7c3aed;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.rec-icon-box svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.rec-text {}
+.rec-title { font-size: 13px; font-weight: 700; color: #1e1b4b; margin-bottom: 5px; line-height: 1.3; }
+.rec-desc { font-size: 11px; color: #5b4f8a; line-height: 1.55; margin-bottom: 9px; }
+.rec-link {
+  font-size: 11px; font-weight: 600; color: #7c3aed;
+  text-decoration: none;
+  display: inline-flex; align-items: center; gap: 3px;
+}
+.rec-link:hover { text-decoration: underline; }
+
+/* ── Arrow ── */
+.hiw-arrow svg {
+  width: 28px; height: 28px;
+  color: #c8c8e0;
+}
+</style>
+</head>
+<body>
+
+<section class="section">
+  <div class="badge"><span class="badge-dot"></span> Как работает RConf AI</div>
+  <h2 class="section-title">Из рабочего диалога –<br>в развитие команды</h2>
+  <p class="section-sub">RConf AI превращает коммуникации из Rendall X в карту связей, AI-сигналы и понятные действия для руководителя.</p>
+
+  <div class="row">
+
+    <!-- ══ CARD 1: ДИАЛОГ ══ -->
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">Диалог</span>
+        <span class="card-num">01</span>
+      </div>
+      <p class="card-title">Команда общается в Rendall X</p>
+
+      <div class="messenger">
+        <div class="msg-topbar">
+          <div class="msg-appicon">
+            <svg viewBox="0 0 20 20"><path d="M3 3h14v10H11.5L8 16V13H3V3z"/></svg>
+          </div>
+          <span class="msg-appname">Rendall X</span>
+        </div>
+
+        <div class="msg-body">
+          <div class="msg-sidebar">
+            <!-- Chat icon (active) -->
+            <svg class="sb-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <!-- People icon -->
+            <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <!-- Hash icon -->
+            <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
+              <line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>
+            </svg>
+            <!-- Calendar icon -->
+            <svg class="sb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+
+          <div class="msg-feed">
+            <div class="msg-item">
+              <div class="av av-a">А</div>
+              <div class="msg-right">
+                <div class="msg-head">
+                  <span class="msg-name">Анна</span>
+                  <span class="msg-time">10:15</span>
+                </div>
+                <div class="msg-text">Обсудим запуск новой функции<br>на следующей неделе.</div>
+              </div>
+            </div>
+            <div class="msg-item">
+              <div class="av av-i">И</div>
+              <div class="msg-right">
+                <div class="msg-head">
+                  <span class="msg-name">Игорь</span>
+                  <span class="msg-time">10:16</span>
+                </div>
+                <div class="msg-text">Нужна поддержка дизайна<br>и аналитики.</div>
+              </div>
+            </div>
+            <div class="msg-item">
+              <div class="av av-m">М</div>
+              <div class="msg-right">
+                <div class="msg-head">
+                  <span class="msg-name">Мария</span>
+                  <span class="msg-time">10:18</span>
+                </div>
+                <div class="msg-text">Созвон в пятницу в 15:00 ✅</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="msg-footer">
+          <span class="msg-footer-label">Интервью и встречи</span>
+          <div class="msg-footer-right">
+            <div class="mini-avs">
+              <div class="mini-av mav1"></div>
+              <div class="mini-av mav2"></div>
+            </div>
+            <span class="footer-count">7 на этой неделе</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow 1→2 -->
+    <div class="arrow-col hiw-arrow">
+      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="14" r="3" fill="#ddd8f8"/>
+        <circle cx="14" cy="14" r="3" fill="#c8c0f0"/>
+        <circle cx="24" cy="14" r="3" fill="#b0a8e8"/>
+        <polyline points="19,9 25,14 19,19" stroke="#b0a8e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+
+    <!-- ══ CARD 2: AI-АНАЛИЗ ══ -->
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">AI-Анализ</span>
+        <span class="card-num">02</span>
+      </div>
+      <p class="card-title">Нейросеть строит карту сигналов</p>
+
+      <div class="analysis-inner">
+        <div class="analysis-main">
+
+          <!-- Brain SVG – detailed -->
+          <div class="brain-container">
+            <svg viewBox="0 0 160 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#9b59f5" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#9b59f5" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="brainFill" x1="20" y1="15" x2="140" y2="155" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#c4b5fd"/>
+                  <stop offset="55%" stop-color="#9b59f5"/>
+                  <stop offset="100%" stop-color="#6d28d9"/>
+                </linearGradient>
+                <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#8b5cf6" flood-opacity="0.35"/>
+                </filter>
+              </defs>
+
+              <!-- Glow halo -->
+              <ellipse cx="80" cy="90" rx="62" ry="58" fill="url(#glow1)"/>
+
+              <!-- Main brain shape – left hemisphere -->
+              <path d="
+                M80 22
+                C70 22 61 25 55 32
+                C48 32 41 37 39 44
+                C33 45 28 50 28 57
+                C24 60 22 66 24 72
+                C20 76 20 83 23 88
+                C20 94 22 101 27 106
+                C26 113 31 120 39 123
+                C41 130 49 135 58 134
+                C62 138 70 140 78 139
+                L80 139
+                L80 22 Z
+              " fill="url(#brainFill)" filter="url(#softShadow)" opacity="0.95"/>
+
+              <!-- Right hemisphere -->
+              <path d="
+                M80 22
+                C90 22 99 25 105 32
+                C112 32 119 37 121 44
+                C127 45 132 50 132 57
+                C136 60 138 66 136 72
+                C140 76 140 83 137 88
+                C140 94 138 101 133 106
+                C134 113 129 120 121 123
+                C119 130 111 135 102 134
+                C98 138 90 140 82 139
+                L80 139
+                L80 22 Z
+              " fill="url(#brainFill)" opacity="0.9"/>
+
+              <!-- Center division fissure -->
+              <path d="M80 24 C78 45 78 65 80 85 C82 105 82 120 80 138"
+                stroke="rgba(255,255,255,0.25)" stroke-width="2" fill="none"/>
+
+              <!-- Gyri (ridges) – left -->
+              <path d="M55 40 C50 48 48 58 52 65 C48 70 47 78 50 84"
+                stroke="rgba(255,255,255,0.2)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M42 60 C40 68 41 76 46 82 C43 88 44 96 50 100"
+                stroke="rgba(255,255,255,0.18)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M58 90 C54 98 55 107 60 112 C57 116 59 122 64 124"
+                stroke="rgba(255,255,255,0.15)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+              <!-- Gyri – right -->
+              <path d="M105 40 C110 48 112 58 108 65 C112 70 113 78 110 84"
+                stroke="rgba(255,255,255,0.2)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M118 60 C120 68 119 76 114 82 C117 88 116 96 110 100"
+                stroke="rgba(255,255,255,0.18)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M102 90 C106 98 105 107 100 112 C103 116 101 122 96 124"
+                stroke="rgba(255,255,255,0.15)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+              <!-- Highlight -->
+              <ellipse cx="60" cy="52" rx="14" ry="9"
+                fill="white" opacity="0.14" transform="rotate(-30 60 52)"/>
+
+              <!-- Neural nodes -->
+              <circle cx="80" cy="80" r="6" fill="white" opacity="0.95"/>
+              <circle cx="56" cy="68" r="4" fill="#e0d4ff" opacity="0.9"/>
+              <circle cx="104" cy="68" r="4" fill="#e0d4ff" opacity="0.9"/>
+              <circle cx="46" cy="88" r="3.5" fill="#c4b5fd"/>
+              <circle cx="114" cy="88" r="3.5" fill="#c4b5fd"/>
+              <circle cx="64" cy="52" r="3" fill="#ddd6fe"/>
+              <circle cx="96" cy="52" r="3" fill="#ddd6fe"/>
+              <circle cx="62" cy="108" r="3" fill="#c4b5fd"/>
+              <circle cx="98" cy="108" r="3" fill="#c4b5fd"/>
+              <circle cx="80" cy="120" r="3.5" fill="white" opacity="0.8"/>
+              <!-- Outer -->
+              <circle cx="30" cy="72" r="2.5" fill="#a78bfa" opacity="0.7"/>
+              <circle cx="130" cy="72" r="2.5" fill="#a78bfa" opacity="0.7"/>
+              <circle cx="36" cy="105" r="2" fill="#a78bfa" opacity="0.6"/>
+              <circle cx="124" cy="105" r="2" fill="#a78bfa" opacity="0.6"/>
+
+              <!-- Connections -->
+              <line x1="80" y1="80" x2="56" y2="68" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="80" y1="80" x2="104" y2="68" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+              <line x1="80" y1="80" x2="64" y2="52" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+              <line x1="80" y1="80" x2="96" y2="52" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+              <line x1="80" y1="80" x2="46" y2="88" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+              <line x1="80" y1="80" x2="114" y2="88" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+              <line x1="80" y1="80" x2="62" y2="108" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+              <line x1="80" y1="80" x2="98" y2="108" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+              <line x1="80" y1="80" x2="80" y2="120" stroke="rgba(255,255,255,0.45)" stroke-width="1.3"/>
+              <line x1="56" y1="68" x2="46" y2="88" stroke="rgba(255,255,255,0.25)" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="56" y1="68" x2="30" y2="72" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="104" y1="68" x2="114" y2="88" stroke="rgba(255,255,255,0.25)" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="104" y1="68" x2="130" y2="72" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="46" y1="88" x2="36" y2="105" stroke="rgba(255,255,255,0.18)" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="114" y1="88" x2="124" y2="105" stroke="rgba(255,255,255,0.18)" stroke-width="1" stroke-dasharray="2 2"/>
+              <line x1="62" y1="108" x2="80" y2="120" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+              <line x1="98" y1="108" x2="80" y2="120" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+            </svg>
+          </div>
+
+          <!-- Stats -->
+          <div class="stats-col">
+            <div class="stats-head">AI-Сигналы</div>
+            <div class="stat-item">
+              <span class="stat-name">Вовлечённость</span>
+              <span class="stat-val g">78% ↑</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Риски выгорания</span>
+              <span class="stat-val o">2 ★</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Слабые связи</span>
+              <span class="stat-val">5 ★</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Темы роста</span>
+              <span class="stat-val">7 ★</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="tags">
+          <span class="tag">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#9090c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            </svg>
+            вовлечённость
+          </span>
+          <span class="tag">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#9090c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+              <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+            темы
+          </span>
+          <span class="tag">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#9090c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            слабые связи
+          </span>
+          <span class="tag">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#9090c0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            динамика
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow 2→3 -->
+    <div class="arrow-col hiw-arrow">
+      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="14" r="3" fill="#ddd8f8"/>
+        <circle cx="14" cy="14" r="3" fill="#c8c0f0"/>
+        <circle cx="24" cy="14" r="3" fill="#b0a8e8"/>
+        <polyline points="19,9 25,14 19,19" stroke="#b0a8e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+
+    <!-- ══ CARD 3: РАЗВИТИЕ ══ -->
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">Развитие</span>
+        <span class="card-num">03</span>
+      </div>
+      <p class="card-title">Рекомендации и рост</p>
+
+      <div class="growth-inner">
+        <!-- Chart + rocket -->
+        <div class="chart-area">
+          <div class="bars">
+            <div class="b b1"></div>
+            <div class="b b2"></div>
+            <div class="b b3"></div>
+            <div class="b b4"></div>
+            <div class="b b5"></div>
+          </div>
+
+          <!-- Rocket illustration -->
+          <div class="rocket-wrap">
+            <svg viewBox="0 0 90 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="rBody" x1="30" y1="5" x2="60" y2="85" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#e9e3ff"/>
+                  <stop offset="100%" stop-color="#8b5cf6"/>
+                </linearGradient>
+                <linearGradient id="rFlame" x1="45" y1="80" x2="45" y2="110" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#fbbf24"/>
+                  <stop offset="60%" stop-color="#f97316"/>
+                  <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+                </linearGradient>
+                <radialGradient id="rWindow" cx="40%" cy="30%" r="70%">
+                  <stop offset="0%" stop-color="#bfdbfe"/>
+                  <stop offset="100%" stop-color="#2563eb"/>
+                </radialGradient>
+              </defs>
+              <!-- Flame -->
+              <ellipse cx="45" cy="92" rx="8" ry="14" fill="url(#rFlame)"/>
+              <ellipse cx="45" cy="94" rx="4.5" ry="8" fill="#fde68a" opacity="0.7"/>
+              <!-- Body -->
+              <path d="M45 8 C36 8 28 18 26 36 L26 76 L45 82 L64 76 L64 36 C62 18 54 8 45 8Z"
+                fill="url(#rBody)"/>
+              <!-- Left fin -->
+              <path d="M26 58 L14 74 L26 70Z" fill="#a78bfa" opacity="0.85"/>
+              <!-- Right fin -->
+              <path d="M64 58 L76 74 L64 70Z" fill="#a78bfa" opacity="0.85"/>
+              <!-- Window -->
+              <circle cx="45" cy="42" r="11" fill="white" opacity="0.9"/>
+              <circle cx="45" cy="42" r="7.5" fill="url(#rWindow)"/>
+              <ellipse cx="42" cy="39" rx="3" ry="2" fill="white" opacity="0.4" transform="rotate(-20 42 39)"/>
+              <!-- Nose stripe -->
+              <path d="M39 14 C40 10 50 10 51 14" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <!-- Stars -->
+              <circle cx="16" cy="30" r="2" fill="#c4b5fd" opacity="0.7"/>
+              <circle cx="74" cy="22" r="1.5" fill="#ddd6fe" opacity="0.6"/>
+              <circle cx="10" cy="52" r="1.5" fill="#a78bfa" opacity="0.5"/>
+              <path d="M78 40 L80 36 L82 40 L78 40Z" fill="#c4b5fd" opacity="0.6"/>
+            </svg>
+          </div>
+
+          <div class="sparkle">+</div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="rec-card">
+          <div class="rec-label">Рекомендация</div>
+          <div class="rec-row">
+            <div class="rec-icon-box">
+              <svg viewBox="0 0 24 24">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+            </div>
+            <div class="rec-text">
+              <div class="rec-title">Усилить связь в команде</div>
+              <div class="rec-desc">Организовать парные сессии между участниками с низким уровнем взаимодействия.</div>
+              <a href="#" class="rec-link">Подробнее →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>
