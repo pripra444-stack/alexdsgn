@@ -3743,7 +3743,7 @@ const WHY_BAND = Array.from({ length: 130 }, (_, i) => {
   };
 });
 
-function WhyMeBg() {
+function WhyMeBg({ inView }: { inView: boolean }) {
   return (
     <div aria-hidden style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
 
@@ -3777,10 +3777,10 @@ function WhyMeBg() {
           background: s.id % 9 === 0 ? "rgba(220,255,140,0.95)" : "#CBFF00",
           boxShadow: s.size > 1.4 ? `0 0 ${s.size * 4}px rgba(203,255,0,${s.opa * 0.5})` : "none",
         }}
-        animate={{
+        animate={inView ? {
           opacity: [s.opa * 0.4, s.opa, s.opa * 0.55, s.opa * 0.85, s.opa * 0.4],
           scale:   [1, 1.4, 0.8, 1.2, 1],
-        }}
+        } : {}}
         transition={{ duration: s.dur, repeat: Infinity, ease: "easeInOut", delay: s.delay }}
         />
       ))}
@@ -3794,10 +3794,10 @@ function WhyMeBg() {
           borderRadius: "50%",
           background: "#CBFF00",
         }}
-        animate={{
+        animate={inView ? {
           opacity: [s.opa * 0.3, s.opa, s.opa * 0.4, s.opa * 0.8, s.opa * 0.3],
           scale:   [1, 1.3, 0.7, 1.1, 1],
-        }}
+        } : {}}
         transition={{ duration: s.dur, repeat: Infinity, ease: "easeInOut", delay: s.delay }}
         />
       ))}
@@ -3812,7 +3812,7 @@ function WhyMeBg() {
         rotate: -20,
         transformOrigin: "right center",
       }}
-      animate={{ x: [0, -500], y: [0, 200], opacity: [0, 0, 1, 0.7, 0] }}
+      animate={inView ? { x: [0, -500], y: [0, 200], opacity: [0, 0, 1, 0.7, 0] } : {}}
       transition={{ duration: 0.55, repeat: Infinity, repeatDelay: 10.8, ease: "easeIn", times: [0, 0.05, 0.15, 0.7, 1], delay: 2.4 }}
       />
 
@@ -3826,7 +3826,7 @@ function WhyMeBg() {
         rotate: -14,
         transformOrigin: "right center",
       }}
-      animate={{ x: [0, -400], y: [0, 140], opacity: [0, 0, 0.85, 0.6, 0] }}
+      animate={inView ? { x: [0, -400], y: [0, 140], opacity: [0, 0, 0.85, 0.6, 0] } : {}}
       transition={{ duration: 0.48, repeat: Infinity, repeatDelay: 13.2, ease: "easeIn", times: [0, 0.06, 0.18, 0.72, 1], delay: 7.1 }}
       />
     </div>
@@ -3835,10 +3835,12 @@ function WhyMeBg() {
 
 function WhyMe() {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const sectionRef = useRef(null);
+  const inView = useInView(sectionRef, { margin: "100px" });
 
   return (
-    <section className="py-28 md:py-36" style={{ position: "relative", overflow: "hidden" }}>
-      <WhyMeBg />
+    <section ref={sectionRef} className="py-28 md:py-36" style={{ position: "relative", overflow: "hidden" }}>
+      <WhyMeBg inView={inView} />
       <div className="max-w-[1280px] mx-auto px-5 md:px-10" style={{ position: "relative", zIndex: 1 }}>
         <Reveal>
           <Label>Почему я</Label>
@@ -3927,7 +3929,7 @@ const PROC_BUBBLES = Array.from({ length: 22 }, (_, i) => ({
   opa: 0.18 + (i * 0.07) % 0.45,
 }));
 
-function ProcessBg() {
+function ProcessBg({ inView }: { inView: boolean }) {
   return (
     <div aria-hidden style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
       {/* Vertical light rays — like in Cases cards */}
@@ -3941,7 +3943,7 @@ function ProcessBg() {
           transformOrigin: "top center",
           borderRadius: "0 0 55% 55%",
         }}
-        animate={{ opacity: [0.4, 0.75, 0.4] }}
+        animate={inView ? { opacity: [0.4, 0.75, 0.4] } : {}}
         transition={{ duration: 3.2 + i * 0.65, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
         />
       ))}
@@ -3956,7 +3958,7 @@ function ProcessBg() {
           border: `1px solid rgba(203,255,0,${b.opa})`,
           boxShadow: `0 0 ${b.size * 2}px rgba(203,255,0,${b.opa * 0.5})`,
         }}
-        animate={{ y: [0, -700], x: [0, Math.sin(b.id * 1.5) * 14, 0], opacity: [0, b.opa, b.opa * 0.85, 0] }}
+        animate={inView ? { y: [0, -700], x: [0, Math.sin(b.id * 1.5) * 14, 0], opacity: [0, b.opa, b.opa * 0.85, 0] } : {}}
         transition={{ duration: b.dur, repeat: Infinity, delay: b.delay, ease: "linear" }}
         />
       ))}
@@ -3970,7 +3972,7 @@ function ProcessBg() {
           left: `${8 + (i * 47) % 84}%`,
           top: `${10 + (i * 31) % 78}%`,
         }}
-        animate={{ opacity: [0, 0.9, 0], scale: [0, 1.6, 0] }}
+        animate={inView ? { opacity: [0, 0.9, 0], scale: [0, 1.6, 0] } : {}}
         transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.9, ease: "easeInOut" }}
         />
       ))}
@@ -4279,14 +4281,17 @@ function ProcessMobile() {
 
 function Process() {
   const progressMV = useMotionValue(0);
+  const sectionRef = useRef(null);
+  const inView = useInView(sectionRef, { margin: "100px" });
 
   useAnimationFrame((time) => {
+    if (!inView) return;
     progressMV.set((time / 3600) % PROCESS.length);
   });
 
   return (
-    <section id="process" className="py-28 md:py-36 bg-surface/20" style={{ overflowX: "clip", position: "relative" }}>
-      <ProcessBg />
+    <section ref={sectionRef} id="process" className="py-28 md:py-36 bg-surface/20" style={{ overflowX: "clip", position: "relative" }}>
+      <ProcessBg inView={inView} />
       <div className="max-w-[1280px] mx-auto px-5 md:px-10" style={{ position: "relative", zIndex: 1 }}>
         <Reveal>
           <Label>Процесс</Label>
