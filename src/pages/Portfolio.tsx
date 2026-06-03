@@ -194,19 +194,21 @@ function CountUp({
   duration?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: false, margin: "200px" });
   const count = useMotionValue(0);
   const rounded = useTransform(count, (v) => Math.round(v));
 
   useEffect(() => {
+    if (!inView) return;
     const ctrl = animate(count, to, {
       duration,
       ease: "easeInOut",
       repeat: Infinity,
-      repeatType: "mirror", // counts up then back down, forever
-      repeatDelay: 0.4,     // brief pause at top and bottom
+      repeatType: "mirror",
+      repeatDelay: 0.4,
     });
     return ctrl.stop;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [inView]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <span ref={ref}>
@@ -672,7 +674,7 @@ const WAVE_BARS = Array.from({ length: 32 }, (_, i) => {
   };
 });
 
-/** Horizontal frequency bars — decorative band behind avatar */
+/** Horizontal frequency bars — decorative band behind avatar (CSS animation, compositor thread) */
 function AudioWaveform() {
   return (
     <div
@@ -692,21 +694,17 @@ function AudioWaveform() {
       }}
     >
       {WAVE_BARS.map((bar, i) => (
-        <m.div
+        <div
           key={i}
           style={{
             flex: "none",
             width: 3,
+            height: bar.h,
             background: "linear-gradient(to top, rgba(203,255,0,0.9), rgba(203,255,0,0.05))",
             borderRadius: 2,
-          }}
-          animate={{ height: [bar.h, bar.h * 0.22, bar.h * 0.72, bar.h * 0.18, bar.h] }}
-          transition={{
-            duration: bar.dur,
-            ease: "easeInOut",
-            repeat: Infinity,
-            delay: bar.delay,
-          }}
+            ["--wh" as string]: `${bar.h}px`,
+            animation: `wave-bar ${bar.dur}s ease-in-out ${bar.delay}s infinite`,
+          } as React.CSSProperties}
         />
       ))}
     </div>
@@ -1435,7 +1433,7 @@ const BRAND_META: Record<BrandKey, {
 const LOGO_MAX_H = 78;
 const LOGO_MAX_W = 240;
 
-function BrandWordmark({ brand }: { brand: BrandKey }) {
+function BrandWordmark({ brand, inView = true }: { brand: BrandKey; inView?: boolean }) {
   const meta = BRAND_META[brand];
   return (
     <span style={{
@@ -1445,7 +1443,7 @@ function BrandWordmark({ brand }: { brand: BrandKey }) {
       {/* Pulsing radial halo behind the logo — the "candle flame" glow */}
       <m.span
         aria-hidden
-        animate={{ opacity: [0.55, 0.95, 0.55], scale: [0.88, 1.18, 0.88] }}
+        animate={inView ? { opacity: [0.55, 0.95, 0.55], scale: [0.88, 1.18, 0.88] } : {}}
         transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
         className="group-hover:!opacity-0 transition-opacity duration-300"
         style={{
@@ -1464,7 +1462,7 @@ function BrandWordmark({ brand }: { brand: BrandKey }) {
         src={meta.logo}
         alt=""
         draggable={false}
-        animate={{ scale: [1, 1.045, 1], y: [0, -3, 0], opacity: [0.95, 1, 0.95] }}
+        animate={inView ? { scale: [1, 1.045, 1], y: [0, -3, 0], opacity: [0.95, 1, 0.95] } : {}}
         transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
         className="relative transition-[filter] duration-300 group-hover:[filter:brightness(0)_drop-shadow(0_0_10px_rgba(0,0,0,0.55))]"
         style={{
@@ -1488,6 +1486,8 @@ function BrandWordmark({ brand }: { brand: BrandKey }) {
    appear only as text mentions (descriptive use, not brand mark reproduction).
    Inverts to black on parent group-hover so it stays legible on the acid bg. */
 function MarketplaceFlair({ brand }: { brand: BrandKey }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: false, margin: "100px" });
   const meta = BRAND_META[brand];
   // Fixed pseudo-random positions/timings so SSR matches CSR + no jitter
   const blobs = [
@@ -1501,6 +1501,7 @@ function MarketplaceFlair({ brand }: { brand: BrandKey }) {
 
   return (
     <div
+      ref={ref}
       style={{
         position: "relative", width: "100%", height: 140,
         marginTop: 18, overflow: "hidden",
@@ -1520,7 +1521,7 @@ function MarketplaceFlair({ brand }: { brand: BrandKey }) {
 
       {/* Centrepiece category typography — pulses subtly */}
       <m.div
-        animate={{ scale: [1, 1.03, 1], opacity: [0.85, 1, 0.85] }}
+        animate={inView ? { scale: [1, 1.03, 1], opacity: [0.85, 1, 0.85] } : {}}
         transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
         style={{
           position: "absolute", inset: 0,
@@ -1528,14 +1529,14 @@ function MarketplaceFlair({ brand }: { brand: BrandKey }) {
           pointerEvents: "none",
         }}
       >
-        <BrandWordmark brand={brand} />
+        <BrandWordmark brand={brand} inView={inView} />
       </m.div>
 
       {/* Small floating marketplace text labels — mention, not mark reproduction */}
       {blobs.map((b, i) => (
         <m.span
           key={i}
-          animate={{ x: [0, b.dx, 0], y: [0, b.dy, 0], opacity: [b.op * 0.6, b.op, b.op * 0.6] }}
+          animate={inView ? { x: [0, b.dx, 0], y: [0, b.dy, 0], opacity: [b.op * 0.6, b.op, b.op * 0.6] } : { x: 0, y: 0, opacity: b.op }}
           transition={{ duration: b.dur, repeat: Infinity, ease: "easeInOut", delay: b.delay }}
           className="font-mono group-hover:!text-black/55 transition-colors duration-300"
           style={{
@@ -1632,14 +1633,13 @@ function ServiceCard({
   );
 }
 
+const VORONKA_DECK_SLIDES: SlideEntry[] = VORONKA_SLIDES.map((s) => ({
+  img: s.img, label: s.label,
+}));
+
 function Services() {
   const [deck, setDeck] = useState<{ slides: SlideEntry[]; title: string } | null>(null);
   const [hovSvc, setHovSvc] = useState<number | null>(null);
-
-  // Voronka stays as image-only carousel (no per-slide story yet)
-  const VORONKA_DECK_SLIDES: SlideEntry[] = VORONKA_SLIDES.map((s) => ({
-    img: s.img, label: s.label,
-  }));
 
   const SVC_COLS = 2;
   function svcStyle(idx: number): React.CSSProperties {
