@@ -10,8 +10,6 @@ fontStyle.textContent = `@font-face{font-family:"LunaObscura";src:url("${import.
 document.head.insertBefore(fontStyle, document.head.firstChild);
 
 const Portfolio = lazy(() => import("./pages/Portfolio"));
-const Oferta    = lazy(() => import("./pages/Oferta"));
-const Privacy   = lazy(() => import("./pages/Privacy"));
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -19,9 +17,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <HashRouter>
         <Suspense fallback={null}>
           <Routes>
-            <Route path="/"        element={<Portfolio />} />
-            <Route path="/oferta"  element={<Oferta />} />
-            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/" element={<Portfolio />} />
           </Routes>
         </Suspense>
       </HashRouter>
